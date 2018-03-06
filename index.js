@@ -1,4 +1,10 @@
-import { AppRegistry } from 'react-native';
-import App from './src/App';
+import { AppRegistry } from "react-native";
+import App from "./lib/Router";
+AppRegistry.registerComponent("freeconomy", () => App);
 
-AppRegistry.registerComponent('freeconomy', () => App);
+ if (window.document) {
+     AppRegistry.runApplication("freeconomy", {
+         initialProps : {},
+         rootTag : document.getElementById("react-root"),
+     });
+ }
