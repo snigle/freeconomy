@@ -9,12 +9,18 @@ import {
   Platform,
   StyleSheet,
   Text,
-  View
+  View,
 } from 'react-native';
 
 import { Route } from 'react-router'
+import {MyLink} from "./Link"
 
 import WalletsView from "./WalletsView"
+import AddWalletView from "./AddWalletView"
+import TransactionsView from "./TransactionsView"
+import AddTransactionView from "./AddTransactionView"
+//@ts-ignore
+import { AppBar, IconToggle, connectTheme, Icon } from 'carbon-ui'
 
 const styles = StyleSheet.create({
   container: {
@@ -35,10 +41,12 @@ const styles = StyleSheet.create({
   },
 });
 
-
-const App = () =>
-<View style={styles.container}>
-  <WalletsView />
+const App = (props:any) =>
+<View>
+  <Route exact path="/" component={WalletsView}></Route>
+  <Route path="/AddWalletView" component={AddWalletView}></Route>
+  <Route path="/Wallet/:WalletUUID/TransactionsView" component={(props : any) => <TransactionsView WalletUUID={props.match.params.WalletUUID}/>}></Route>
+  <Route path="/Wallet/:WalletUUID/AddTransactionView" component={(props : any) => <AddTransactionView WalletUUID={props.match.params.WalletUUID}/>} />
 </View>
 
 export default App;

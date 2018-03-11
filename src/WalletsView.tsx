@@ -1,12 +1,15 @@
 import * as React from "react"
 import * as Models from "./Models"
-import {Wallet} from "./Models"
+import {Wallet, displayPrice} from "./Types"
 import Loading from "./Loading"
-// import WalletListItem from "./WalletListItem"
+import WalletListItem from "./WalletListItem"
 import AddWalletView from "./AddWalletView"
 import {View, Button, Text} from "react-native"
-// import {Route} from "react-router"
-// import {Link} from "react-router-dom"
+import {MyLink} from "./Link"
+import * as _ from "lodash"
+//@ts-ignore
+import { AppBar, Icon, Paper, Display1, FlatButton, connectTheme, Divider } from 'carbon-ui'
+
 interface State {
   Wallets ?: Wallet[],
 }
@@ -21,34 +24,46 @@ class Wallets extends React.Component<object,State>{
     this.state = {}
   }
 
-  // async componentDidMount() {
-  //   try{
-  //     this.setState({ Wallets : await Models.GetWallets() })
-  //   }catch {
-  //     console.log("fail")
-  //   }
-  // }
+  componentDidMount() {
+    Models.GetWallets().then(wallets => this.setState({ Wallets : wallets}))
+    .catch(() => console.log("fail to load wallets, need to reset ?"))
+  }
 
-render() {
-  return <View><Text>testoooooooooaaaaaaaaaaaaaaaaaaaaaooo</Text><Text>test</Text></View>
-}
-  // render() {
-  //
-  //   if (!this.state.Wallets) {
-  //     return <Loading Message="Chargement des wallets"></Loading>;
-  //   }
-  //
-  //   // <Link to="/AddWalletView"></Link>
-  //   // <Route path="/AddWalletView" component={AddWalletView}></Route>
-  //   return <View>
-  //   <Text>Test</Text>
-  //   {
-  //     this.state.Wallets.map((wallet,index) =>
-  //       <WalletListItem key={index} Wallet={wallet}></WalletListItem>
-  //     )
-  //   }
-  //   </View>
-  // }
+  render() {
+    let content: any
+    if (!this.state.Wallets) {
+     content = <Loading Message="Chargement des wallets" />;
+   } else {
+
+     const groupWallet = _.groupBy(this.state.Wallets, w => w.Currency.Code);
+
+     content = _.map(groupWallet, (wallets, currencyCode) => {
+       const total: number = wallets.reduce((sumTotal, w) =>
+       sumTotal + w.TotalPerYear.reduce((sumPerWallet, totalYear) =>
+       totalYear.Total + sumPerWallet , 0) , 0)
+
+       return <View>
+         <Text>{`Wallets (${currencyCode}) : ${displayPrice(total, wallets[0].Currency)}`}</Text>
+         {
+           wallets.map((wallet) =>
+             <WalletListItem key={wallet.UUID} Wallet={wallet}></WalletListItem>
+           )
+         }
+         <Divider />
+         </View>
+     });
+
+   }
+
+    return <View>
+    <AppBar title="Freeconomy">
+      {
+        <MyLink to="/AddWalletView"><Icon name="add" /></MyLink>
+      }
+    </AppBar>
+    {content}
+    </View>
+  }
 
 }
 
