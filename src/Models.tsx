@@ -29,6 +29,36 @@ export async function CreateWallet(input : WalletInput):Promise<Wallet[]> {
   )
 }
 
+export async function UpdateWallet(walletUUID : string, input : WalletInput):Promise<Wallet[]> {
+    return GetWallets().then(wallets => {
+      const wallet = wallets.find(w => w.UUID === walletUUID);
+      if (!wallet) {
+        throw("fail to find wallet");
+      }
+      Object.assign(wallet, {
+          Name : input.Name,
+          Description: input.Description,
+          Currency: input.Currency,
+          Icon: input.Icon,
+      });
+      return wallets;
+    }
+  ).then((wallets) =>
+      AsyncStorage.setItem("wallets", JSON.stringify(wallets)).then(() => wallets)
+  )
+}
+
+export async function DeleteWallet(walletUUID : string):Promise<Wallet[]> {
+    return GetAllTransactions()
+    .then(transactions => transactions.filter(t => t.WalletUUID === walletUUID))
+    .then(transactions => AsyncStorage.setItem("transactions", JSON.stringify(transactions)))
+    .then(() => GetWallets())
+    .then(walletsBefore => walletsBefore.filter(w => w.UUID !== walletUUID))
+    .then((wallets) =>
+      AsyncStorage.setItem("wallets", JSON.stringify(wallets)).then(() => wallets)
+    )
+}
+
 export async function CreateTransaction(input : TransactionInput):Promise<Transaction[]> {
     return GetAllTransactions().then(transactions => transactions.concat([{
       UUID: v4(),

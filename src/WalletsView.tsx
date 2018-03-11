@@ -5,6 +5,7 @@ import Loading from "./Loading"
 import WalletListItem from "./WalletListItem"
 import AddWalletView from "./AddWalletView"
 import {View, Button, Text} from "react-native"
+import {History} from "history"
 import {MyLink} from "./Link"
 import * as _ from "lodash"
 //@ts-ignore
@@ -15,9 +16,10 @@ interface State {
 }
 
 interface Props {
+  history : History
 }
 
-class Wallets extends React.Component<object,State>{
+class Wallets extends React.Component<Props,State>{
 
   constructor(props: Props) {
     super(props)
@@ -46,7 +48,7 @@ class Wallets extends React.Component<object,State>{
          <Text>{`Wallets (${currencyCode}) : ${displayPrice(total, wallets[0].Currency)}`}</Text>
          {
            wallets.map((wallet) =>
-             <WalletListItem key={wallet.UUID} Wallet={wallet}></WalletListItem>
+             <WalletListItem key={wallet.UUID} Wallet={wallet} history={this.props.history}></WalletListItem>
            )
          }
          <Divider />

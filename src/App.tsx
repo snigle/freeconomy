@@ -12,11 +12,13 @@ import {
   View,
 } from 'react-native';
 
-import { Route } from 'react-router'
+import { Route, match } from 'react-router'
+import {History} from "history"
 import {MyLink} from "./Link"
 
 import WalletsView from "./WalletsView"
 import AddWalletView from "./AddWalletView"
+import DeleteWalletView from "./DeleteWalletView"
 import TransactionsView from "./TransactionsView"
 import AddTransactionView from "./AddTransactionView"
 //@ts-ignore
@@ -41,12 +43,17 @@ const styles = StyleSheet.create({
   },
 });
 
+interface Props{
+  match : match<any>
+}
 const App = (props:any) =>
 <View>
   <Route exact path="/" component={WalletsView}></Route>
-  <Route path="/AddWalletView" component={AddWalletView}></Route>
+  <Route path="/AddWalletView" exact component={AddWalletView}></Route>
+  <Route path="/AddWalletView/:WalletUUID" component={({match, history} : { match : match<{WalletUUID :string}>, history: History }) => <AddWalletView WalletUUID={match.params.WalletUUID} history={history}/>}></Route>
+  <Route path="/DeleteWalletView/:WalletUUID/:Name" component={({match, history} : { match : match<{WalletUUID :string, Name : string}>, history: History }) => <DeleteWalletView WalletUUID={match.params.WalletUUID} Name={match.params.Name} history={history}/>}></Route>
   <Route path="/Wallet/:WalletUUID/TransactionsView" component={(props : any) => <TransactionsView WalletUUID={props.match.params.WalletUUID}/>}></Route>
-  <Route path="/Wallet/:WalletUUID/AddTransactionView" component={(props : any) => <AddTransactionView WalletUUID={props.match.params.WalletUUID}/>} />
+  <Route path="/Wallet/:WalletUUID/AddTransactionView" component={(props : any) => <AddTransactionView WalletUUID={props.match.params.WalletUUID} history={props.history}/>} />
 </View>
 
 export default App;

@@ -4,6 +4,7 @@ import * as Models from "./Models"
 import {MyLink} from "./Link"
 import {TransactionInput, Category} from "./Types"
 import DatePicker from "./DatePicker"
+import {History} from "history"
 //@ts-ignore
 import { RaisedButton, TextField, AppBar, Icon } from 'carbon-ui'
 
@@ -15,7 +16,8 @@ interface State extends TransactionInput{
 }
 
 interface Props {
-  WalletUUID : string
+  WalletUUID : string,
+  history : History,
 }
 
 class AddTransactionView extends React.Component<Props,State>{
@@ -106,7 +108,7 @@ class AddTransactionView extends React.Component<Props,State>{
   save() {
     this.setState({...this.state, Loading : true })
     Models.CreateTransaction(this.state).then(() => {
-      console.log("transaction added");
+      this.props.history.goBack();
     }).catch((err: any) => console.log("error", err))
   }
 };
