@@ -26,8 +26,8 @@ export default class extends React.Component<Props, State>{
     let options, dialog : JSX.Element | null;
     if (this.state.displayOption) {
       options = <View>
-      <MyLink to={`/AddWalletView/${this.props.Wallet.UUID}`}><Text>Modifier</Text></MyLink>
-      <MyLink to={`/DeleteWalletView/${this.props.Wallet.UUID}/${this.props.Wallet.Name}`}><Text>Supprimer</Text></MyLink>
+      <Button onPress={() => this.props.history.push(`/AddWalletView/${this.props.Wallet.UUID}`)} title="Modifier"/>
+      <Button onPress={() => this.props.history.push(`/DeleteWalletView/${this.props.Wallet.UUID}/${this.props.Wallet.Name}`)} title="Supprimer"/>
       </View>
     }
     return (

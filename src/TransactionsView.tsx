@@ -6,7 +6,7 @@ import TransactionListItem from "./TransactionListItem"
 import AddWalletView from "./AddWalletView"
 import {View, Button, Text} from "react-native"
 import {MyLink} from "./Link"
-import * as _ from "lodash"
+import {History} from "history"
 //@ts-ignore
 import { AppBar, Icon, Paper, Display1, FlatButton, connectTheme, Divider } from 'carbon-ui'
 
@@ -17,6 +17,7 @@ interface State {
 
 interface Props {
   WalletUUID : string,
+  history : History,
 }
 
 class TransactionsView extends React.Component<Props,State>{
@@ -49,7 +50,7 @@ class TransactionsView extends React.Component<Props,State>{
          {
            this.state.Transactions.map((transaction) =>
             this.state.Wallet &&
-             <TransactionListItem key={transaction.UUID} Transaction={transaction} Currency={this.state.Wallet.Currency}></TransactionListItem>
+             <TransactionListItem key={transaction.UUID} Transaction={transaction} Currency={this.state.Wallet.Currency} history={this.props.history}></TransactionListItem>
            )
          }
          <Divider />

@@ -52,27 +52,9 @@ const App = (props:any) =>
   <Route path="/AddWalletView" exact component={AddWalletView}></Route>
   <Route path="/AddWalletView/:WalletUUID" component={({match, history} : { match : match<{WalletUUID :string}>, history: History }) => <AddWalletView WalletUUID={match.params.WalletUUID} history={history}/>}></Route>
   <Route path="/DeleteWalletView/:WalletUUID/:Name" component={({match, history} : { match : match<{WalletUUID :string, Name : string}>, history: History }) => <DeleteWalletView WalletUUID={match.params.WalletUUID} Name={match.params.Name} history={history}/>}></Route>
-  <Route path="/Wallet/:WalletUUID/TransactionsView" component={(props : any) => <TransactionsView WalletUUID={props.match.params.WalletUUID}/>}></Route>
-  <Route path="/Wallet/:WalletUUID/AddTransactionView" component={(props : any) => <AddTransactionView WalletUUID={props.match.params.WalletUUID} history={props.history}/>} />
+  <Route path="/Wallet/:WalletUUID/TransactionsView" component={(props : any) => <TransactionsView WalletUUID={props.match.params.WalletUUID} history={props.history}/>}></Route>
+  <Route path="/Wallet/:WalletUUID/AddTransactionView" exact component={(props : any) => <AddTransactionView WalletUUID={props.match.params.WalletUUID} history={props.history}/>} />
+  <Route path="/Wallet/:WalletUUID/AddTransactionView/:TransactionUUID" component={({match, history} : any) => <AddTransactionView WalletUUID={match.params.WalletUUID} TransactionUUID={match.params.TransactionUUID} history={history}/>} />
 </View>
 
 export default App;
-// export default class App extends React.Component<Props> {
-//   render() {
-//     return (
-//       <View style={styles.container}>
-//         <Text style={styles.welcome}>
-//           Welcome to React Native!
-//         </Text>
-//         <Text style={styles.instructions}>
-//           To get started, edit App.js
-//         </Text>
-//         <Text style={styles.instructions}>
-//           {instructions}
-//         </Text>
-//         <Home></Home>
-//       </View>
-//     );
-//   }
-// }
-//

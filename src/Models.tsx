@@ -79,6 +79,44 @@ export async function CreateTransaction(input : TransactionInput):Promise<Transa
   )
 }
 
+export async function UpdateTransaction(transactionUUID : string, input : TransactionInput):Promise<Transaction[]> {
+    return GetAllTransactions().then(transactions => {
+      let transaction = transactions.find(t => t.UUID === transactionUUID)
+      if (!transaction) {
+        throw("transaction not found");
+      }
+      let old = {...transaction}
+      Object.assign(transaction, {
+        Beneficiary : input.Beneficiary,
+        CategoryUUID : input.CategoryUUID,
+        Date : input.Date,
+        Comment : input.Comment,
+        Price : input.Price,
+        WalletUUID: input.WalletUUID,
+      });
+      return AsyncStorage.setItem("transactions", JSON.stringify(transactions))
+      .then(() => RefreshTotalWallet(input.WalletUUID, input.Date.getFullYear()))
+      .then(() => RefreshTotalWallet(old.WalletUUID, new Date(old.Date).getFullYear()))
+      .then(() => transactions)
+    }
+  )
+}
+
+export async function DeleteTransaction(transactionUUID : string):Promise<Transaction[]> {
+    return GetAllTransactions().then(transactions => {
+      let transaction = transactions.find(t => t.UUID === transactionUUID)
+      if (!transaction) {
+        return transactions
+      }
+      const old : Transaction = transaction
+      transactions = transactions.filter(t => t.UUID !== transactionUUID);
+      return AsyncStorage.setItem("transactions", JSON.stringify(transactions))
+      .then(() => RefreshTotalWallet(old.WalletUUID, new Date(old.Date).getFullYear()))
+      .then(() => transactions)
+    }
+  )
+}
+
 async function RefreshTotalWallet(walletUUID : string, year : number):Promise<void> {
   GetAllTransactions(walletUUID).then(transactions => {
     GetWallets().then(wallets => {
@@ -105,6 +143,18 @@ export async function GetAllTransactions(...walletUUIDs : string[]):Promise<Tran
     }
     return result.filter(t => !walletUUIDs.length || walletUUIDs.find(e => e==t.WalletUUID)).map(TransactionDefault);
   });
+}
+
+export async function GetTransaction(transactionUUID : string):Promise<Transaction> {
+  return GetAllTransactions()
+    .then(transactions => transactions.find(t => t.UUID === transactionUUID))
+    .then(transaction => {
+      if (!transaction) {
+        throw("transaction not found")
+      } else {
+        return transaction
+      }
+    })
 }
 
 export async function GetWallet(walletUUID : string):Promise<Wallet> {

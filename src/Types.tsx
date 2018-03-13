@@ -105,7 +105,7 @@ export const TransactionDefault = (w :Transaction):Transaction => ({
     LastUpdate: w.LastUpdate || new Date(0),
 
     Beneficiary : w.Beneficiary || "Other",
-    Date : w.Date || new Date(),
+    Date : (w.Date && new Date(w.Date)) || new Date(),
     Price : w.Price || 0,
     Comment: w.Comment || "",
   })

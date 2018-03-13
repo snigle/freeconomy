@@ -2,7 +2,7 @@ import * as React from "react";
 import {Text, View, TextInput, Picker} from "react-native"
 import * as Models from "./Models"
 import {MyLink} from "./Link"
-import {TransactionInput, Category} from "./Types"
+import {TransactionInput, Category, Transaction} from "./Types"
 import DatePicker from "./DatePicker"
 import {History} from "history"
 //@ts-ignore
@@ -17,6 +17,7 @@ interface State extends TransactionInput{
 
 interface Props {
   WalletUUID : string,
+  TransactionUUID? : string,
   history : History,
 }
 
@@ -39,9 +40,31 @@ class AddTransactionView extends React.Component<Props,State>{
   }
 
   async componentDidMount() {
+    let getTransactionPromise : Promise<any>;
+    if (this.props.TransactionUUID) {
+      getTransactionPromise = Models.GetTransaction(this.props.TransactionUUID).then(transaction => {
+        this.setState({...this.state,
+          Beneficiary : transaction.Beneficiary,
+          CategoryUUID : transaction.CategoryUUID,
+          Comment : transaction.Comment,
+          Price : transaction.Price,
+          PriceText : ""+transaction.Price,
+          Date: transaction.Date,
+          WalletUUID : transaction.WalletUUID,
+      })
+      })
+    } else {
+      getTransactionPromise = Promise.resolve()
+    }
+
     Promise.all([
       Models.GetCategories(),
+      getTransactionPromise,
     ]).then(([categories]) => {
+      let defaultCategory = categories[0];
+      if (this.state.CategoryUUID) {
+        defaultCategory = categories.find(c => c.UUID === this.state.CategoryUUID) || defaultCategory;
+      }
       this.setState({...this.state, Categories : categories, Category : categories[0], Loading : false})
     })
   }
@@ -76,6 +99,7 @@ class AddTransactionView extends React.Component<Props,State>{
     if (this.state.Loading) {
       content = <Text>Chargement des categories</Text>
     } else {
+      console.log("display", this.state);
       content = <View>
         <TextField placeholder="Benificiary" onChangeText={(v:string) => this.changeBenificiary(v)} value={this.state.Beneficiary}/>
         <Picker
@@ -107,7 +131,13 @@ class AddTransactionView extends React.Component<Props,State>{
 
   save() {
     this.setState({...this.state, Loading : true })
-    Models.CreateTransaction(this.state).then(() => {
+    let savePromise : Promise<any>
+    if (this.props.TransactionUUID) {
+      savePromise = Models.UpdateTransaction(this.props.TransactionUUID, this.state);
+    } else {
+      savePromise = Models.CreateTransaction(this.state);
+    }
+    savePromise.then(() => {
       this.props.history.goBack();
     }).catch((err: any) => console.log("error", err))
   }
