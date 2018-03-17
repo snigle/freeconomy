@@ -61,9 +61,10 @@ class TransactionsView extends React.Component<Props,State>{
     return <View>
     <AppBar title="Freeconomy">
       {
-        <View>
+        <View style={{flexDirection:"row"}}>
         <MyLink to="/"><Icon name="arrow_back" /></MyLink>
         <MyLink to={`/Wallet/${this.props.WalletUUID}/AddTransactionView`}><Icon name="add" /></MyLink>
+        <MyLink to={`/ImportTransactionsView?walletUUID=${this.props.WalletUUID}`}><Button onPress={() => (console.log("import"))} title="Import" /></MyLink>
         </View>
       }
     </AppBar>
