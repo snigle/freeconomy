@@ -53,8 +53,10 @@ export async function UpdateWallet(walletUUID : string, input : WalletInput):Pro
 
 export async function DeleteWallet(walletUUID : string):Promise<Wallet[]> {
     return GetAllTransactions()
-    .then(transactions => transactions.filter(t => t.WalletUUID !== walletUUID))
-    .then(SaveTransactions)
+    .then(transactions => ([transactions.filter(t => t.WalletUUID !== walletUUID), transactions.filter(t => t.WalletUUID === walletUUID)]))
+    .then(([toKeep, toDelete]) => SaveTransactions(toKeep).then(() => toDelete))
+    .then(toDelete => GetAllDeleted().then(deleted => deleted.concat(toDelete.map((t) : Collection => ({UUID : t.UUID, LastUpdate : t.LastUpdate})))))
+    .then(SaveDeleted)
     .then(() => GetWallets())
     .then(walletsBefore => walletsBefore.filter(w => w.UUID !== walletUUID))
     .then(SaveWallets)
