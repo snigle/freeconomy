@@ -7,6 +7,7 @@ import AddWalletView from "./AddWalletView"
 import {View, Button, Text} from "react-native"
 import {History} from "history"
 import {MyLink} from "./Link"
+import {GoogleSync} from "./Sync"
 import * as _ from "lodash"
 //@ts-ignore
 import { AppBar, Icon, Paper, Display1, FlatButton, connectTheme, Divider } from 'carbon-ui'
@@ -59,9 +60,11 @@ class Wallets extends React.Component<Props,State>{
 
     return <View>
     <AppBar title="Freeconomy">
-      {
+      <View style={{flexDirection:"row"}}>
         <MyLink to="/AddWalletView"><Icon name="add" /></MyLink>
-      }
+        <Button onPress={() => GoogleSync()} title="Sync" />
+        <Button onPress={() => Models.SaveLogin({id : "", token : "", expires : new Date()})} title="Logout" />
+      </View>
     </AppBar>
     {content}
     </View>

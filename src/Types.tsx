@@ -36,7 +36,7 @@ export interface WalletInput {
 export const WalletDefault = (w :Wallet):Wallet => ({
     UUID : w.UUID || v4(),
     TotalPerYear : w.TotalPerYear || [],
-    LastUpdate: w.LastUpdate || new Date(0),
+    LastUpdate: asDate(w.LastUpdate),
     Name : w.Name || "No Name",
     Description: w.Description || "",
     Currency : { Code : "EUR", Symbol: "€"},
@@ -70,7 +70,7 @@ export interface Category {
 export const CategoryDefault = (w :Category):Category => ({
     UUID : w.UUID || v4(),
     ParentCategoryUUID : w.ParentCategoryUUID,
-    LastUpdate: w.LastUpdate || new Date(0),
+    LastUpdate: asDate(w.LastUpdate),
     Name : w.Name || "No category",
     Icon: w.Icon || "shopping_cart",
   })
@@ -97,15 +97,19 @@ export interface TransactionInput{
   Comment: string,
 }
 
+function asDate(date? : Date) : Date {
+  return (date && new Date(date)) || new Date()
+}
+
 export const TransactionDefault = (w :Transaction):Transaction => ({
     UUID : w.UUID || v4(),
     WalletUUID : w.WalletUUID || "",
     CategoryUUID : w.CategoryUUID || "",
 
-    LastUpdate: w.LastUpdate || new Date(0),
+    LastUpdate: asDate(w.LastUpdate),
 
     Beneficiary : w.Beneficiary || "Other",
-    Date : (w.Date && new Date(w.Date)) || new Date(),
+    Date : asDate(w.Date),
     Price : w.Price || 0,
     Comment: w.Comment || "",
   })
@@ -122,5 +126,16 @@ export interface Transfert{
   Comment : string,
 
   Date : Date,
+  LastUpdate : Date,
+}
+
+export interface Login {
+  id : string,
+  token : string,
+  expires : Date,
+}
+
+export interface Collection {
+  UUID : string,
   LastUpdate : Date,
 }

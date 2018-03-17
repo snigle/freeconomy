@@ -1,5 +1,5 @@
 import {AsyncStorage} from "react-native"
-import {Transaction, TransactionInput, TransactionDefault, Wallet, WalletInput, WalletDefault, Category, CategoryDefault} from "./Types"
+import {Collection, Login, Transaction, TransactionInput, TransactionDefault, Wallet, WalletInput, WalletDefault, Category, CategoryDefault} from "./Types"
 import {v4} from "uuid";
 
 export async function GetWallets():Promise<Wallet[]> {
@@ -24,9 +24,11 @@ export async function CreateWallet(input : WalletInput):Promise<Wallet[]> {
       Currency: input.Currency,
       Icon: input.Icon,
     }])
-  ).then((wallets) =>
-      AsyncStorage.setItem("wallets", JSON.stringify(wallets)).then(() => wallets)
-  )
+  ).then(SaveWallets);
+}
+
+export async function SaveWallets(wallets : Wallet[]):Promise<Wallet[]> {
+  return AsyncStorage.setItem("wallets", JSON.stringify(wallets)).then(() => wallets)
 }
 
 export async function UpdateWallet(walletUUID : string, input : WalletInput):Promise<Wallet[]> {
@@ -40,6 +42,7 @@ export async function UpdateWallet(walletUUID : string, input : WalletInput):Pro
           Description: input.Description,
           Currency: input.Currency,
           Icon: input.Icon,
+          LastUpdate : new Date(),
       });
       return wallets;
     }
@@ -50,13 +53,37 @@ export async function UpdateWallet(walletUUID : string, input : WalletInput):Pro
 
 export async function DeleteWallet(walletUUID : string):Promise<Wallet[]> {
     return GetAllTransactions()
-    .then(transactions => transactions.filter(t => t.WalletUUID === walletUUID))
-    .then(transactions => AsyncStorage.setItem("transactions", JSON.stringify(transactions)))
+    .then(transactions => transactions.filter(t => t.WalletUUID !== walletUUID))
+    .then(SaveTransactions)
     .then(() => GetWallets())
     .then(walletsBefore => walletsBefore.filter(w => w.UUID !== walletUUID))
-    .then((wallets) =>
-      AsyncStorage.setItem("wallets", JSON.stringify(wallets)).then(() => wallets)
-    )
+    .then(SaveWallets)
+    .then(w => markAsDeleted(walletUUID).then(() => w))
+}
+
+export async function GetAllDeleted() : Promise<Collection[]> {
+  return AsyncStorage.getItem("deleted").then((raw : string) => {
+    let result: Collection[] | null = JSON.parse(raw);
+    return (result && result.map(d => ({...d, LastUpdate : new Date(d.LastUpdate)})).filter(d => d.UUID)) || [];
+  });
+}
+
+async function markAsDeleted(uuid : string) : Promise<Collection[]> {
+  return GetAllDeleted()
+    .then(deleted => deleted.concat({UUID : uuid, LastUpdate : new Date()}))
+    .then(SaveDeleted);
+}
+
+export async function SaveDeleted(deleted : Collection[]) : Promise<Collection[]> {
+  console.log("save deleted", deleted);
+  return AsyncStorage.setItem("deleted", JSON.stringify(deleted)).then(() => deleted);
+}
+
+export async function CleanDeleted() : Promise<Collection[]>{
+  const now = new Date();
+  return GetAllDeleted().then(deleted =>
+    deleted.filter(d => d.LastUpdate > new Date(now.getFullYear(), now.getMonth()-2, now.getDate()))
+  ).then(SaveDeleted);
 }
 
 export async function CreateTransaction(input : TransactionInput):Promise<Transaction[]> {
@@ -73,12 +100,15 @@ export async function CreateTransaction(input : TransactionInput):Promise<Transa
       WalletUUID: input.WalletUUID,
     }])
   ).then((transactions) =>
-        AsyncStorage.setItem("transactions", JSON.stringify(transactions))
+        SaveTransactions(transactions)
         .then(() => RefreshTotalWallet(input.WalletUUID, input.Date.getFullYear()))
         .then(() => transactions)
   )
 }
 
+export async function SaveTransactions(transactions : Transaction[]) : Promise<Transaction[]> {
+  return AsyncStorage.setItem("transactions", JSON.stringify(transactions)).then(() => transactions);
+}
 export async function UpdateTransaction(transactionUUID : string, input : TransactionInput):Promise<Transaction[]> {
     return GetAllTransactions().then(transactions => {
       let transaction = transactions.find(t => t.UUID === transactionUUID)
@@ -93,6 +123,7 @@ export async function UpdateTransaction(transactionUUID : string, input : Transa
         Comment : input.Comment,
         Price : input.Price,
         WalletUUID: input.WalletUUID,
+        LastUpdate : new Date(),
       });
       return AsyncStorage.setItem("transactions", JSON.stringify(transactions))
       .then(() => RefreshTotalWallet(input.WalletUUID, input.Date.getFullYear()))
@@ -113,6 +144,7 @@ export async function DeleteTransaction(transactionUUID : string):Promise<Transa
       return AsyncStorage.setItem("transactions", JSON.stringify(transactions))
       .then(() => RefreshTotalWallet(old.WalletUUID, new Date(old.Date).getFullYear()))
       .then(() => transactions)
+      .then((transactions : Transaction[]) => markAsDeleted(transactionUUID).then(() => transactions))
     }
   )
 }
@@ -124,15 +156,29 @@ async function RefreshTotalWallet(walletUUID : string, year : number):Promise<vo
       if (!wallet) {
         return;
       }
-      let total = wallet.TotalPerYear.find(y => y.Year === year)
-      if (!total) {
-        total = {Year : year, Total : 0}
-        wallet.TotalPerYear.push(total);
-      }
-      total.Total = transactions.reduce((agg,transaction) => agg+transaction.Price, 0);
+      calculateTotal(wallet, transactions,year);
       return  AsyncStorage.setItem("wallets", JSON.stringify(wallets))
     })
   })
+}
+
+function calculateTotal(wallet : Wallet, transactions : Transaction[], year : number): Wallet {
+  let total = wallet.TotalPerYear.find(y => y.Year === year)
+  if (!total) {
+    total = {Year : year, Total : 0}
+    wallet.TotalPerYear.push(total);
+  }
+  total.Total = transactions.reduce((agg,transaction) => agg+transaction.Price, 0);
+  wallet.LastUpdate = new Date();
+  return wallet;
+}
+
+export async function RefreshAllTotalWallet(transactions : Transaction[]):Promise<Wallet[]> {
+    return GetWallets().then(wallets => {
+      wallets.forEach(w => w.TotalPerYear.forEach( y =>
+        calculateTotal(w, transactions.filter(t => t.WalletUUID == w.UUID && new Date(t.Date).getFullYear() === y.Year), y.Year)))
+      return SaveWallets(wallets);
+    })
 }
 
 export async function GetAllTransactions(...walletUUIDs : string[]):Promise<Transaction[]> {
@@ -183,4 +229,19 @@ export async function GetCategories():Promise<Category[]> {
       }
       return result.map(CategoryDefault);
     });
+}
+
+export async function GetLogin():Promise<Login> {
+  return AsyncStorage.getItem("login").then(raw => {
+    let result : Login | null = JSON.parse(raw);
+    if (!result) {
+      throw("login not found");
+    }
+    result.expires = new Date(result.expires);
+    return result;
+  })
+}
+
+export async function SaveLogin(login : Login):Promise<Login> {
+  return AsyncStorage.setItem("login", JSON.stringify(login)).then(() => login)
 }

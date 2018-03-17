@@ -21,6 +21,7 @@ import AddWalletView from "./AddWalletView"
 import DeleteWalletView from "./DeleteWalletView"
 import TransactionsView from "./TransactionsView"
 import AddTransactionView from "./AddTransactionView"
+import GoogleSyncOAuthCallBack from "./GoogleSyncOAuthCallBack"
 //@ts-ignore
 import { AppBar, IconToggle, connectTheme, Icon } from 'carbon-ui'
 
@@ -55,6 +56,7 @@ const App = (props:any) =>
   <Route path="/Wallet/:WalletUUID/TransactionsView" component={(props : any) => <TransactionsView WalletUUID={props.match.params.WalletUUID} history={props.history}/>}></Route>
   <Route path="/Wallet/:WalletUUID/AddTransactionView" exact component={(props : any) => <AddTransactionView WalletUUID={props.match.params.WalletUUID} history={props.history}/>} />
   <Route path="/Wallet/:WalletUUID/AddTransactionView/:TransactionUUID" component={({match, history} : any) => <AddTransactionView WalletUUID={match.params.WalletUUID} TransactionUUID={match.params.TransactionUUID} history={history}/>} />
+  <Route path="/oauthCallback" component={GoogleSyncOAuthCallBack} />
 </View>
 
 export default App;
