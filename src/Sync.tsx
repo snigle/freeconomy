@@ -3,6 +3,7 @@ import * as Driver from "./GoogleSync"
 import {Wallet, Login, Transaction} from "./Types"
 import {Collection} from "./GoogleSync"
 import * as OAuth from "./OAuth"
+import {AsyncStorage} from "react-native"
 
 export function GoogleSync() : Promise<any> {
   return Models.GetLogin().then(login => {
@@ -12,7 +13,7 @@ export function GoogleSync() : Promise<any> {
       return OAuth.login();
     }
     return login;
-  })
+  }, () => OAuth.login())
   .then(login => {
     // Synchronisation
     return syncCollection<Collection>(login, "deleted", Models.GetAllDeleted, Models.SaveDeleted, {})
@@ -27,7 +28,7 @@ export function GoogleSync() : Promise<any> {
     ]))
     .then(([wallets, transactions]) => Models.RefreshAllTotalWallet(transactions))
     .then(() => Models.CleanDeleted());
-  }).catch(() => OAuth.login());
+  }).catch((err) => AsyncStorage.removeItem("login").then(() => console.log("error sync", err)));
 }
 
 async function syncCollection<CollectionType extends Collection>(

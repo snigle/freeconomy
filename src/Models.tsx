@@ -88,8 +88,9 @@ export async function CleanDeleted() : Promise<Collection[]>{
   ).then(SaveDeleted);
 }
 
-export async function CreateTransaction(input : TransactionInput):Promise<Transaction[]> {
-    return GetAllTransactions().then(transactions => transactions.concat([{
+export async function CreateTransaction(...inputs : TransactionInput[]):Promise<Transaction[]> {
+    return GetAllTransactions().then((transactions) : Transaction[] =>
+      transactions.concat(inputs.map((input) : Transaction=>({
       UUID: v4(),
       LastUpdate: new Date(),
 
@@ -100,16 +101,30 @@ export async function CreateTransaction(input : TransactionInput):Promise<Transa
       Comment : input.Comment,
       Price : input.Price,
       WalletUUID: input.WalletUUID,
-    }])
+    })))
   ).then((transactions) =>
         SaveTransactions(transactions)
-        .then(() => RefreshTotalWallet(input.WalletUUID, input.Date.getFullYear()))
+        .then(() => {
+          const mapWalletYear : { [key:string] : { [key:number] : boolean }}= {}
+          const promise : Promise<void> = Promise.resolve();
+          transactions.forEach(t => {
+            if (!mapWalletYear[t.WalletUUID]) {
+              mapWalletYear[t.WalletUUID] = {};
+            }
+            const year = new Date(t.Date).getFullYear();
+            if (!mapWalletYear[t.WalletUUID][year]) {
+              promise.then(() => RefreshTotalWallet(t.WalletUUID, year))
+            }
+            mapWalletYear[t.WalletUUID][year]  = true;
+          })
+          return promise;
+        })
         .then(() => transactions)
   )
 }
 
 export async function SaveTransactions(transactions : Transaction[]) : Promise<Transaction[]> {
-  return AsyncStorage.setItem("transactions", JSON.stringify(transactions)).then(() => transactions);
+  return AsyncStorage.setItem("transactions", JSON.stringify(transactions.sort((a,b)=> new Date(b.Date).getTime() - new Date(a.Date).getTime()))).then(() => transactions);
 }
 export async function UpdateTransaction(transactionUUID : string, input : TransactionInput):Promise<Transaction[]> {
     return GetAllTransactions().then(transactions => {
@@ -164,7 +179,8 @@ async function RefreshTotalWallet(walletUUID : string, year : number):Promise<vo
   })
 }
 
-function calculateTotal(wallet : Wallet, transactions : Transaction[], year : number): Wallet {
+function calculateTotal(wallet : Wallet, inputTransactions : Transaction[], year : number): Wallet {
+  const transactions = inputTransactions.filter(t => t.WalletUUID === wallet.UUID && new Date(t.Date).getFullYear() === year)
   let total = wallet.TotalPerYear.find(y => y.Year === year)
   if (!total) {
     total = {Year : year, Total : 0}
@@ -231,6 +247,11 @@ export async function GetCategories():Promise<Category[]> {
       }
       return result.map(CategoryDefault);
     });
+}
+
+export async function SaveCategories(...categories : Category[]):Promise<Category[]> {
+    return GetCategories().then(result => result.concat(categories))
+    .then(result => AsyncStorage.setItem("categories", JSON.stringify(result)).then(() => result))
 }
 
 export async function GetLogin():Promise<Login> {

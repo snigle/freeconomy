@@ -2,17 +2,19 @@ import * as React from "react"
 import * as Models from "./Models"
 import {Wallet, Transaction, displayPrice} from "./Types"
 import Loading from "./Loading"
-import TransactionListItem from "./TransactionListItem"
+import GroupTransactionsByDay from "./GroupTransactionsByDay"
 import AddWalletView from "./AddWalletView"
-import {View, Button, Text} from "react-native"
+import {View, Button, Text, FlatList, Platform} from "react-native"
 import {MyLink} from "./Link"
 import {History} from "history"
+import * as _ from "lodash"
 //@ts-ignore
 import { AppBar, Icon, Paper, Display1, FlatButton, connectTheme, Divider } from 'carbon-ui'
 
+
 interface State {
   Transactions ?: Transaction[],
-  Wallet ?: Wallet,
+  Wallet : Wallet,
 }
 
 interface Props {
@@ -24,7 +26,20 @@ class TransactionsView extends React.Component<Props,State>{
 
   constructor(props: Props) {
     super(props)
-    this.state = {}
+    this.state = {
+      Wallet : {
+        Currency : {
+          Code : "",
+          Symbol : "",
+        },
+        Description : "",
+        Icon : "",
+        LastUpdate : new Date(),
+        Name : "",
+        TotalPerYear : [],
+        UUID : "",
+      }
+    }
   }
 
   async componentDidMount() {
@@ -32,7 +47,9 @@ class TransactionsView extends React.Component<Props,State>{
         Models.GetAllTransactions(this.props.WalletUUID),
         Models.GetWallet(this.props.WalletUUID),
       ])
-      .then(([transactions, wallet]) => this.setState({ Transactions : transactions, Wallet : wallet }))
+      .then(([transactions, wallet]) => {
+        this.setState({ Transactions : transactions, Wallet : wallet });
+      })
       .catch((err) => console.log("fail to load transactions, need to reset ?", err))
 
 
@@ -42,24 +59,16 @@ class TransactionsView extends React.Component<Props,State>{
     let content: any
     if (!this.state.Transactions) {
      content = <Loading Message="Chargement des transactions" />;
+   } else if (!this.state.Wallet){
+     content = <Loading Message="Chargement du wallet" />;
    } else {
-
-       const total: number = 0
-       console.log("transactions", this.state.Transactions)
-       content = <View>
-         {
-           this.state.Transactions.map((transaction) =>
-            this.state.Wallet &&
-             <TransactionListItem key={transaction.UUID} Transaction={transaction} Currency={this.state.Wallet.Currency} history={this.props.history}></TransactionListItem>
-           )
-         }
-         <Divider />
-         </View>
-
+     console.log("transactions", this.state.Transactions)
+       content =
+       <GroupTransactionsByDay Transactions={this.state.Transactions} Currency={this.state.Wallet.Currency} history={this.props.history} />
    }
 
     return <View>
-    <AppBar title="Freeconomy">
+    <AppBar title={this.state.Wallet.Name || "Freeconomy"} >
       {
         <View style={{flexDirection:"row"}}>
         <MyLink to="/"><Icon name="arrow_back" /></MyLink>

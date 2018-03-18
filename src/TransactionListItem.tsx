@@ -9,6 +9,7 @@ import {Icon, TouchableRipple} from "carbon-ui"
 
 interface Props {
   Transaction : Transaction,
+  CurrentTotal : number,
   Currency : Currency,
   history : History,
 }
@@ -36,15 +37,16 @@ export default class extends React.Component<Props, State> {
       style={{display: this.state.deleted ?"none" : undefined}}
       >
     <View>
-    <View style={{height: 60, flexDirection: "row", alignItems: "center"}}>
+    <View style={{height: 60, flexDirection: "row", alignItems: "center", justifyContent:"center"}}>
     <View style={{flex:1}}>
     <Icon name="account_balance_wallet" style={margins}/>
     </View>
-    <View style={{flex:4}}>
+    <View style={{flex:5}}>
     <Text style={margins}>{this.props.Transaction.Beneficiary}</Text>
     </View>
-    <View style={{flex:2}}>
-    <Text style={{...margins, textAlign: "right"}}>{displayPrice(this.props.Transaction.Price, this.props.Currency)}</Text>
+    <View style={{flex:3}}>
+    <Text style={{...margins, textAlign: "right", fontSize:18, color : this.props.Transaction.Price > 0 ? "green": "red"}}>{displayPrice(this.props.Transaction.Price, this.props.Currency)}</Text>
+    <Text style={{...margins, textAlign: "right", fontSize:10}}>{displayPrice(this.props.CurrentTotal, this.props.Currency)}</Text>
     </View>
     </View>
     {this.state.displayOption && options}

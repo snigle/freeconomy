@@ -44,7 +44,7 @@ export const WalletDefault = (w :Wallet):Wallet => ({
   })
 
   export const displayPrice = (price : number, currency : Currency) : string =>
-   `${price} ${currency.Symbol}`
+   `${Math.round(price*100)/100} ${currency.Symbol}`
 
 
 ///////////////////////////////////////////////////////////

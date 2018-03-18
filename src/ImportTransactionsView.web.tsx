@@ -6,7 +6,7 @@ import * as Papa from "papaparse"
 import * as Models from "./Models"
 import {Transaction, Category} from "./Types"
 import {v4} from "uuid"
-import TransactionListItem from "./TransactionListItem"
+import GroupTransactionsByDay from "./GroupTransactionsByDay"
 import {History} from "history"
 //@ts-ignore
 import {DataTable, AppBar} from "carbon-ui"
@@ -93,9 +93,8 @@ export default class extends React.Component<RouteComponentProps<any>,State> {
       content = (
         <View>
         <Text> Voulez vous importer toutes ces transactions ? </Text>
-        {this.state.TransactionsToImport.map(t =>
-          <TransactionListItem key={t.UUID} Transaction={t} history={this.props.history} Currency={{Code : "EUR", Symbol : "€"}}/>
-        )}
+        <Button title="Importer" onPress={() => this.import()} />
+        <GroupTransactionsByDay Transactions={this.state.TransactionsToImport} history={this.props.history} Currency={{Code : "EUR", Symbol : "€"}}/>
         </View>
       )
     } else if (this.state.Lines.length) {
@@ -212,4 +211,11 @@ export default class extends React.Component<RouteComponentProps<any>,State> {
     })
 
   }
+
+  import() {
+    Models.SaveCategories(...this.state.CategoriesToImport).then(() =>
+      Models.CreateTransaction(...this.state.TransactionsToImport)
+    ).then(() => AsyncStorage.removeItem("csv")).then(() => this.props.history.push("/"))
+  }
+
 }
