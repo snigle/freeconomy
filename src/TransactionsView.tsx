@@ -1,6 +1,6 @@
 import * as React from "react"
 import * as Models from "./Models"
-import {Wallet, Transaction, displayPrice} from "./Types"
+import {Wallet, Transaction, displayPrice, Category} from "./Types"
 import Loading from "./Loading"
 import GroupTransactionsByDay from "./GroupTransactionsByDay"
 import AddWalletView from "./AddWalletView"
@@ -15,10 +15,12 @@ import { AppBar, Icon, Paper, Display1, FlatButton, connectTheme, Divider } from
 interface State {
   Transactions ?: Transaction[],
   Wallet : Wallet,
+  Categories : Category[],
 }
 
 interface Props {
   WalletUUID : string,
+  Search? : string,
   history : History,
 }
 
@@ -38,17 +40,31 @@ class TransactionsView extends React.Component<Props,State>{
         Name : "",
         TotalPerYear : [],
         UUID : "",
-      }
+      },
+      Categories : [],
     }
   }
 
   async componentDidMount() {
       Promise.all([
-        Models.GetAllTransactions(this.props.WalletUUID),
+        Models.GetAllTransactions().then(transactions => transactions.filter(t => {
+          if (this.props.WalletUUID) {
+            if (this.props.WalletUUID !== t.WalletUUID) {
+              return false;
+            }
+          }
+          if (this.props.Search) {
+            if(!t.Beneficiary.match(this.props.Search) && !t.Comment.match(this.props.Search)) {
+              return false;
+            }
+          }
+          return true;
+        })),
         Models.GetWallet(this.props.WalletUUID),
+        Models.GetCategories(),
       ])
-      .then(([transactions, wallet]) => {
-        this.setState({ Transactions : transactions, Wallet : wallet });
+      .then(([transactions, wallet, categories]) => {
+        this.setState({ Transactions : transactions, Wallet : wallet, Categories : categories });
       })
       .catch((err) => console.log("fail to load transactions, need to reset ?", err))
 
@@ -64,7 +80,7 @@ class TransactionsView extends React.Component<Props,State>{
    } else {
      console.log("transactions", this.state.Transactions)
        content =
-       <GroupTransactionsByDay Transactions={this.state.Transactions} Currency={this.state.Wallet.Currency} history={this.props.history} />
+       <GroupTransactionsByDay Categories={this.state.Categories} Transactions={this.state.Transactions} Currency={this.state.Wallet.Currency} history={this.props.history} />
    }
 
     return <View>

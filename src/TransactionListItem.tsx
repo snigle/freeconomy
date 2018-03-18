@@ -1,6 +1,6 @@
 import * as React from "react"
 import {Text, View, Button} from "react-native"
-import {Transaction, displayPrice, Currency} from "./Types"
+import {Transaction, displayPrice, Currency, Category} from "./Types"
 import {MyLink} from "./Link"
 import {History} from "history"
 import * as Models from "./Models"
@@ -12,6 +12,7 @@ interface Props {
   CurrentTotal : number,
   Currency : Currency,
   history : History,
+  Category : Category,
 }
 
 interface State {
@@ -39,7 +40,7 @@ export default class extends React.Component<Props, State> {
     <View>
     <View style={{height: 60, flexDirection: "row", alignItems: "center", justifyContent:"center"}}>
     <View style={{flex:1}}>
-    <Icon name="account_balance_wallet" style={margins}/>
+    <Icon name={this.props.Category.Icon} style={margins}/>
     </View>
     <View style={{flex:5}}>
     <Text style={margins}>{this.props.Transaction.Beneficiary}</Text>

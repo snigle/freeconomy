@@ -39,11 +39,11 @@ class Wallets extends React.Component<Props,State>{
    } else {
 
      const groupWallet = _.groupBy(this.state.Wallets, w => w.Currency.Code);
-
      content = _.map(groupWallet, (wallets, currencyCode) => {
        const total: number = wallets.reduce((sumTotal, w) =>
        sumTotal + w.TotalPerYear.reduce((sumPerWallet, totalYear) =>
        totalYear.Total + sumPerWallet , 0) , 0)
+       console.log("wallets", wallets)
 
        return <View>
          <Text>{`Wallets (${currencyCode}) : ${displayPrice(total, wallets[0].Currency)}`}</Text>

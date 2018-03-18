@@ -1,6 +1,6 @@
 import * as Models from "./Models"
 import * as Driver from "./GoogleSync"
-import {Wallet, Login, Transaction} from "./Types"
+import {Wallet, Login, Transaction, Category} from "./Types"
 import {Collection} from "./GoogleSync"
 import * as OAuth from "./OAuth"
 import {AsyncStorage} from "react-native"
@@ -25,6 +25,7 @@ export function GoogleSync() : Promise<any> {
     .then(deleted => Promise.all([
       syncCollection<Wallet>(login, "wallets", Models.GetWallets, Models.SaveWallets, deleted),
       syncCollection<Transaction>(login, "transactions", Models.GetAllTransactions, Models.SaveTransactions, deleted),
+      syncCollection<Category>(login, "categories", Models.GetCategories, Models.SaveCategories, deleted),
     ]))
     .then(([wallets, transactions]) => Models.RefreshAllTotalWallet(transactions))
     .then(() => Models.CleanDeleted());

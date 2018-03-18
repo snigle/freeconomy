@@ -106,14 +106,14 @@ export async function CreateTransaction(...inputs : TransactionInput[]):Promise<
         SaveTransactions(transactions)
         .then(() => {
           const mapWalletYear : { [key:string] : { [key:number] : boolean }}= {}
-          const promise : Promise<void> = Promise.resolve();
+          let promise : Promise<void> = Promise.resolve();
           transactions.forEach(t => {
             if (!mapWalletYear[t.WalletUUID]) {
               mapWalletYear[t.WalletUUID] = {};
             }
             const year = new Date(t.Date).getFullYear();
             if (!mapWalletYear[t.WalletUUID][year]) {
-              promise.then(() => RefreshTotalWallet(t.WalletUUID, year))
+              promise = promise.then(() => RefreshTotalWallet(t.WalletUUID, year))
             }
             mapWalletYear[t.WalletUUID][year]  = true;
           })
@@ -249,9 +249,13 @@ export async function GetCategories():Promise<Category[]> {
     });
 }
 
-export async function SaveCategories(...categories : Category[]):Promise<Category[]> {
-    return GetCategories().then(result => result.concat(categories))
-    .then(result => AsyncStorage.setItem("categories", JSON.stringify(result)).then(() => result))
+export async function CreateCategory(...categories : Category[]):Promise<Category[]> {
+  return GetCategories().then(result => result.concat(categories))
+  .then(SaveCategories)
+}
+
+export async function SaveCategories(categories : Category[]):Promise<Category[]> {
+    return AsyncStorage.setItem("categories", JSON.stringify(categories)).then(() => categories)
 }
 
 export async function GetLogin():Promise<Login> {

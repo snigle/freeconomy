@@ -5,13 +5,13 @@ import {MyLink} from "./Link"
 import {TransactionInput, Category, Transaction} from "./Types"
 import DatePicker from "./DatePicker"
 import {History} from "history"
+import * as _ from "lodash"
 //@ts-ignore
 import { RaisedButton, TextField, AppBar, Icon } from 'carbon-ui'
 
 interface State extends TransactionInput{
   Loading : boolean,
   PriceText : string,
-  Category? : Category,
   Categories : Category[],
 }
 
@@ -58,14 +58,14 @@ class AddTransactionView extends React.Component<Props,State>{
     }
 
     Promise.all([
-      Models.GetCategories(),
+      Models.GetCategories().then(c => _.sortBy(_.uniqBy(c, c => c.Name), "Name")),
       getTransactionPromise,
     ]).then(([categories]) => {
       let defaultCategory = categories[0];
       if (this.state.CategoryUUID) {
         defaultCategory = categories.find(c => c.UUID === this.state.CategoryUUID) || defaultCategory;
       }
-      this.setState({...this.state, Categories : categories, Category : categories[0], Loading : false})
+      this.setState({...this.state, Categories : categories, Loading : false})
     })
   }
 
@@ -75,9 +75,9 @@ class AddTransactionView extends React.Component<Props,State>{
   changeComment(text : string) {
     this.setState({...this.state, Comment : text});
   }
-  changeCategory(category : Category) {
-    console.log("change category", category);
-    this.setState({...this.state, CategoryUUID : category.UUID, Category : category})
+  changeCategory(uuid : string) {
+    console.log("change category", uuid);
+    this.setState({...this.state, CategoryUUID : uuid})
   }
   changePrice(priceText : string) {
     const price = parseFloat(priceText)
@@ -104,11 +104,11 @@ class AddTransactionView extends React.Component<Props,State>{
         <TextField placeholder="Benificiary" onChangeText={(v:string) => this.changeBenificiary(v)} value={this.state.Beneficiary}/>
         <Picker
           mode="dropdown"
-          selectedValue={this.state.Category}
-          onValueChange={(itemValue, itemIndex) => this.changeCategory(this.state.Categories[itemIndex])}>
+          selectedValue={this.state.CategoryUUID}
+          onValueChange={(itemValue, itemIndex) => this.changeCategory(itemValue)}>
           {
             this.state.Categories.map(category =>
-              <Picker.Item key={category.UUID} label={category.Name} value={category} />
+              <Picker.Item key={category.UUID} label={category.Name} value={category.UUID} />
             )
           }
         </Picker>

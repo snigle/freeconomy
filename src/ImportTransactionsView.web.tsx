@@ -17,6 +17,7 @@ interface Props extends RouteProps{
 interface State {
   WalletUUID : string,
   Lines : string[][],
+  Categories : Category[],
 
   // Computed
   CategoriesToImport : Category[],
@@ -49,6 +50,7 @@ export default class extends React.Component<RouteComponentProps<any>,State> {
         Comment : "",
         CategoriesToImport : [],
         TransactionsToImport : [],
+        Categories : [],
         }
     } else {
       this.state = {
@@ -61,12 +63,16 @@ export default class extends React.Component<RouteComponentProps<any>,State> {
         Comment : "",
         CategoriesToImport : [],
         TransactionsToImport : [],
+        Categories : [],
         }
     }
   }
 
   async componentDidMount() {
-    AsyncStorage.getItem("csv").then(result => this.handleCSVContent(result))
+    Promise.all([
+    Models.GetCategories().then(categories => this.setState({...this.state, Categories : categories})),
+    AsyncStorage.getItem("csv").then(result => this.handleCSVContent(result)),
+    ])
   }
 
   bindInput(key : Keys, value : string) {
@@ -94,7 +100,7 @@ export default class extends React.Component<RouteComponentProps<any>,State> {
         <View>
         <Text> Voulez vous importer toutes ces transactions ? </Text>
         <Button title="Importer" onPress={() => this.import()} />
-        <GroupTransactionsByDay Transactions={this.state.TransactionsToImport} history={this.props.history} Currency={{Code : "EUR", Symbol : "€"}}/>
+        <GroupTransactionsByDay Categories={this.state.Categories} Transactions={this.state.TransactionsToImport} history={this.props.history} Currency={{Code : "EUR", Symbol : "€"}}/>
         </View>
       )
     } else if (this.state.Lines.length) {
@@ -213,7 +219,7 @@ export default class extends React.Component<RouteComponentProps<any>,State> {
   }
 
   import() {
-    Models.SaveCategories(...this.state.CategoriesToImport).then(() =>
+    Models.CreateCategory(...this.state.CategoriesToImport).then(() =>
       Models.CreateTransaction(...this.state.TransactionsToImport)
     ).then(() => AsyncStorage.removeItem("csv")).then(() => this.props.history.push("/"))
   }

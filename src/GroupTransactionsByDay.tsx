@@ -1,10 +1,10 @@
 import * as React from "react"
+import {View, Button, Text, FlatList, Platform} from "react-native"
 import * as Models from "./Models"
-import {Currency, Transaction, displayPrice} from "./Types"
+import {Currency, Transaction, displayPrice, Category} from "./Types"
 import Loading from "./Loading"
 import TransactionListItem from "./TransactionListItem"
 import AddWalletView from "./AddWalletView"
-import {View, Button, Text, FlatList, Platform} from "react-native"
 import {MyLink} from "./Link"
 import {History} from "history"
 import * as _ from "lodash"
@@ -20,6 +20,7 @@ interface PricedTransaction extends Transaction {
 interface Props {
   Transactions : Transaction[],
   Currency : Currency,
+  Categories : Category[],
   history : History,
 }
 
@@ -27,8 +28,9 @@ export default function
 
   render(props:Props) {
     let content: any
-
     const groupedTransactions : TransactionByDay[] = []
+    const categories = _.mapValues(_.groupBy(props.Categories, "UUID"), t => t[0])
+    const defaultCategory : Category = { Name : "Unknown", Icon : "help", LastUpdate : new Date(), UUID:"" }
     let pricedTransaction : PricedTransaction[] = props.Transactions.map(t => ({...t, Total : 0}))
     let total = 0;
     pricedTransaction.reverse().forEach(t => {
@@ -48,7 +50,7 @@ export default function
              <Text>{transactionByDay.day.toLocaleString()}</Text>
              {
              transactionByDay.transactions.map(transaction =>
-               <TransactionListItem key={transaction.UUID} Transaction={transaction} Currency={props.Currency} history={props.history} CurrentTotal={transaction.Total}></TransactionListItem>
+               <TransactionListItem key={transaction.UUID} Category={categories[transaction.CategoryUUID] || defaultCategory} Transaction={transaction} Currency={props.Currency} history={props.history} CurrentTotal={transaction.Total}></TransactionListItem>
               )
              }
              </View>
@@ -62,13 +64,12 @@ export default function
        data={groupedTransactions.reverse()}
        keyExtractor={(item : TransactionByDay) => item.day.toISOString()}
        inverted
-       // initialNumToRender={props.Transactions.length-1}
        renderItem={({item}) =>
          <View>
          <Text>{item.day.toLocaleString()}</Text>
          {
          item.transactions.map((transaction : PricedTransaction) =>
-           <TransactionListItem key={transaction.UUID} Transaction={transaction} Currency={props.Currency} history={props.history} CurrentTotal={transaction.Total}></TransactionListItem>
+           <TransactionListItem key={transaction.UUID} Category={categories[transaction.CategoryUUID] || defaultCategory} Transaction={transaction} Currency={props.Currency} history={props.history} CurrentTotal={transaction.Total}></TransactionListItem>
           )
          }
          </View>
