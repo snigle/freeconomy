@@ -1,9 +1,10 @@
 import * as React from "react"
 import {View, Button, Text, FlatList, Platform} from "react-native"
 import * as Models from "./Models"
-import {Currency, Transaction, displayPrice, Category} from "./Types"
+import {Wallet, Currency, Transaction, displayPrice, Category, Transfert} from "./Types"
 import Loading from "./Loading"
 import TransactionListItem from "./TransactionListItem"
+import TransfertListItem from "./TransfertListItem"
 import AddWalletView from "./AddWalletView"
 import {MyLink} from "./Link"
 import {History} from "history"
@@ -13,25 +14,41 @@ import { AppBar, Icon, Paper, Display1, FlatButton, connectTheme, Divider } from
 
 type TransactionByDay = {day:Date, transactions : PricedTransaction[]}
 
-interface PricedTransaction extends Transaction {
+interface PricedTransaction {
+    Transaction? : Transaction,
+    Transfert? : Transfert,
+    Price : number,
     Total : number,
+    Date : Date,
 }
 
 interface Props {
   Transactions : Transaction[],
+  WalletUUID : string,
+  Transfert : Transfert[],
   Currency : Currency,
   Categories : Category[],
   history : History,
+  Wallets : Wallet[],
 }
 
 export default function
-
   render(props:Props) {
     let content: any
     const groupedTransactions : TransactionByDay[] = []
     const categories = _.mapValues(_.groupBy(props.Categories, "UUID"), t => t[0])
     const defaultCategory : Category = { Name : "Unknown", Icon : "help", LastUpdate : new Date(), UUID:"" }
-    let pricedTransaction : PricedTransaction[] = props.Transactions.map(t => ({...t, Total : 0}))
+    let pricedTransaction : PricedTransaction[] = props.Transactions.map(t => ({Transaction : t, Total : 0, Price : t.Price, Date : t.Date}))
+    pricedTransaction = pricedTransaction.concat(props.Transfert.map(transfert => {
+      let price = 0;
+      if (transfert.From.WalletUUID == props.WalletUUID) {
+        price = -transfert.From.Price;
+      } else if (transfert.To.WalletUUID == props.WalletUUID) {
+        price = transfert.To.Price;
+      }
+      return {Transfert : transfert, Total : 0, Price : price, Date : transfert.Date}
+    }))
+    pricedTransaction = _.sortBy(pricedTransaction, p => -p.Date.getTime())
     let total = 0;
     pricedTransaction.reverse().forEach(t => {
       total += t.Price
@@ -45,13 +62,17 @@ export default function
      if (Platform.OS === "web") {
        content = <View>
          {
-           groupedTransactions.map(transactionByDay =>
+           groupedTransactions.slice(groupedTransactions.length-200,groupedTransactions.length).map(transactionByDay =>
              <View>
              <Text>{transactionByDay.day.toLocaleString()}</Text>
              {
-             transactionByDay.transactions.map(transaction =>
-               <TransactionListItem key={transaction.UUID} Category={categories[transaction.CategoryUUID] || defaultCategory} Transaction={transaction} Currency={props.Currency} history={props.history} CurrentTotal={transaction.Total}></TransactionListItem>
-              )
+             transactionByDay.transactions.map(transaction => {
+               if (transaction.Transaction) {
+                 return <TransactionListItem key={transaction.Transaction.UUID} Category={categories[transaction.Transaction.CategoryUUID] || defaultCategory} Transaction={transaction.Transaction} Currency={props.Currency} history={props.history} CurrentTotal={transaction.Total}></TransactionListItem>
+               } else if (transaction.Transfert) {
+                 return <TransfertListItem key={transaction.Transfert.UUID} Transfert={transaction.Transfert} Currency={props.Currency} history={props.history} CurrentTotal={transaction.Total} Wallets={props.Wallets} WalletUUID={props.WalletUUID}></TransfertListItem>
+               }
+             })
              }
              </View>
            )
@@ -69,7 +90,13 @@ export default function
          <Text>{item.day.toLocaleString()}</Text>
          {
          item.transactions.map((transaction : PricedTransaction) =>
-           <TransactionListItem key={transaction.UUID} Category={categories[transaction.CategoryUUID] || defaultCategory} Transaction={transaction} Currency={props.Currency} history={props.history} CurrentTotal={transaction.Total}></TransactionListItem>
+         {
+           if (transaction.Transaction) {
+             return <TransactionListItem key={transaction.Transaction.UUID} Category={categories[transaction.Transaction.CategoryUUID] || defaultCategory} Transaction={transaction.Transaction} Currency={props.Currency} history={props.history} CurrentTotal={transaction.Total}></TransactionListItem>
+           } else if (transaction.Transfert) {
+             return <TransfertListItem key={transaction.Transfert.UUID} Transfert={transaction.Transfert} Currency={props.Currency} history={props.history} CurrentTotal={transaction.Total} Wallets={props.Wallets} WalletUUID={props.WalletUUID}></TransfertListItem>
+           }
+         }
           )
          }
          </View>

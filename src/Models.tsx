@@ -1,5 +1,5 @@
 import {AsyncStorage} from "react-native"
-import {Collection, Login, Transaction, TransactionInput, TransactionDefault, Wallet, WalletInput, WalletDefault, Category, CategoryDefault} from "./Types"
+import {TransfertDefault, TransfertInput, Transfert, Collection, Login, Transaction, TransactionInput, TransactionDefault, Wallet, WalletInput, WalletDefault, Category, CategoryDefault} from "./Types"
 import {v4} from "uuid";
 
 export async function GetWallets():Promise<Wallet[]> {
@@ -46,15 +46,18 @@ export async function UpdateWallet(walletUUID : string, input : WalletInput):Pro
       });
       return wallets;
     }
-  ).then((wallets) =>
-      AsyncStorage.setItem("wallets", JSON.stringify(wallets)).then(() => wallets)
-  )
+  ).then(SaveWallets)
 }
 
 export async function DeleteWallet(walletUUID : string):Promise<Wallet[]> {
     return GetAllTransactions()
     .then(transactions => ([transactions.filter(t => t.WalletUUID !== walletUUID), transactions.filter(t => t.WalletUUID === walletUUID)]))
     .then(([toKeep, toDelete]) => SaveTransactions(toKeep).then(() => toDelete))
+    .then(toDelete => GetAllDeleted().then(deleted => deleted.concat(toDelete.map((t) : Collection => ({UUID : t.UUID, LastUpdate : t.LastUpdate})))))
+    .then(SaveDeleted)
+    .then(() => GetTransferts())
+    .then(transactions => ([transactions.filter(t => t.From.WalletUUID !== walletUUID && t.To.WalletUUID !== walletUUID), transactions.filter(t => t.From.WalletUUID === walletUUID || t.To.WalletUUID === walletUUID)]))
+    .then(([toKeep, toDelete]) => SaveTransferts(toKeep).then(() => toDelete))
     .then(toDelete => GetAllDeleted().then(deleted => deleted.concat(toDelete.map((t) : Collection => ({UUID : t.UUID, LastUpdate : t.LastUpdate})))))
     .then(SaveDeleted)
     .then(() => GetWallets())
@@ -123,6 +126,48 @@ export async function CreateTransaction(...inputs : TransactionInput[]):Promise<
   )
 }
 
+export async function CreateTransfert(...inputs : TransfertInput[]):Promise<Transfert[]> {
+    return GetTransferts().then((transactions) : Transfert[] =>
+      transactions.concat(inputs.map((input) : Transfert=>({
+      UUID: v4(),
+      LastUpdate: new Date(),
+
+      // Inputs
+      Date : input.Date,
+      Comment : input.Comment || "",
+      From : input.From,
+      To : input.To,
+    })))
+  ).then((transactions) =>
+        SaveTransferts(transactions)
+        .then(() => {
+          const mapWalletYear : { [key:string] : { [key:number] : boolean }}= {}
+          let promise : Promise<void> = Promise.resolve();
+          transactions.forEach(t => {
+            if (!mapWalletYear[t.From.WalletUUID]) {
+              mapWalletYear[t.From.WalletUUID] = {};
+            }
+            if (!mapWalletYear[t.To.WalletUUID]) {
+              mapWalletYear[t.To.WalletUUID] = {};
+            }
+            const year = new Date(t.Date).getFullYear();
+            if (!mapWalletYear[t.From.WalletUUID][year]) {
+              promise = promise.then(() => RefreshTotalWallet(t.From.WalletUUID, year))
+            }
+            if (!mapWalletYear[t.To.WalletUUID][year]) {
+              promise = promise.then(() => RefreshTotalWallet(t.To.WalletUUID, year))
+            }
+            mapWalletYear[t.From.WalletUUID][year]  = true;
+            mapWalletYear[t.To.WalletUUID][year]  = true;
+          })
+          return promise;
+        })
+        .then(() => transactions)
+  )
+}
+export async function SaveTransferts(transactions : Transfert[]) : Promise<Transfert[]> {
+  return AsyncStorage.setItem("transfert", JSON.stringify(transactions.sort((a,b)=> new Date(b.Date).getTime() - new Date(a.Date).getTime()))).then(() => transactions);
+}
 export async function SaveTransactions(transactions : Transaction[]) : Promise<Transaction[]> {
   return AsyncStorage.setItem("transactions", JSON.stringify(transactions.sort((a,b)=> new Date(b.Date).getTime() - new Date(a.Date).getTime()))).then(() => transactions);
 }
@@ -150,6 +195,30 @@ export async function UpdateTransaction(transactionUUID : string, input : Transa
   )
 }
 
+export async function UpdateTransfert(transactionUUID : string, input : TransfertInput):Promise<Transfert[]> {
+    return GetTransferts().then(transactions => {
+      let transaction = transactions.find(t => t.UUID === transactionUUID)
+      if (!transaction) {
+        throw("transaction not found");
+      }
+      let old :Transfert = {...transaction, To : {...transaction.To}, From : {...transaction.From}}
+      Object.assign(transaction, {
+        Date : input.Date,
+        Comment : input.Comment,
+        To : {... input.To},
+        From : {...input.From},
+        LastUpdate : new Date(),
+      });
+      return SaveTransferts(transactions)
+      .then(() => RefreshTotalWallet(input.To.WalletUUID, input.Date.getFullYear()))
+      .then(() => RefreshTotalWallet(input.From.WalletUUID, input.Date.getFullYear()))
+      .then(() => RefreshTotalWallet(old.To.WalletUUID, new Date(old.Date).getFullYear()))
+      .then(() => RefreshTotalWallet(old.From.WalletUUID, new Date(old.Date).getFullYear()))
+      .then(() => transactions)
+    }
+  )
+}
+
 export async function DeleteTransaction(transactionUUID : string):Promise<Transaction[]> {
     return GetAllTransactions().then(transactions => {
       let transaction = transactions.find(t => t.UUID === transactionUUID)
@@ -158,7 +227,7 @@ export async function DeleteTransaction(transactionUUID : string):Promise<Transa
       }
       const old : Transaction = transaction
       transactions = transactions.filter(t => t.UUID !== transactionUUID);
-      return AsyncStorage.setItem("transactions", JSON.stringify(transactions))
+      return SaveTransactions(transactions)
       .then(() => RefreshTotalWallet(old.WalletUUID, new Date(old.Date).getFullYear()))
       .then(() => transactions)
       .then((transactions : Transaction[]) => markAsDeleted(transactionUUID).then(() => transactions))
@@ -166,35 +235,59 @@ export async function DeleteTransaction(transactionUUID : string):Promise<Transa
   )
 }
 
+export async function DeleteTransfert(transactionUUID : string):Promise<Transfert[]> {
+    return GetTransferts().then(transactions => {
+      let transaction = transactions.find(t => t.UUID === transactionUUID)
+      if (!transaction) {
+        return transactions
+      }
+      const old : Transfert = transaction
+      transactions = transactions.filter(t => t.UUID !== transactionUUID);
+      return SaveTransferts(transactions)
+      .then(() => RefreshTotalWallet(old.From.WalletUUID, new Date(old.Date).getFullYear()))
+      .then(() => RefreshTotalWallet(old.To.WalletUUID, new Date(old.Date).getFullYear()))
+      .then(() => transactions)
+      .then((transactions : Transfert[]) => markAsDeleted(transactionUUID).then(() => transactions))
+    }
+  )
+}
+
 async function RefreshTotalWallet(walletUUID : string, year : number):Promise<void> {
-  GetAllTransactions(walletUUID).then(transactions => {
-    GetWallets().then(wallets => {
+  GetAllTransactions(walletUUID).then(transactions =>
+    GetTransferts(walletUUID).then((transfert) => {
+    return GetWallets().then(wallets => {
       const wallet = wallets.find(w => w.UUID == walletUUID)
       if (!wallet) {
         return;
       }
-      calculateTotal(wallet, transactions,year);
+      calculateTotal(wallet, transactions, transfert, year);
+      console.log("refresh total wallet", wallet.TotalPerYear.find(t => t.Year === year), walletUUID, wallet, year)
       return  AsyncStorage.setItem("wallets", JSON.stringify(wallets))
     })
   })
+  )
 }
 
-function calculateTotal(wallet : Wallet, inputTransactions : Transaction[], year : number): Wallet {
+function calculateTotal(wallet : Wallet, inputTransactions : Transaction[], transfert : Transfert[], year : number): Wallet {
   const transactions = inputTransactions.filter(t => t.WalletUUID === wallet.UUID && new Date(t.Date).getFullYear() === year)
+  const transfertsIn = transfert.filter(t => t.To.WalletUUID === wallet.UUID && new Date(t.Date).getFullYear() === year)
+  const transfertsOut = transfert.filter(t => t.From.WalletUUID === wallet.UUID && new Date(t.Date).getFullYear() === year)
   let total = wallet.TotalPerYear.find(y => y.Year === year)
   if (!total) {
     total = {Year : year, Total : 0}
     wallet.TotalPerYear.push(total);
   }
   total.Total = transactions.reduce((agg,transaction) => agg+transaction.Price, 0);
+    total.Total += transfertsIn.reduce((agg,transaction) => agg+transaction.To.Price, 0);
+  total.Total -= transfertsOut.reduce((agg,transaction) => agg+transaction.From.Price, 0);
   wallet.LastUpdate = new Date();
   return wallet;
 }
 
-export async function RefreshAllTotalWallet(transactions : Transaction[]):Promise<Wallet[]> {
+export async function RefreshAllTotalWallet(transactions : Transaction[], transfert : Transfert[]):Promise<Wallet[]> {
     return GetWallets().then(wallets => {
       wallets.forEach(w => w.TotalPerYear.forEach( y =>
-        calculateTotal(w, transactions.filter(t => t.WalletUUID == w.UUID && new Date(t.Date).getFullYear() === y.Year), y.Year)))
+        calculateTotal(w, transactions, transfert, y.Year)))
       return SaveWallets(wallets);
     })
 }
@@ -217,6 +310,28 @@ export async function GetTransaction(transactionUUID : string):Promise<Transacti
         throw("transaction not found")
       } else {
         return transaction
+      }
+    })
+}
+
+export async function GetTransferts(...walletUUIDs : string[]):Promise<Transfert[]> {
+  return AsyncStorage.getItem("transfert").then(raw => {
+    let result: Transfert[] | null = JSON.parse(raw);
+    if (!result) {
+      return [];
+    }
+    return result.filter(t => !walletUUIDs.length || walletUUIDs.find(e => e===t.From.WalletUUID || e===t.To.WalletUUID)).map(TransfertDefault);
+  });
+}
+
+export async function GetTransfert(UUID : string):Promise<Transfert> {
+  return GetTransferts()
+    .then(list => list.find(t => t.UUID === UUID))
+    .then(t => {
+      if (!t) {
+        throw("transaction not found")
+      } else {
+        return t
       }
     })
 }

@@ -1,18 +1,20 @@
 import * as React from "react"
 import {Text, View, Button} from "react-native"
-import {Transaction, displayPrice, Currency, Category} from "./Types"
+import {Transfert, displayPrice, Currency, Category, Wallet} from "./Types"
 import {MyLink} from "./Link"
 import {History} from "history"
 import * as Models from "./Models"
+import * as _ from "lodash"
 //@ts-ignore
 import {Icon, TouchableRipple} from "carbon-ui"
 
 interface Props {
-  Transaction : Transaction,
+  Transfert : Transfert,
   CurrentTotal : number,
   Currency : Currency,
+  WalletUUID : string,
+  Wallets : Wallet[],
   history : History,
-  Category : Category,
 }
 
 interface State {
@@ -29,24 +31,36 @@ export default class extends React.Component<Props, State> {
   }
 
   render() {
+    let description = "";
+    let price = 0;
+    const walletFrom = _.find(this.props.Wallets, w => (w.UUID === this.props.Transfert.From.WalletUUID))
+    const walletTo = _.find(this.props.Wallets, w => (w.UUID === this.props.Transfert.To.WalletUUID))
+    const income = this.props.WalletUUID === this.props.Transfert.To.WalletUUID
+    if (!income) {
+      description = `Transfert to ${walletTo ? walletTo.Name : "Wallet"}`
+      price = -this.props.Transfert.From.Price;
+    } else if (income) {
+      description = `Transfert from ${walletFrom ? walletFrom.Name : "Wallet"}`
+      price = this.props.Transfert.To.Price;
+    }
     const options = <View>
     <Button onPress={() => this.delete()} title="Supprimer" />
     </View>
     return <TouchableRipple
-      onPress={() => this.props.history.push(`/Wallet/${this.props.Transaction.WalletUUID}/AddTransactionView/${this.props.Transaction.UUID}`)}
+      onPress={() => this.props.history.push(`/Wallet/${this.props.Transfert.From.WalletUUID}/AddTransfertView/${this.props.Transfert.UUID}`)}
       onLongPress={() => this.setState({...this.state, displayOption : true})}
       style={{display: this.state.deleted ?"none" : undefined}}
       >
     <View>
     <View style={{height: 60, flexDirection: "row", alignItems: "center", justifyContent:"center"}}>
     <View style={{flex:1}}>
-    <Icon name={this.props.Category.Icon} style={margins}/>
+    <Icon name="sync" style={margins}/>
     </View>
     <View style={{flex:6}}>
-    <Text style={margins}>{this.props.Transaction.Beneficiary}</Text>
+    <Text style={margins}>{description}</Text>
     </View>
     <View style={{flex:3}}>
-    <Text style={{...margins, textAlign: "right", fontSize:18, color : this.props.Transaction.Price > 0 ? "green": "red"}}>{displayPrice(this.props.Transaction.Price, this.props.Currency)}</Text>
+    <Text style={{...margins, textAlign: "right", fontSize:18, color : price > 0 ? "green": "red"}}>{displayPrice(price, this.props.Currency)}</Text>
     <Text style={{...margins, textAlign: "right", fontSize:10}}>{displayPrice(this.props.CurrentTotal, this.props.Currency)}</Text>
     </View>
     </View>
@@ -56,6 +70,6 @@ export default class extends React.Component<Props, State> {
   }
 
   delete() {
-    Models.DeleteTransaction(this.props.Transaction.UUID).then( () => this.setState({deleted : true}) )
+    Models.DeleteTransfert(this.props.Transfert.UUID).then( () => this.setState({deleted : true}) )
   }
 }

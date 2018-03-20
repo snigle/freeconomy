@@ -112,7 +112,16 @@ export const TransactionDefault = (w :Transaction):Transaction => ({
     Date : asDate(w.Date),
     Price : w.Price || 0,
     Comment: w.Comment || "",
-  })
+})
+
+export const TransfertDefault = (w :Transfert):Transfert => ({
+    UUID : w.UUID || v4(),
+    To : w.To,
+    From : w.From,
+    LastUpdate: asDate(w.LastUpdate),
+    Date : asDate(w.Date),
+    Comment: w.Comment || "",
+})
 
 interface TransfertDetail {
   WalletUUID : string,
@@ -127,6 +136,13 @@ export interface Transfert{
 
   Date : Date,
   LastUpdate : Date,
+}
+
+export interface TransfertInput {
+  From : TransfertDetail,
+  To : TransfertDetail,
+  Comment? : string,
+  Date : Date,
 }
 
 export interface Login {

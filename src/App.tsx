@@ -22,6 +22,7 @@ import AddWalletView from "./AddWalletView"
 import DeleteWalletView from "./DeleteWalletView"
 import TransactionsView from "./TransactionsView"
 import AddTransactionView from "./AddTransactionView"
+import AddTransfertView from "./AddTransfertView"
 import GoogleSyncOAuthCallBack from "./GoogleSyncOAuthCallBack"
 import ImportTransactionsView from "./ImportTransactionsView"
 
@@ -68,6 +69,8 @@ const App = (props:any) =>
   <Route path="/Wallet/:WalletUUID/TransactionsView" component={(props : RouteComponentProps<any>) => <TransactionsView WalletUUID={props.match.params.WalletUUID} history={props.history} Search={queryString(props.location.search,"search")}/>}></Route>
   <Route path="/Wallet/:WalletUUID/AddTransactionView" exact component={(props : any) => <AddTransactionView WalletUUID={props.match.params.WalletUUID} history={props.history}/>} />
   <Route path="/Wallet/:WalletUUID/AddTransactionView/:TransactionUUID" component={({match, history} : any) => <AddTransactionView WalletUUID={match.params.WalletUUID} TransactionUUID={match.params.TransactionUUID} history={history}/>} />
+  <Route path="/Wallet/:WalletUUID/AddTransfertView" exact component={(props : RouteComponentProps<any>) => <AddTransfertView WalletUUID={props.match.params.WalletUUID} history={props.history}/>} />
+  <Route path="/Wallet/:WalletUUID/AddTransfertView/:TransfertUUID" component={({match, history} : any) => <AddTransfertView WalletUUID={match.params.WalletUUID} TransfertUUID={match.params.TransfertUUID} history={history}/>} />
   <Route path="/oauthCallback" component={GoogleSyncOAuthCallBack} />
   <Route path="/ImportTransactionsView" component={ImportTransactionsView} />
 </View>

@@ -1,6 +1,6 @@
 import * as React from "react"
 import * as Models from "./Models"
-import {Wallet, Transaction, displayPrice, Category} from "./Types"
+import {Transfert, Wallet, Transaction, displayPrice, Category} from "./Types"
 import Loading from "./Loading"
 import GroupTransactionsByDay from "./GroupTransactionsByDay"
 import AddWalletView from "./AddWalletView"
@@ -13,9 +13,11 @@ import { AppBar, Icon, Paper, Display1, FlatButton, connectTheme, Divider } from
 
 
 interface State {
-  Transactions ?: Transaction[],
+  Transactions : Transaction[],
   Wallet : Wallet,
   Categories : Category[],
+  Wallets : Wallet[],
+  Transfert : Transfert[],
 }
 
 interface Props {
@@ -41,6 +43,9 @@ class TransactionsView extends React.Component<Props,State>{
         TotalPerYear : [],
         UUID : "",
       },
+      Wallets : [],
+      Transactions : [],
+      Transfert :[],
       Categories : [],
     }
   }
@@ -60,11 +65,30 @@ class TransactionsView extends React.Component<Props,State>{
           }
           return true;
         })),
-        Models.GetWallet(this.props.WalletUUID),
+        Models.GetWallets(),
         Models.GetCategories(),
+        Models.GetTransferts().then(transfert => transfert.filter(t => {
+          if (this.props.WalletUUID) {
+            if (this.props.WalletUUID !== t.From.WalletUUID && this.props.WalletUUID !== t.To.WalletUUID) {
+              return false;
+            }
+          }
+          if (this.props.Search) {
+            if(!t.Comment.match(this.props.Search)) {
+              return false;
+            }
+          }
+          return true;
+          }
+        ))
       ])
-      .then(([transactions, wallet, categories]) => {
-        this.setState({ Transactions : transactions, Wallet : wallet, Categories : categories });
+      .then(([transactions, wallets, categories, transfert]) => {
+        const wallet = wallets.find(w => w.UUID === this.props.WalletUUID)
+        if (!wallet) {
+          this.props.history.goBack();
+          return;
+        }
+        this.setState({ Transactions : transactions, Transfert : transfert, Wallet : wallet, Categories : categories, Wallets : wallets });
       })
       .catch((err) => console.log("fail to load transactions, need to reset ?", err))
 
@@ -78,9 +102,9 @@ class TransactionsView extends React.Component<Props,State>{
    } else if (!this.state.Wallet){
      content = <Loading Message="Chargement du wallet" />;
    } else {
-     console.log("transactions", this.state.Transactions)
+     console.log("transactions", this.state.Transactions, this.state.Transfert)
        content =
-       <GroupTransactionsByDay Categories={this.state.Categories} Transactions={this.state.Transactions} Currency={this.state.Wallet.Currency} history={this.props.history} />
+       <GroupTransactionsByDay Transfert={this.state.Transfert} WalletUUID={this.props.WalletUUID} Wallets={this.state.Wallets} Categories={this.state.Categories} Transactions={this.state.Transactions} Currency={this.state.Wallet.Currency} history={this.props.history} />
    }
 
     return <View>
@@ -89,6 +113,7 @@ class TransactionsView extends React.Component<Props,State>{
         <View style={{flexDirection:"row"}}>
         <MyLink to="/"><Icon name="arrow_back" /></MyLink>
         <MyLink to={`/Wallet/${this.props.WalletUUID}/AddTransactionView`}><Icon name="add" /></MyLink>
+        <MyLink to={`/Wallet/${this.props.WalletUUID}/AddTransfertView`}><Icon name="add" /></MyLink>
         <MyLink to={`/ImportTransactionsView?walletUUID=${this.props.WalletUUID}`}><Button onPress={() => (console.log("import"))} title="Import" /></MyLink>
         </View>
       }
