@@ -7,9 +7,12 @@ import AddWalletView from "./AddWalletView"
 import {View, Button, Text, FlatList, Platform} from "react-native"
 import {MyLink} from "./Link"
 import {History} from "history"
+import SideBar from "./SideBar"
+import {Header, Icon} from "react-native-elements"
 import * as _ from "lodash"
+import MoreActions from "./MoreActions"
 //@ts-ignore
-import { AppBar, Icon, Paper, Display1, FlatButton, connectTheme, Divider } from 'carbon-ui'
+import { FlatButton, connectTheme, Divider } from 'carbon-ui'
 
 
 interface State {
@@ -18,6 +21,7 @@ interface State {
   Categories : Category[],
   Wallets : Wallet[],
   Transfert : Transfert[],
+  displayOptions : boolean,
 }
 
 interface Props {
@@ -27,7 +31,7 @@ interface Props {
 }
 
 class TransactionsView extends React.Component<Props,State>{
-
+  private sidebar? : SideBar
   constructor(props: Props) {
     super(props)
     this.state = {
@@ -47,6 +51,7 @@ class TransactionsView extends React.Component<Props,State>{
       Transactions : [],
       Transfert :[],
       Categories : [],
+      displayOptions : false,
     }
   }
 
@@ -97,6 +102,15 @@ class TransactionsView extends React.Component<Props,State>{
 
   render() {
     let content: any
+    let options: JSX.Element = <View></View>
+    if (this.state.displayOptions) {
+      options = <MoreActions actions={[
+        {title : "Add Transaction", onPress : () => this.props.history.push(`/Wallet/${this.props.WalletUUID}/AddTransactionView`)},
+        {title : "Add Transfert", onPress : () => this.props.history.push(`/Wallet/${this.props.WalletUUID}/AddTransfertView`)},
+        {title: "Import from csv", onPress : () => this.props.history.push(`/ImportTransactionsView?walletUUID=${this.props.WalletUUID}`)},
+      ]} />
+    }
+
     if (!this.state.Transactions) {
      content = <Loading Message="Chargement des transactions" />;
    } else if (!this.state.Wallet){
@@ -107,19 +121,19 @@ class TransactionsView extends React.Component<Props,State>{
        <GroupTransactionsByDay Transfert={this.state.Transfert} WalletUUID={this.props.WalletUUID} Wallets={this.state.Wallets} Categories={this.state.Categories} Transactions={this.state.Transactions} Currency={this.state.Wallet.Currency} history={this.props.history} />
    }
 
-    return <View>
-    <AppBar title={this.state.Wallet.Name || "Freeconomy"} >
-      {
-        <View style={{flexDirection:"row"}}>
-        <MyLink to="/"><Icon name="arrow_back" /></MyLink>
-        <MyLink to={`/Wallet/${this.props.WalletUUID}/AddTransactionView`}><Icon name="add" /></MyLink>
-        <MyLink to={`/Wallet/${this.props.WalletUUID}/AddTransfertView`}><Icon name="add" /></MyLink>
-        <MyLink to={`/ImportTransactionsView?walletUUID=${this.props.WalletUUID}`}><Button onPress={() => (console.log("import"))} title="Import" /></MyLink>
-        </View>
-      }
-    </AppBar>
+    return (
+    <SideBar history={this.props.history} ref={(sidebar: SideBar) => this.sidebar = sidebar}>
+    <View style={{flex:1}}>
+    <Header
+    outerContainerStyles={{height:60}}
+      leftComponent={{ icon: 'menu', color: '#fff', onPress : () => this.sidebar && this.sidebar.openDrawer() }}
+      centerComponent={{ text: this.state.Wallet.Name || "Freeconomy", style: { fontSize: 20, color: '#fff' } }}
+      rightComponent={{ icon:this.state.displayOptions ? "expand-less" : "more-vert", color : "#fff", onPress:() => this.setState({...this.state, displayOptions : !this.state.displayOptions})}}
+    />
+    {options}
     {content}
     </View>
+    </SideBar>)
   }
 
 }

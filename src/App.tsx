@@ -26,7 +26,7 @@ import AddTransactionView from "./AddTransactionView"
 import AddTransfertView from "./AddTransfertView"
 import GoogleSyncOAuthCallBack from "./GoogleSyncOAuthCallBack"
 import ImportTransactionsView from "./ImportTransactionsView"
-
+import SideBar from "./SideBar"
 //@ts-ignore
 import { AppBar, IconToggle, connectTheme, Icon } from 'carbon-ui'
 
@@ -62,7 +62,7 @@ function queryString(search :string, key : string) : string {
 }
 
 const App = (props:any) =>
-<View style={{flex:1}}>
+  <View style={{flex:1}}>
   <Route exact path="/" component={WalletsView}></Route>
   <Route path="/AddWalletView" exact component={AddWalletView}></Route>
   <Route path="/AddWalletView/:WalletUUID" component={({match, history} : { match : match<{WalletUUID :string}>, history: History }) => <AddWalletView WalletUUID={match.params.WalletUUID} history={history}/>}></Route>
@@ -74,6 +74,6 @@ const App = (props:any) =>
   <Route path="/Wallet/:WalletUUID/AddTransfertView/:TransfertUUID" component={({match, history} : any) => <AddTransfertView WalletUUID={match.params.WalletUUID} TransfertUUID={match.params.TransfertUUID} history={history}/>} />
   <Route path="/oauthCallback" component={GoogleSyncOAuthCallBack} />
   <Route path="/ImportTransactionsView" component={ImportTransactionsView} />
-</View>
+  </View>
 
 export default App;

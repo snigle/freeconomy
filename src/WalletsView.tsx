@@ -11,6 +11,7 @@ import {GoogleSync} from "./Sync"
 import * as _ from "lodash"
 import {Header, Divider, Card, Icon} from "react-native-elements"
 import MoreActions from "./MoreActions"
+import SideBar from "./SideBar"
 
 interface State {
   Wallets ?: Wallet[],
@@ -22,10 +23,12 @@ interface Props {
 }
 
 class Wallets extends React.Component<Props,State>{
+  public sidebar : SideBar | null
 
   constructor(props: Props) {
     super(props)
     this.state = { displayOptions : false}
+    this.sidebar = null
   }
 
   componentDidMount() {
@@ -73,10 +76,11 @@ class Wallets extends React.Component<Props,State>{
 
    }
 
-    return <View style={{flex:1}}>
+    return <SideBar history={this.props.history} ref={(sidebar: SideBar) => this.sidebar = sidebar}>
+    <View style={{flex:1}}>
     <Header
     outerContainerStyles={{height:60}}
-      leftComponent={{ icon: 'menu', color: '#fff' }}
+      leftComponent={{ icon: 'menu', color: '#fff', onPress : () => this.sidebar && this.sidebar.openDrawer() }}
       centerComponent={{ text: 'Freeconomy', style: { fontSize: 20, color: '#fff' } }}
       rightComponent={{ icon:this.state.displayOptions ? "expand-less" : "more-vert", color : "#fff", onPress:() => this.setState({...this.state, displayOptions : !this.state.displayOptions})}}
     />
@@ -94,6 +98,7 @@ class Wallets extends React.Component<Props,State>{
       onPress={() => this.props.history.push("/AddWalletView")} />
       </View>
     </View>
+    </SideBar>
   }
 
 }
