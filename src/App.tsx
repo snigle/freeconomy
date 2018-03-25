@@ -10,6 +10,7 @@ import {
   StyleSheet,
   Text,
   View,
+  ScrollView,
 } from 'react-native';
 
 import { Route, match , RouteComponentProps} from 'react-router'
@@ -61,7 +62,7 @@ function queryString(search :string, key : string) : string {
 }
 
 const App = (props:any) =>
-<View>
+<View style={{flex:1}}>
   <Route exact path="/" component={WalletsView}></Route>
   <Route path="/AddWalletView" exact component={AddWalletView}></Route>
   <Route path="/AddWalletView/:WalletUUID" component={({match, history} : { match : match<{WalletUUID :string}>, history: History }) => <AddWalletView WalletUUID={match.params.WalletUUID} history={history}/>}></Route>

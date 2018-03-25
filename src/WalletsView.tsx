@@ -4,16 +4,20 @@ import {Wallet, displayPrice} from "./Types"
 import Loading from "./Loading"
 import WalletListItem from "./WalletListItem"
 import AddWalletView from "./AddWalletView"
-import {View, Button, Text} from "react-native"
+import {View, Button, Text, ScrollView, FlatList} from "react-native"
 import {History} from "history"
 import {MyLink} from "./Link"
 import {GoogleSync} from "./Sync"
 import * as _ from "lodash"
+import {Header, Divider, Card, Icon} from "react-native-elements"
+import MoreActions from "./MoreActions"
+
 //@ts-ignore
-import { AppBar, Icon, Paper, Display1, FlatButton, connectTheme, Divider } from 'carbon-ui'
+import { AppBar, Paper, Display1, FlatButton, connectTheme } from 'carbon-ui'
 
 interface State {
   Wallets ?: Wallet[],
+  displayOptions : boolean
 }
 
 interface Props {
@@ -24,7 +28,7 @@ class Wallets extends React.Component<Props,State>{
 
   constructor(props: Props) {
     super(props)
-    this.state = {}
+    this.state = { displayOptions : false}
   }
 
   componentDidMount() {
@@ -32,8 +36,20 @@ class Wallets extends React.Component<Props,State>{
     .catch(() => console.log("fail to load wallets, need to reset ?"))
   }
 
+  handleClick(e : any) {
+    console.log("handle click")
+  }
+
   render() {
-    let content: any
+    let content: JSX.Element[] | JSX.Element
+    let options : JSX.Element = <View></View>
+    if (this.state.displayOptions) {
+      options = <MoreActions actions={[
+        {title : "Add wallet", onPress : () => this.props.history.push("/AddWalletView")},
+        {title : "Synchronise", onPress : () => GoogleSync()},
+        {title: "Logout", onPress : () => Models.SaveLogin({id : "", token : "", expires : new Date()})},
+      ]} />
+    }
     if (!this.state.Wallets) {
      content = <Loading Message="Chargement des wallets" />;
    } else {
@@ -45,28 +61,42 @@ class Wallets extends React.Component<Props,State>{
        totalYear.Total + sumPerWallet , 0) , 0)
        console.log("wallets", wallets)
 
-       return <View>
-         <Text>{`Wallets (${currencyCode}) : ${displayPrice(total, wallets[0].Currency)}`}</Text>
+       return <Card key={currencyCode} title={`Wallets (${currencyCode}) : ${displayPrice(total, wallets[0].Currency)}`}
+       dividerStyle={{marginBottom: 0}} titleStyle={{marginTop:10}} containerStyle={{margin:3, padding:0}} wrapperStyle={{padding:0}}>
          {
            wallets.map((wallet) =>
-             <WalletListItem key={wallet.UUID} Wallet={wallet} history={this.props.history}></WalletListItem>
+              <View key={wallet.UUID}>
+                <WalletListItem Wallet={wallet} history={this.props.history}></WalletListItem>
+                <Divider />
+              </View>
            )
          }
-         <Divider />
-         </View>
+         </Card>
      });
 
    }
 
-    return <View>
-    <AppBar title="Freeconomy">
-      <View style={{flexDirection:"row"}}>
-        <MyLink to="/AddWalletView"><Icon name="add" /></MyLink>
-        <Button onPress={() => GoogleSync()} title="Sync" />
-        <Button onPress={() => Models.SaveLogin({id : "", token : "", expires : new Date()})} title="Logout" />
-      </View>
-    </AppBar>
+    return <View style={{flex:1}}>
+    <Header
+    outerContainerStyles={{height:60}}
+      leftComponent={{ icon: 'menu', color: '#fff' }}
+      centerComponent={{ text: 'Freeconomy', style: { fontSize: 20, color: '#fff' } }}
+      rightComponent={{ icon:this.state.displayOptions ? "expand-less" : "more-vert", color : "#fff", onPress:() => this.setState({...this.state, displayOptions : !this.state.displayOptions})}}
+      innerContainerStyles={{overflow:"visible"}}
+    />
+    <View style={{flex:1}}>
+    {options}
+    <ScrollView >
     {content}
+    <View style={{height:100}}/>
+    </ScrollView>
+    <Icon
+      raised
+      containerStyle={{position:"absolute", right:20,bottom:20}}
+      name='add'
+      color='#517fa4'
+      onPress={() => console.log('Add')} />
+      </View>
     </View>
   }
 

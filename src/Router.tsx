@@ -4,7 +4,7 @@ import { NativeRouter, BackButton } from 'react-router-native'
 import App from './App'
 
 const Router = <NativeRouter>
-  <View>
+  <View style={{flex :1}}>
     <BackButton/>
     <App/>
   </View>

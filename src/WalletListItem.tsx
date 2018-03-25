@@ -5,7 +5,8 @@ import {MyLink} from "./Link"
 import {History} from "history"
 import * as Models from "./Models"
 //@ts-ignore
-import {Icon, TouchableRipple as TouchableHighlight, Dialog, FlatButton} from "carbon-ui"
+import {TouchableRipple as TouchableHighlight, Dialog, FlatButton} from "carbon-ui"
+import {Icon, Divider} from "react-native-elements"
 interface Props {
   Wallet : Wallet
   history: History
@@ -14,7 +15,7 @@ interface State {
   displayOption : boolean,
 }
 
-const margins = {marginLeft : 15, marginRight : 15}
+const margins = {}
 
 export default class extends React.Component<Props, State>{
   constructor(props : Props) {
@@ -37,8 +38,12 @@ export default class extends React.Component<Props, State>{
         onPress={() => this.props.history.push(`/Wallet/${this.props.Wallet.UUID}/TransactionsView`)}
       >
       <View style={{height: 60, flexDirection: "row", alignItems: "center"}}>
-      <View style={{flex:1}}>
-      <Icon name="account_balance_wallet" style={margins}/>
+      <View style={{flex:2}}>
+      <Icon
+        reverse
+        name='account-balance-wallet'
+        color='#517fa4'
+      />
       </View>
       <View style={{flex:4}}>
       <Text style={margins}>{this.props.Wallet.Name}</Text>

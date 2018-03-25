@@ -38,6 +38,9 @@ module.exports = {
         test: /\.jsx?$/,
         include: [
           path.resolve(__dirname, "node_modules/react-router-native"),
+          path.resolve(__dirname, "node_modules/react-native-elements"),
+          path.resolve(__dirname, "node_modules/react-native-vector-icons"),
+
           // path.resolve(__dirname, "node_modules/react-native-material-ui"),
           // path.resolve(__dirname, "node_modules/react-native-vector-icons"),
           path.resolve(__dirname, "lib"),

@@ -6,7 +6,7 @@ import App from './App'
 import {WebStyles} from "carbon-ui"
 
 const Router = <BrowserRouter>
-  <View>
+  <View style={{flex :1}}>
   <WebStyles />
   <App/>
   </View>
