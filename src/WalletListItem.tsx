@@ -41,8 +41,9 @@ export default class extends React.Component<Props, State>{
       <View style={{flex:2}}>
       <Icon
         reverse
-        name='account-balance-wallet'
-        color='#517fa4'
+        name={this.props.Wallet.Icon.Name}
+        type={this.props.Wallet.Icon.Type}
+        color={this.props.Wallet.Icon.Color}
       />
       </View>
       <View style={{flex:4}}>

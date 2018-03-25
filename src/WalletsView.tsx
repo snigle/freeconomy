@@ -12,9 +12,6 @@ import * as _ from "lodash"
 import {Header, Divider, Card, Icon} from "react-native-elements"
 import MoreActions from "./MoreActions"
 
-//@ts-ignore
-import { AppBar, Paper, Display1, FlatButton, connectTheme } from 'carbon-ui'
-
 interface State {
   Wallets ?: Wallet[],
   displayOptions : boolean
@@ -82,7 +79,6 @@ class Wallets extends React.Component<Props,State>{
       leftComponent={{ icon: 'menu', color: '#fff' }}
       centerComponent={{ text: 'Freeconomy', style: { fontSize: 20, color: '#fff' } }}
       rightComponent={{ icon:this.state.displayOptions ? "expand-less" : "more-vert", color : "#fff", onPress:() => this.setState({...this.state, displayOptions : !this.state.displayOptions})}}
-      innerContainerStyles={{overflow:"visible"}}
     />
     <View style={{flex:1}}>
     {options}
@@ -95,7 +91,7 @@ class Wallets extends React.Component<Props,State>{
       containerStyle={{position:"absolute", right:20,bottom:20}}
       name='add'
       color='#517fa4'
-      onPress={() => console.log('Add')} />
+      onPress={() => this.props.history.push("/AddWalletView")} />
       </View>
     </View>
   }

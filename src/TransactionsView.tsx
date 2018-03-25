@@ -37,7 +37,7 @@ class TransactionsView extends React.Component<Props,State>{
           Symbol : "",
         },
         Description : "",
-        Icon : "",
+        Icon : {Name : "", Color : "", Type : "material"},
         LastUpdate : new Date(),
         Name : "",
         TotalPerYear : [],

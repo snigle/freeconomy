@@ -23,14 +23,21 @@ export interface Wallet {
   Name: string,
   Description: string,
   Currency: Currency,
-  Icon: string,
+  Icon: Icon,
+}
+
+export type IconType = "material" | "material-community" | "zocial" | "font-awesome"| "octicon"| "ionicon"| "foundation"| "evilicon"| "simple-line-icon"| "feather"| "entypo"
+export interface Icon {
+  Name : string,
+  Color : string,
+  Type : IconType
 }
 
 export interface WalletInput {
   Name: string,
   Description: string,
   Currency: Currency,
-  Icon: string,
+  Icon: Icon,
 }
 
 export const WalletDefault = (w :Wallet):Wallet => ({
@@ -39,8 +46,8 @@ export const WalletDefault = (w :Wallet):Wallet => ({
     LastUpdate: asDate(w.LastUpdate),
     Name : w.Name || "No Name",
     Description: w.Description || "",
-    Currency : { Code : "EUR", Symbol: "€"},
-    Icon: "account_balance_wallet",
+    Currency : w.Currency || { Code : "EUR", Symbol: "€"},
+    Icon: w.Icon || { Name : "account_balance_wallet", Color : "#517fa4"},
   })
 
   export const displayPrice = (price : number, currency : Currency) : string =>
