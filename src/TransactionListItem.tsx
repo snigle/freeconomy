@@ -4,8 +4,9 @@ import {Transaction, displayPrice, Currency, Category} from "./Types"
 import {MyLink} from "./Link"
 import {History} from "history"
 import * as Models from "./Models"
+import {Icon} from "react-native-elements"
 //@ts-ignore
-import {Icon, TouchableRipple} from "carbon-ui"
+import { TouchableRipple} from "carbon-ui"
 
 interface Props {
   Transaction : Transaction,
@@ -40,7 +41,7 @@ export default class extends React.Component<Props, State> {
     <View>
     <View style={{height: 60, flexDirection: "row", alignItems: "center", justifyContent:"center"}}>
     <View style={{flex:1}}>
-    <Icon name={this.props.Category.Icon} style={margins}/>
+    <Icon name={this.props.Category.Icon.Name} type={this.props.Category.Icon.Type}/>
     </View>
     <View style={{flex:6}}>
     <Text style={margins}>{this.props.Transaction.Beneficiary}</Text>

@@ -10,7 +10,7 @@ import {ColorWheel} from "react-native-color-wheel"
 //@ts-ignore
 import * as colorsys from 'colorsys'
 //@ts-ignore
-import { RaisedButton, TextField, AppBar } from 'carbon-ui'
+import { RaisedButton, TextField} from 'carbon-ui'
 
 interface State extends WalletInput{
   Loading : boolean,
@@ -81,11 +81,9 @@ class AddWalletView extends React.Component<Props,State>{
   }
 
   render() {
-    let content : JSX.Element
-    if (this.state.Loading) {
-      content = <View><Text>Chargement</Text></View>
-    } else {
-      content = <ScrollView>
+    let content : JSX.Element= <View><Text>Chargement</Text></View>
+    if (!this.state.Loading) {
+      content = <ScrollView style={{flex:1}}>
       <TextField placeholder="Name" onChangeText={(v:string) => this.changeName(v)} value={this.state.Name}/>
       <TextField placeholder="Description" onChangeText={(v:string) => this.changeDescription(v)} value={this.state.Description}/>
 
@@ -127,13 +125,15 @@ class AddWalletView extends React.Component<Props,State>{
       </ScrollView>
     }
     return (
-      <View>
+      <View style={{flex:1}}>
         <Header
         outerContainerStyles={{height:60}}
           leftComponent={{ icon: 'navigate-before', color: '#fff', onPress:() => this.props.history.replace("/") }}
           centerComponent={{ text: 'Add Wallet', style: { fontSize: 20, color: '#fff' } }}
         />
-        {content}
+        {
+          content
+        }
       </View>
     )
   }

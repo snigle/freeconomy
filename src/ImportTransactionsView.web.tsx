@@ -4,7 +4,7 @@ import {RouteProps, RouterProps, RouteComponentProps} from "react-router"
 import * as queryString from "querystring"
 import * as Papa from "papaparse"
 import * as Models from "./Models"
-import {Transaction, Category} from "./Types"
+import {DefaultIcon, Transaction, Category, Wallet, CategoryInput} from "./Types"
 import {v4} from "uuid"
 import GroupTransactionsByDay from "./GroupTransactionsByDay"
 import {History} from "history"
@@ -18,9 +18,10 @@ interface State {
   WalletUUID : string,
   Lines : string[][],
   Categories : Category[],
+  Wallets : Wallet[],
 
   // Computed
-  CategoriesToImport : Category[],
+  CategoriesToImport : CategoryInput[],
   TransactionsToImport : Transaction[],
 
   // Inputs
@@ -38,40 +39,31 @@ export default class extends React.Component<RouteComponentProps<any>,State> {
   constructor(props : RouteComponentProps<any>) {
     super(props)
     console.log("props", props);
+    let state = {
+      WalletUUID : "",
+      Lines : [],
+      CategoryName : "",
+      Beneficiary : "",
+      Date : "",
+      Price : "",
+      Comment : "",
+      CategoriesToImport : [],
+      TransactionsToImport : [],
+      Categories : [],
+      Wallets : [],
+      }
     if (props.location) {
       const toto = queryString.parse(props.location.search.replace("?",""))
-      this.state = {
-        WalletUUID : Array.isArray(toto.walletUUID) ? toto.walletUUID[0] : toto.walletUUID,
-        Lines : [],
-        CategoryName : "",
-        Beneficiary : "",
-        Date : "",
-        Price : "",
-        Comment : "",
-        CategoriesToImport : [],
-        TransactionsToImport : [],
-        Categories : [],
-        }
-    } else {
-      this.state = {
-        WalletUUID : "",
-        Lines : [],
-        CategoryName : "",
-        Beneficiary : "",
-        Date : "",
-        Price : "",
-        Comment : "",
-        CategoriesToImport : [],
-        TransactionsToImport : [],
-        Categories : [],
-        }
+      state.WalletUUID = Array.isArray(toto.walletUUID) ? toto.walletUUID[0] : toto.walletUUID;
     }
+    this.state = state;
   }
 
   async componentDidMount() {
     Promise.all([
-    Models.GetCategories().then(categories => this.setState({...this.state, Categories : categories})),
-    AsyncStorage.getItem("csv").then(result => this.handleCSVContent(result)),
+      Models.GetCategories().then(categories => this.setState({...this.state, Categories : categories})),
+      Models.GetWallets().then(wallets => this.setState({...this.state, Wallets : wallets})),
+    AsyncStorage.getItem("csv").then(result => result && this.handleCSVContent(result)),
     ])
   }
 
@@ -100,7 +92,7 @@ export default class extends React.Component<RouteComponentProps<any>,State> {
         <View>
         <Text> Voulez vous importer toutes ces transactions ? </Text>
         <Button title="Importer" onPress={() => this.import()} />
-        <GroupTransactionsByDay Categories={this.state.Categories} Transactions={this.state.TransactionsToImport} history={this.props.history} Currency={{Code : "EUR", Symbol : "€"}}/>
+        <GroupTransactionsByDay WalletUUID={this.state.WalletUUID} Transfert={[]} Wallets={this.state.Wallets} Categories={this.state.Categories} Transactions={this.state.TransactionsToImport} history={this.props.history} Currency={{Code : "EUR", Symbol : "€"}}/>
         </View>
       )
     } else if (this.state.Lines.length) {
@@ -114,7 +106,15 @@ export default class extends React.Component<RouteComponentProps<any>,State> {
             <TextInput keyboardType="numeric" key={k} onChangeText={(e) => this.bindInput(k, e)} placeholder="Column Name" value={this.state[k]}/>
             </View>
           ))}
-          <Button title="Import" onPress={() => this.generateTransactions()}/>
+            <View style={{flexDirection:"row"}}>
+              <View style={{flex:1}}>
+                <Button title="Cancel" onPress={() => this.cancel()}/>
+              </View>
+              <View style={{flex:1}}>
+                <Button title="Import" onPress={() => this.generateTransactions()}/>
+              </View>
+
+            </View>
           </View>
           <Text>Your CSV file : </Text>
           <View style={{flex : 10, flexDirection:"column"}}>
@@ -159,6 +159,11 @@ export default class extends React.Component<RouteComponentProps<any>,State> {
     console.log("file read", csv.data.slice(0,5));
   }
 
+  cancel() {
+    AsyncStorage.removeItem("csv");
+    this.setState({Lines : []});
+  }
+
   generateTransactions() {
     if (!mandatory.reduce((agg, current)=> (agg && this.state[current] !== ""), true)){
       console.log("missing mandatory field")
@@ -182,7 +187,7 @@ export default class extends React.Component<RouteComponentProps<any>,State> {
         }
         const c = {
           UUID : v4(),
-          Icon : "android",
+          Icon : DefaultIcon({Name : "shopping-cart", Color : "#517fa4", Type : "material"}),
           LastUpdate : new Date(),
           Name : categoryName,
         }

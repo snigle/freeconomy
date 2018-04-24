@@ -35,7 +35,7 @@ interface Props {
 
 function displayTransaction(transactionByDay : TransactionByDay, props : Props) : JSX.Element {
   const categories = _.mapValues(_.groupBy(props.Categories, "UUID"), t => t[0])
-  const defaultCategory : Category = { Name : "Unknown", Icon : "help", LastUpdate : new Date(), UUID:"" }
+  const defaultCategory : Category = { Name : "Unknown", Icon : {Name : "help", Color : "#517fa4", Type : "material"}, LastUpdate : new Date(), UUID:"" }
    return (
     <View key={transactionByDay.day.toString()}>
     <Text style={{backgroundColor:"rgb(130, 130, 130)", color:"white"}}>{transactionByDay.day.toLocaleString()}</Text>

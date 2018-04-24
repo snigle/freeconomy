@@ -30,7 +30,8 @@ export default class extends React.Component<Props,any>{
   <ScrollView>
     <Text style={{textAlign:"center", margin:10, fontSize:18}}>Freeconomy</Text>
     <List containerStyle={{marginTop:0}}>
-      <ListItem title="Accueil" onPress={() => this.props.history.replace("/")} />
+    <ListItem title="Accueil" onPress={() => this.props.history.replace("/")} />
+    <ListItem title="Categories" onPress={() => this.props.history.replace("/CategoriesView")} />
     </List>
   </ScrollView>
   }

@@ -102,16 +102,6 @@ class AddTransactionView extends React.Component<Props,State>{
       console.log("display", this.state);
       content = <View>
         <TextField placeholder="Benificiary" onChangeText={(v:string) => this.changeBenificiary(v)} value={this.state.Beneficiary}/>
-        <Picker
-          mode="dropdown"
-          selectedValue={this.state.CategoryUUID}
-          onValueChange={(itemValue, itemIndex) => this.changeCategory(itemValue)}>
-          {
-            this.state.Categories.map(category =>
-              <Picker.Item key={category.UUID} label={category.Name} value={category.UUID} />
-            )
-          }
-        </Picker>
         <DatePicker value={this.state.Date} callback={(date: Date) => this.changeDate(date)}/>
         <TextField keyboardType="numeric" placeholder="Price" onChangeText={(v:string) => this.changePrice(v)} value={this.state.PriceText}/>
         <RaisedButton onPress={() => this.save()}>Save</RaisedButton>

@@ -26,6 +26,8 @@ import AddTransactionView from "./AddTransactionView"
 import AddTransfertView from "./AddTransfertView"
 import GoogleSyncOAuthCallBack from "./GoogleSyncOAuthCallBack"
 import ImportTransactionsView from "./ImportTransactionsView"
+import CategoriesView from "./CategoriesView"
+import AddCategoryView from "./AddCategoryView"
 import SideBar from "./SideBar"
 //@ts-ignore
 import { AppBar, IconToggle, connectTheme, Icon } from 'carbon-ui'
@@ -64,6 +66,9 @@ function queryString(search :string, key : string) : string {
 const App = (props:any) =>
   <View style={{flex:1}}>
   <Route exact path="/" component={WalletsView}></Route>
+  <Route exact path="/CategoriesView" component={CategoriesView}></Route>
+  <Route path="/AddCategoryView" exact component={({match, history} : { match : match<{CategoryUUID :string}>, history: History }) => <AddCategoryView CategoryUUID={match.params.CategoryUUID} history={history}/>}></Route>
+  <Route path="/AddCategoryView/:CategoryUUID" component={({match, history} : { match : match<{CategoryUUID :string}>, history: History }) => <AddCategoryView CategoryUUID={match.params.CategoryUUID} history={history}/>}></Route>
   <Route path="/AddWalletView" exact component={AddWalletView}></Route>
   <Route path="/AddWalletView/:WalletUUID" component={({match, history} : { match : match<{WalletUUID :string}>, history: History }) => <AddWalletView WalletUUID={match.params.WalletUUID} history={history}/>}></Route>
   <Route path="/DeleteWalletView/:WalletUUID/:Name" component={({match, history} : { match : match<{WalletUUID :string, Name : string}>, history: History }) => <DeleteWalletView WalletUUID={match.params.WalletUUID} Name={match.params.Name} history={history}/>}></Route>

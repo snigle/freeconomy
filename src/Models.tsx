@@ -1,6 +1,7 @@
 import {AsyncStorage} from "react-native"
-import {TransfertDefault, TransfertInput, Transfert, Collection, Login, Transaction, TransactionInput, TransactionDefault, Wallet, WalletInput, WalletDefault, Category, CategoryDefault} from "./Types"
+import {DefaultIcon, TransfertDefault, CategoryInput, TransfertInput, Transfert, Collection, Login, Transaction, TransactionInput, TransactionDefault, Wallet, WalletInput, WalletDefault, Category, CategoryDefault} from "./Types"
 import {v4} from "uuid";
+import * as _ from "lodash"
 
 export async function GetWallets():Promise<Wallet[]> {
     return AsyncStorage.getItem("wallets").then(raw => {
@@ -355,8 +356,8 @@ export async function GetCategories():Promise<Category[]> {
       let result: Category[] | null = JSON.parse(raw);
       if (!result) {
         result = [
-          { Icon : "shopping_cart", Name : "Shopping", UUID : v4(), LastUpdate : new Date()},
-          { Icon : "shopping_cart", Name : "Other", UUID : v4(), LastUpdate : new Date()},
+          { Icon : DefaultIcon({Name : "shopping-cart", Color : "#517fa4", Type : "material"}), Name : "Shopping", UUID : v4(), LastUpdate : new Date()},
+          { Icon : DefaultIcon({Name : "shopping-cart", Color : "#517fa4", Type : "material"}), Name : "Other", UUID : v4(), LastUpdate : new Date()},
         ].map(CategoryDefault);
         return AsyncStorage.setItem("categories", JSON.stringify(result)).then(() => result || [])
       }
@@ -364,13 +365,45 @@ export async function GetCategories():Promise<Category[]> {
     });
 }
 
-export async function CreateCategory(...categories : Category[]):Promise<Category[]> {
-  return GetCategories().then(result => result.concat(categories))
+export async function UpdateCategory(categoryUUID : string, input : CategoryInput):Promise<Category[]> {
+    return GetCategories().then(categories => {
+      let result = categories.find(c => c.UUID === categoryUUID)
+      if (!result) {
+        throw("Category not found")
+      }
+      Object.assign(result, input);
+      return SaveCategories(categories);
+    })
+}
+
+export async function GetCategory(categoryUUID : string):Promise<Category> {
+    return GetCategories().then(categories => {
+      let result = categories.find(c => c.UUID === categoryUUID)
+      if (!result) {
+        throw("Category not found")
+      }
+      return result;
+    })
+}
+
+export async function CreateCategory(...categories : CategoryInput[]):Promise<Category[]> {
+  return GetCategories().then(result => result.concat(
+    // Remove already exists
+    categories.filter(c => !result.find(r => r.Name === c.Name))
+    .map(categoryInput => ({
+      UUID : v4(),
+      LastUpdate: new Date(),
+
+      Name : categoryInput.Name,
+      Icon : categoryInput.Icon,
+      ParentCategoryUUID : categoryInput.ParentCategoryUUID,
+    }))
+  ))
   .then(SaveCategories)
 }
 
 export async function SaveCategories(categories : Category[]):Promise<Category[]> {
-    return AsyncStorage.setItem("categories", JSON.stringify(categories)).then(() => categories)
+    return AsyncStorage.setItem("categories", JSON.stringify(_.sortBy(categories, "Name"))).then(() => categories)
 }
 
 export async function GetLogin():Promise<Login> {

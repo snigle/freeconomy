@@ -40,6 +40,12 @@ export interface WalletInput {
   Icon: Icon,
 }
 
+export const DefaultIcon = (i : Icon):Icon => ({
+  Name : i.Name || "account-balance-wallet",
+  Color : i.Color || "#517fa4",
+  Type : i.Type || "material",
+})
+
 export const WalletDefault = (w :Wallet):Wallet => ({
     UUID : w.UUID || v4(),
     TotalPerYear : w.TotalPerYear || [],
@@ -47,7 +53,7 @@ export const WalletDefault = (w :Wallet):Wallet => ({
     Name : w.Name || "No Name",
     Description: w.Description || "",
     Currency : w.Currency || { Code : "EUR", Symbol: "€"},
-    Icon: w.Icon || { Name : "account_balance_wallet", Color : "#517fa4"},
+    Icon: DefaultIcon(w.Icon),
   })
 
   export const displayPrice = (price : number, currency : Currency) : string =>
@@ -56,22 +62,18 @@ export const WalletDefault = (w :Wallet):Wallet => ({
 
 ///////////////////////////////////////////////////////////
 // Category
-
-export interface Category {
-  UUID : string,
-  Name : string,
-  Icon : string,
-}
-
-
-///////////////////////////////////////////////////////////
-// Operations
 export interface Category {
   UUID : string,
   Name : string,
   ParentCategoryUUID? : string,
-  Icon : string,
+  Icon : Icon,
   LastUpdate : Date,
+}
+
+export interface CategoryInput {
+  Name: string,
+  Icon: Icon,
+  ParentCategoryUUID? : string,
 }
 
 export const CategoryDefault = (w :Category):Category => ({
@@ -79,7 +81,7 @@ export const CategoryDefault = (w :Category):Category => ({
     ParentCategoryUUID : w.ParentCategoryUUID,
     LastUpdate: asDate(w.LastUpdate),
     Name : w.Name || "No category",
-    Icon: w.Icon || "shopping_cart",
+    Icon: DefaultIcon(w.Icon),
   })
 
 export interface Transaction{

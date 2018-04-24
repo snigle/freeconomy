@@ -36,10 +36,6 @@ class Wallets extends React.Component<Props,State>{
     .catch(() => console.log("fail to load wallets, need to reset ?"))
   }
 
-  handleClick(e : any) {
-    console.log("handle click")
-  }
-
   render() {
     let content: JSX.Element[] | JSX.Element
     let options : JSX.Element = <View></View>
