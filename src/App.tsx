@@ -21,6 +21,7 @@ import * as querystring from "querystring"
 import WalletsView from "./WalletsView"
 import AddWalletView from "./AddWalletView"
 import DeleteWalletView from "./DeleteWalletView"
+import DeleteCategoryView from "./DeleteCategoryView"
 import TransactionsView from "./TransactionsView"
 import AddTransactionView from "./AddTransactionView"
 import AddTransfertView from "./AddTransfertView"
@@ -69,6 +70,7 @@ const App = (props:any) =>
   <Route exact path="/CategoriesView" component={CategoriesView}></Route>
   <Route path="/AddCategoryView" exact component={({match, history} : { match : match<{CategoryUUID :string}>, history: History }) => <AddCategoryView CategoryUUID={match.params.CategoryUUID} history={history}/>}></Route>
   <Route path="/AddCategoryView/:CategoryUUID" component={({match, history} : { match : match<{CategoryUUID :string}>, history: History }) => <AddCategoryView CategoryUUID={match.params.CategoryUUID} history={history}/>}></Route>
+  <Route path="/DeleteCategoryView/:CategoryUUID/:Name" component={({match, history} : { match : match<{CategoryUUID :string, Name : string}>, history: History }) => <DeleteCategoryView CategoryUUID={match.params.CategoryUUID} Name={match.params.Name} history={history}/>}></Route>
   <Route path="/AddWalletView" exact component={AddWalletView}></Route>
   <Route path="/AddWalletView/:WalletUUID" component={({match, history} : { match : match<{WalletUUID :string}>, history: History }) => <AddWalletView WalletUUID={match.params.WalletUUID} history={history}/>}></Route>
   <Route path="/DeleteWalletView/:WalletUUID/:Name" component={({match, history} : { match : match<{WalletUUID :string, Name : string}>, history: History }) => <DeleteWalletView WalletUUID={match.params.WalletUUID} Name={match.params.Name} history={history}/>}></Route>

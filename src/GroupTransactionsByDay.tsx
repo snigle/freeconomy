@@ -56,6 +56,7 @@ function displayTransaction(transactionByDay : TransactionByDay, props : Props) 
 
 export default function
   render(props:Props) {
+    console.log("transactions : ", props.Transactions);
     let content: any
     const groupedTransactions : TransactionByDay[] = []
     let pricedTransaction : PricedTransaction[] = props.Transactions.map(t => ({Transaction : t, Total : 0, Price : t.Price, Date : t.Date}))
@@ -82,7 +83,9 @@ export default function
      if (Platform.OS === "web") {
        content = <ScrollView>
          {
-           groupedTransactions.slice(groupedTransactions.length-200,groupedTransactions.length).map(i => displayTransaction(i,props))
+           // Display only last 200 transactions as it slow to load
+           groupedTransactions.map(i => displayTransaction(i,props))
+           // groupedTransactions.slice(groupedTransactions.length-200,groupedTransactions.length).map(i => displayTransaction(i,props))
          }
          <View style={{height:100}} />
          </ScrollView>
@@ -100,7 +103,7 @@ export default function
     return <View style={{flex:1}}>
     <Icon
     raised
-    containerStyle={{position:"absolute", right:20,bottom:20}}
+    containerStyle={{position:"absolute", zIndex:999,right:20,bottom:20}}
     name='add'
     color='#517fa4'
     onPress={() => props.history.push(`/Wallet/${props.WalletUUID}/AddTransactionView`)} />

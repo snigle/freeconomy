@@ -3,13 +3,14 @@ import {Text, View, AsyncStorage, TextInput, Button} from "react-native"
 import {RouteProps, RouterProps, RouteComponentProps} from "react-router"
 import * as queryString from "querystring"
 import * as Papa from "papaparse"
+import {MyLink} from "./Link"
 import * as Models from "./Models"
 import {DefaultIcon, Transaction, Category, Wallet, CategoryInput} from "./Types"
 import {v4} from "uuid"
 import GroupTransactionsByDay from "./GroupTransactionsByDay"
 import {History} from "history"
-//@ts-ignore
-import {DataTable, AppBar} from "carbon-ui"
+import {Header, Icon} from "react-native-elements"
+
 interface Props extends RouteProps{
   history : History
 }
@@ -89,7 +90,7 @@ export default class extends React.Component<RouteComponentProps<any>,State> {
 
     if (this.state.TransactionsToImport.length) {
       content = (
-        <View>
+        <View style={{flex:1}}>
         <Text> Voulez vous importer toutes ces transactions ? </Text>
         <Button title="Importer" onPress={() => this.import()} />
         <GroupTransactionsByDay WalletUUID={this.state.WalletUUID} Transfert={[]} Wallets={this.state.Wallets} Categories={this.state.Categories} Transactions={this.state.TransactionsToImport} history={this.props.history} Currency={{Code : "EUR", Symbol : "€"}}/>
@@ -137,10 +138,12 @@ export default class extends React.Component<RouteComponentProps<any>,State> {
       content = <input style={{flex : 1}} type="file" accept=".csv" onChange={(event) => event.target.files && this.handleFile(event.target.files[0])}/>
     }
     return (
-    <View>
-      <AppBar title="Freeconomy" />
-        <Text style={{flex : 1}}>Import in wallet {this.state.WalletUUID}
-      </Text>
+    <View style={{flex: 1}}>
+      <Header
+      outerContainerStyles={{height:60}}
+        leftComponent={<MyLink to={`/Wallet/${this.state.WalletUUID}/TransactionsView`}><Icon name="arrow-back" /></MyLink>}
+        centerComponent={{ text: `Import in wallet ${this.state.WalletUUID}`, style: { fontSize: 20, color: '#fff' } }}
+      />
       {content}
     </View>)
   }
@@ -204,7 +207,7 @@ export default class extends React.Component<RouteComponentProps<any>,State> {
           return alreadyImportedMap;
         }
       ).then(alreadyImportedMap => {
-        const transactions : Transaction[] = this.state.Lines.map((line) : Transaction => ({
+        let transactions : Transaction[] = this.state.Lines.map((line) : Transaction => ({
           UUID : v4(),
           WalletUUID : this.state.WalletUUID,
           CategoryUUID : categoryNameToUUID[line[parseInt(this.state.CategoryName)]],
@@ -213,8 +216,10 @@ export default class extends React.Component<RouteComponentProps<any>,State> {
           Date : new Date(line[parseInt(this.state.Date)]),
           Price : parseFloat(line[parseInt(this.state.Price)]),
           Comment : this.state.Comment && line[parseInt(this.state.Comment)],
-        }))
-        .filter(t => !alreadyImportedMap[t.Beneficiary+t.Date+t.Price])
+        }));
+        console.log("transactions from csv", transactions);
+        transactions = transactions.filter(t => !alreadyImportedMap[t.Beneficiary+t.Date+t.Price])
+        console.log("transactions to import", transactions);
         state.TransactionsToImport = transactions;
       })
     }).then(() => {

@@ -188,6 +188,7 @@ export async function UpdateTransaction(transactionUUID : string, input : Transa
         WalletUUID: input.WalletUUID,
         LastUpdate : new Date(),
       });
+      console.log("refresh wallet with date", input.Date.getFullYear(), new Date(old.Date).getFullYear());
       return AsyncStorage.setItem("transactions", JSON.stringify(transactions))
       .then(() => RefreshTotalWallet(input.WalletUUID, input.Date.getFullYear()))
       .then(() => RefreshTotalWallet(old.WalletUUID, new Date(old.Date).getFullYear()))
@@ -400,6 +401,20 @@ export async function CreateCategory(...categories : CategoryInput[]):Promise<Ca
     }))
   ))
   .then(SaveCategories)
+}
+
+export async function DeleteCategory(categoryUUID : string):Promise<Category[]> {
+    return GetCategories().then(categories => {
+      let category = categories.find(t => t.UUID === categoryUUID)
+      if (!category) {
+        return categories
+      }
+      categories = categories.filter(t => t.UUID !== categoryUUID);
+      return SaveCategories(categories)
+      .then(() => markAsDeleted(categoryUUID))
+      .then(() => categories);
+    }
+  )
 }
 
 export async function SaveCategories(categories : Category[]):Promise<Category[]> {

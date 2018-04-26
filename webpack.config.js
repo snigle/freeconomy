@@ -41,6 +41,7 @@ module.exports = {
           path.resolve(__dirname, "node_modules/react-native-elements"),
           path.resolve(__dirname, "node_modules/react-native-color-wheel"),
           path.resolve(__dirname, "node_modules/react-native-vector-icons"),
+          path.resolve(__dirname, "node_modules/react-native-autocomplete-input"),
 
           // path.resolve(__dirname, "node_modules/react-native-material-ui"),
           // path.resolve(__dirname, "node_modules/react-native-vector-icons"),

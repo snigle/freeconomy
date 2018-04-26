@@ -1,13 +1,14 @@
 import * as React from "react";
-import {Text, View, TextInput, Picker} from "react-native"
+import {Text, View, TextInput, Picker, Button} from "react-native"
 import * as Models from "./Models"
 import {MyLink} from "./Link"
 import {Wallet, TransfertInput, Category, Transaction} from "./Types"
 import DatePicker from "./DatePicker"
 import {History} from "history"
 import * as _ from "lodash"
+import {Header, Icon} from "react-native-elements"
 //@ts-ignore
-import { RaisedButton, TextField, AppBar, Icon } from 'carbon-ui'
+import { TextField } from 'carbon-ui'
 
 interface State extends TransfertInput{
   Loading : boolean,
@@ -148,16 +149,17 @@ class AddTransactionView extends React.Component<Props,State>{
         </View>
         <DatePicker value={this.state.Date} callback={(date: Date) => this.changeDate(date)}/>
         <TextField placeholder="Comment" onChangeText={(v:string) => this.changeComment(v)} value={this.state.Comment}/>
-        <RaisedButton onPress={() => this.save()}>Save</RaisedButton>
+        <Button title="Save" onPress={() => this.save()}/>
       </View>
     }
     return (
       <View>
-        <AppBar title="Add Transflert">
-          {
-            <MyLink to={`/Wallet/${this.props.WalletUUID}/TransactionsView`}><Icon name="arrow_back" /></MyLink>
-          }
-        </AppBar>
+      <Header
+      outerContainerStyles={{height:60}}
+        leftComponent={<MyLink to={`/Wallet/${this.props.WalletUUID}/TransactionsView`}><Icon name="arrow-back" /></MyLink>}
+        centerComponent={{ text: 'Add Transaction', style: { fontSize: 20, color: '#fff' } }}
+        rightComponent={this.props.TransfertUUID ? <View /> :<MyLink to={`AddTransactionView`}><Icon name="insert-drive-file" /></MyLink>}
+      />
         {content}
       </View>
     )
