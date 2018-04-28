@@ -22,6 +22,7 @@ interface State {
   Wallets : Wallet[],
   Transfert : Transfert[],
   displayOptions : boolean,
+  TransactionsView : JSX.Element,
 }
 
 interface Props {
@@ -52,10 +53,11 @@ class TransactionsView extends React.Component<Props,State>{
       Transfert :[],
       Categories : [],
       displayOptions : false,
+      TransactionsView : <View></View>
     }
   }
 
-  async componentDidMount() {
+  componentDidMount() {
       Promise.all([
         Models.GetAllTransactions().then(transactions => transactions.filter(t => {
           if (this.props.WalletUUID) {
@@ -93,7 +95,8 @@ class TransactionsView extends React.Component<Props,State>{
           this.props.history.goBack();
           return;
         }
-        this.setState({ Transactions : transactions, Transfert : transfert, Wallet : wallet, Categories : categories, Wallets : wallets });
+        this.setState({ Transactions : transactions, Transfert : transfert, Wallet : wallet, Categories : categories, Wallets : wallets,
+        TransactionsView : <GroupTransactionsByDay Transfert={transfert} WalletUUID={this.props.WalletUUID} Wallets={wallets} Categories={categories} Transactions={transactions} Currency={wallet.Currency} history={this.props.history} /> });
       })
       .catch((err) => console.log("fail to load transactions, need to reset ?", err))
 
@@ -117,8 +120,7 @@ class TransactionsView extends React.Component<Props,State>{
      content = <Loading Message="Chargement du wallet" />;
    } else {
      console.log("transactions", this.state.Transactions, this.state.Transfert)
-       content =
-       <GroupTransactionsByDay Transfert={this.state.Transfert} WalletUUID={this.props.WalletUUID} Wallets={this.state.Wallets} Categories={this.state.Categories} Transactions={this.state.Transactions} Currency={this.state.Wallet.Currency} history={this.props.history} />
+       content = this.state.TransactionsView;
    }
 
     return (
