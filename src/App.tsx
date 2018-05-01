@@ -33,6 +33,14 @@ import SideBar from "./SideBar"
 //@ts-ignore
 import { AppBar, IconToggle, connectTheme, Icon } from 'carbon-ui'
 
+// Redux
+import { Provider } from "react-redux";
+import { createStore, applyMiddleware, compose } from "redux";
+import thunk from "redux-thunk";
+import promise from "redux-promise";
+import {createLogger} from "redux-logger";
+import reducer from "./reducer";
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -64,7 +72,15 @@ function queryString(search :string, key : string) : string {
   return value
 }
 
+const logger = createLogger();
+const enhancer = compose(
+  applyMiddleware(thunk, promise, logger)
+);
+export const store = createStore(reducer, {}, enhancer);
+
+
 const App = (props:any) =>
+  <Provider store={store}>
   <View style={{flex:1}}>
   <Route exact path="/" component={WalletsView}></Route>
   <Route exact path="/CategoriesView" component={CategoriesView}></Route>
@@ -82,5 +98,6 @@ const App = (props:any) =>
   <Route path="/oauthCallback" component={GoogleSyncOAuthCallBack} />
   <Route path="/ImportTransactionsView" component={ImportTransactionsView} />
   </View>
+  </Provider>
 
 export default App;

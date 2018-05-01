@@ -141,9 +141,10 @@ class AddTransactionView extends React.Component<Props,State>{
       content = <View>
       <TextField placeholder="Benificiary" onChangeText={(v:string) => this.changeBenificiary(v)} value={this.state.Beneficiary}/>
           {(autocomplete.length === 1 && autocomplete[0].Beneficiary === this.state.Beneficiary)  || autocomplete.map((e) =>
-            <TouchableHighlight onPress={() => this.autoCompleteClick(e)} style={{backgroundColor : "#2689dc0f", padding:2}}>
+            <TouchableHighlight key={e.Beneficiary} onPress={() => this.autoCompleteClick(e)} style={{backgroundColor : "#2689dc0f", padding:2}}>
             <Text>{e.Beneficiary}</Text>
           </TouchableHighlight>)}
+        <TextField placeholder="Comment" onChangeText={(v:string) => this.changeComment(v)} value={this.state.Comment}/>
         <Picker
           style={{marginTop:10}}
           mode="dropdown"

@@ -4,8 +4,14 @@ import {Wallet, Login, Transfert, Transaction, Category} from "./Types"
 import {Collection} from "./GoogleSync"
 import * as OAuth from "./OAuth"
 import {AsyncStorage} from "react-native"
+import {store} from "./App"
+import {syncStart, syncTerminate} from "./reducer/sync"
+
+let syncPromise : Promise<any> = Promise.resolve();
 
 export function GoogleSync() : Promise<any> {
+  syncPromise = syncPromise.then(() => {
+  store.dispatch(syncStart());
   return Models.GetLogin().then(login => {
     console.log("let's go to sync !", login)
     if (login.expires < new Date()) {
@@ -15,12 +21,14 @@ export function GoogleSync() : Promise<any> {
     return login;
   }, () => OAuth.login())
   .then(login => {
+    // Enable synchronisation auto when update models.
+    AsyncStorage.setItem("autosync", "");
     // Synchronisation
     return syncCollection<Collection>(login, "deleted", Models.GetAllDeleted, Models.SaveDeleted, {})
-    .then((deleted) : {[key:string] : boolean} => {
-    const result : {[key:string] : boolean} = {};
-    deleted.forEach(deleted => result[deleted.UUID] = true);
-    return result;
+      .then((deleted) : {[key:string] : boolean} => {
+      const result : {[key:string] : boolean} = {};
+      deleted.forEach(deleted => result[deleted.UUID] = true);
+      return result;
     })
     .then(deleted => Promise.all([
       syncCollection<Wallet>(login, "wallets", Models.GetWallets, Models.SaveWallets, deleted),
@@ -30,7 +38,11 @@ export function GoogleSync() : Promise<any> {
     ]))
     .then(([wallets, transactions, transfert]) => Models.RefreshAllTotalWallet(transactions, transfert))
     .then(() => Models.CleanDeleted());
-  }).catch((err) => AsyncStorage.removeItem("login").then(() => console.log("error sync", err)));
+  })
+  .then(() => store.dispatch(syncTerminate()))
+  .catch((err) => AsyncStorage.removeItem("login").then(() => console.log("error sync", err)))
+  });
+  return syncPromise;
 }
 
 async function syncCollection<CollectionType extends Collection>(

@@ -13,6 +13,7 @@ import {Header, Divider, Card, Icon} from "react-native-elements"
 import MoreActions from "./MoreActions"
 import SideBar from "./SideBar"
 import CategoryListItem from "./CategoryListItem"
+import SyncBar from "./SyncBar"
 
 interface State {
   Categories : Category[],
@@ -67,6 +68,7 @@ class CategoriesView extends React.Component<Props,State>{
       centerComponent={{ text: 'Categories', style: { fontSize: 20, color: '#fff' } }}
       rightComponent={{ icon:this.state.displayOptions ? "expand-less" : "more-vert", color : "#fff", onPress:() => this.setState({...this.state, displayOptions : !this.state.displayOptions})}}
     />
+    <SyncBar history={this.props.history}/>
     <View style={{flex:1}}>
     {options}
     <ScrollView >

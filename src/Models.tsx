@@ -2,6 +2,13 @@ import {AsyncStorage} from "react-native"
 import {DefaultIcon, TransfertDefault, CategoryInput, TransfertInput, Transfert, Collection, Login, Transaction, TransactionInput, TransactionDefault, Wallet, WalletInput, WalletDefault, Category, CategoryDefault} from "./Types"
 import {v4} from "uuid";
 import * as _ from "lodash"
+import {GoogleSync} from "./Sync"
+
+function autoSync() {
+  AsyncStorage.getItem("autosync").then(() => {
+    GoogleSync()
+  }).catch(() => {});
+}
 
 export async function GetWallets():Promise<Wallet[]> {
     return AsyncStorage.getItem("wallets").then(raw => {
@@ -124,7 +131,7 @@ export async function CreateTransaction(...inputs : TransactionInput[]):Promise<
           return promise;
         })
         .then(() => transactions)
-  )
+  ).then(result => autoSync() || result)
 }
 
 export async function CreateTransfert(...inputs : TransfertInput[]):Promise<Transfert[]> {
@@ -164,7 +171,7 @@ export async function CreateTransfert(...inputs : TransfertInput[]):Promise<Tran
           return promise;
         })
         .then(() => transactions)
-  )
+  ).then(result => autoSync() || result)
 }
 export async function SaveTransferts(transactions : Transfert[]) : Promise<Transfert[]> {
   return AsyncStorage.setItem("transfert", JSON.stringify(transactions.sort((a,b)=> new Date(b.Date).getTime() - new Date(a.Date).getTime()))).then(() => transactions);
@@ -194,7 +201,7 @@ export async function UpdateTransaction(transactionUUID : string, input : Transa
       .then(() => RefreshTotalWallet(old.WalletUUID, new Date(old.Date).getFullYear()))
       .then(() => transactions)
     }
-  )
+  ).then(result => autoSync() || result)
 }
 
 export async function UpdateTransfert(transactionUUID : string, input : TransfertInput):Promise<Transfert[]> {
@@ -218,7 +225,7 @@ export async function UpdateTransfert(transactionUUID : string, input : Transfer
       .then(() => RefreshTotalWallet(old.From.WalletUUID, new Date(old.Date).getFullYear()))
       .then(() => transactions)
     }
-  )
+  ).then(result => autoSync() || result)
 }
 
 export async function DeleteTransaction(transactionUUID : string):Promise<Transaction[]> {
@@ -234,7 +241,7 @@ export async function DeleteTransaction(transactionUUID : string):Promise<Transa
       .then(() => transactions)
       .then((transactions : Transaction[]) => markAsDeleted(transactionUUID).then(() => transactions))
     }
-  )
+  ).then(result => autoSync() || result)
 }
 
 export async function DeleteTransfert(transactionUUID : string):Promise<Transfert[]> {
@@ -251,11 +258,11 @@ export async function DeleteTransfert(transactionUUID : string):Promise<Transfer
       .then(() => transactions)
       .then((transactions : Transfert[]) => markAsDeleted(transactionUUID).then(() => transactions))
     }
-  )
+  ).then(result => autoSync() || result)
 }
 
 async function RefreshTotalWallet(walletUUID : string, year : number):Promise<void> {
-  GetAllTransactions(walletUUID).then(transactions =>
+  return GetAllTransactions(walletUUID).then(transactions =>
     GetTransferts(walletUUID).then((transfert) => {
     return GetWallets().then(wallets => {
       const wallet = wallets.find(w => w.UUID == walletUUID)

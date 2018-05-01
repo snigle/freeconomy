@@ -61,3 +61,5 @@ lib/
 .jest/
 
 android/gradle.properties
+client_id.json
+dist/

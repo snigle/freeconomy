@@ -11,6 +11,7 @@ import SideBar from "./SideBar"
 import {Header, Icon} from "react-native-elements"
 import * as _ from "lodash"
 import MoreActions from "./MoreActions"
+import SyncBar from "./SyncBar"
 //@ts-ignore
 import { FlatButton, connectTheme, Divider } from 'carbon-ui'
 
@@ -132,6 +133,7 @@ class TransactionsView extends React.Component<Props,State>{
       centerComponent={{ text: this.state.Wallet.Name || "Freeconomy", style: { fontSize: 20, color: '#fff' } }}
       rightComponent={{ icon:this.state.displayOptions ? "expand-less" : "more-vert", color : "#fff", onPress:() => this.setState({...this.state, displayOptions : !this.state.displayOptions})}}
     />
+    <SyncBar history={this.props.history}/>
     {options}
     {content}
     </View>

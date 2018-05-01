@@ -1,4 +1,9 @@
 {
   "presets": ["react-native"],
-  "sourceMaps": "inline"
+  "sourceMaps": "inline",
+  "env": {
+    "production": {
+      "plugins": ["transform-remove-console"]
+    }
+  }
 }
