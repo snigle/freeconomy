@@ -7,11 +7,13 @@ interface Action extends AnyAction {
 interface Sync{
   syncing : boolean,
   synced : boolean,
+  error : boolean,
 }
 
 const DEFAULT_STATE = {
   syncing: false,
   synced: false,
+  error : false,
 };
 
 const UPDATE_SYNC = "UPDATE_SYNC"
@@ -21,6 +23,7 @@ export const syncStart = () : Action => ({
   sync : {
     syncing : true,
     synced :false,
+    error : false,
   },
 });
 
@@ -29,6 +32,7 @@ export const syncTerminate = () : Action => ({
   sync : {
     syncing : false,
     synced :true,
+    error: false,
   },
 });
 
@@ -37,6 +41,16 @@ export const syncHide = () : Action => ({
   sync : {
     syncing : false,
     synced :false,
+    error : false,
+  },
+});
+
+export const syncError = () : Action => ({
+  type : UPDATE_SYNC,
+  sync : {
+    syncing : false,
+    synced :false,
+    error : true,
   },
 });
 

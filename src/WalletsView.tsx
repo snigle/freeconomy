@@ -43,8 +43,6 @@ class Wallets extends React.Component<Props,State>{
     if (this.state.displayOptions) {
       options = <MoreActions actions={[
         {title : "Add wallet", onPress : () => this.props.history.push("/AddWalletView")},
-        {title : "Synchronise", onPress : () => GoogleSync()},
-        {title: "Logout", onPress : () => Models.SaveLogin({id : "", token : "", expires : new Date()})},
       ]} clicked={() => this.setState({...this.state, displayOptions : false})} />
     }
     if (!this.state.Wallets) {
@@ -81,7 +79,7 @@ class Wallets extends React.Component<Props,State>{
       centerComponent={{ text: 'Freeconomy', style: { fontSize: 20, color: '#fff' } }}
       rightComponent={{ icon:this.state.displayOptions ? "expand-less" : "more-vert", color : "#fff", onPress:() => this.setState({...this.state, displayOptions : !this.state.displayOptions})}}
     />
-    <SyncBar history={this.props.history}/>
+    <SyncBar history={this.props.history} refresh={() => this.componentDidMount()}/>
     <View style={{flex:1}}>
     {options}
     <ScrollView >

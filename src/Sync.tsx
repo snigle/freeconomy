@@ -5,11 +5,13 @@ import {Collection} from "./GoogleSync"
 import * as OAuth from "./OAuth"
 import {AsyncStorage} from "react-native"
 import {store} from "./App"
-import {syncStart, syncTerminate} from "./reducer/sync"
+import {syncStart, syncTerminate, syncHide, syncError} from "./reducer/sync"
 
 let syncPromise : Promise<any> = Promise.resolve();
 
+interface SyncResult { newData : boolean}
 export function GoogleSync() : Promise<any> {
+  const syncResult : SyncResult = {newData : false}
   syncPromise = syncPromise.then(() => {
   store.dispatch(syncStart());
   return Models.GetLogin().then(login => {
@@ -24,23 +26,23 @@ export function GoogleSync() : Promise<any> {
     // Enable synchronisation auto when update models.
     AsyncStorage.setItem("autosync", "");
     // Synchronisation
-    return syncCollection<Collection>(login, "deleted", Models.GetAllDeleted, Models.SaveDeleted, {})
+    return syncCollection<Collection>(login, "deleted", Models.GetAllDeleted, Models.SaveDeleted, {}, syncResult)
       .then((deleted) : {[key:string] : boolean} => {
       const result : {[key:string] : boolean} = {};
       deleted.forEach(deleted => result[deleted.UUID] = true);
       return result;
     })
     .then(deleted => Promise.all([
-      syncCollection<Wallet>(login, "wallets", Models.GetWallets, Models.SaveWallets, deleted),
-      syncCollection<Transaction>(login, "transactions", Models.GetAllTransactions, Models.SaveTransactions, deleted),
-      syncCollection<Transfert>(login, "transfert", Models.GetTransferts, Models.SaveTransferts, deleted),
-      syncCollection<Category>(login, "categories", Models.GetCategories, Models.SaveCategories, deleted),
+      syncCollection<Wallet>(login, "wallets", Models.GetWallets, Models.SaveWallets, deleted, syncResult),
+      syncCollection<Transaction>(login, "transactions", Models.GetAllTransactions, Models.SaveTransactions, deleted, syncResult),
+      syncCollection<Transfert>(login, "transfert", Models.GetTransferts, Models.SaveTransferts, deleted, syncResult),
+      syncCollection<Category>(login, "categories", Models.GetCategories, Models.SaveCategories, deleted, syncResult),
     ]))
     .then(([wallets, transactions, transfert]) => Models.RefreshAllTotalWallet(transactions, transfert))
     .then(() => Models.CleanDeleted());
   })
-  .then(() => store.dispatch(syncTerminate()))
-  .catch((err) => AsyncStorage.removeItem("login").then(() => console.log("error sync", err)))
+  .then(() => syncResult.newData ? store.dispatch(syncTerminate()) : store.dispatch(syncHide()))
+  .catch((err) => AsyncStorage.removeItem("login").then(() => console.log("error sync", err) || store.dispatch(syncError())))
   });
   return syncPromise;
 }
@@ -51,6 +53,7 @@ async function syncCollection<CollectionType extends Collection>(
   GetModels : () => Promise<CollectionType[]>,
   SaveModels : (a : CollectionType[]) => Promise<CollectionType[]>,
   deleted : {[key:string]:boolean},
+  syncResult : SyncResult,
 ) : Promise<CollectionType[]> {
   console.log("sync collection", collectionName, deleted)
   return Driver.downloadFileSafe(login, collectionName)
@@ -78,10 +81,14 @@ async function syncCollection<CollectionType extends Collection>(
     uuids.forEach(uuid => {
       const local = localByUUIDs[uuid]
       const online = onlineByUUIDs[uuid]
-      if ((local && !online) || (local && local.LastUpdate > online.LastUpdate)) {
+      if ((local && !online) || (local && local.LastUpdate >= online.LastUpdate)) {
+        if (collectionName === "categories") {
+          console.log("keep local", local, online);
+        }
         result.push(local);
       } else {
         result.push(online);
+        syncResult.newData = true
       }
     })
     console.log("result", result);

@@ -83,6 +83,7 @@ const App = (props:any) =>
   <Provider store={store}>
   <View style={{flex:1}}>
   <Route exact path="/" component={WalletsView}></Route>
+  <Route exact path="/refresh" component={() => <View/>}></Route>
   <Route exact path="/CategoriesView" component={CategoriesView}></Route>
   <Route path="/AddCategoryView" exact component={({match, history} : { match : match<{CategoryUUID :string}>, history: History }) => <AddCategoryView CategoryUUID={match.params.CategoryUUID} history={history}/>}></Route>
   <Route path="/AddCategoryView/:CategoryUUID" component={({match, history} : { match : match<{CategoryUUID :string}>, history: History }) => <AddCategoryView CategoryUUID={match.params.CategoryUUID} history={history}/>}></Route>

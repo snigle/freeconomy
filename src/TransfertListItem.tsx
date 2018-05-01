@@ -5,8 +5,9 @@ import {MyLink} from "./Link"
 import {History} from "history"
 import * as Models from "./Models"
 import * as _ from "lodash"
+import {Icon} from "react-native-elements"
 //@ts-ignore
-import {Icon, TouchableRipple} from "carbon-ui"
+import {TouchableRipple} from "carbon-ui"
 
 interface Props {
   Transfert : Transfert,
@@ -53,13 +54,13 @@ export default class extends React.Component<Props, State> {
       >
     <View>
     <View style={{height: 60, flexDirection: "row", alignItems: "center", justifyContent:"center"}}>
-    <View style={{flex:1}}>
-    <Icon name="sync" style={margins}/>
+    <View style={{width:50}}>
+    <Icon name="sync" reverse color="#FF0000"/>
     </View>
-    <View style={{flex:6}}>
+    <View style={{flex:1}}>
     <Text style={margins}>{description}</Text>
     </View>
-    <View style={{flex:3}}>
+    <View style={{width:140}}>
     <Text style={{...margins, textAlign: "right", fontSize:18, color : price > 0 ? "green": "red"}}>{displayPrice(price, this.props.Currency)}</Text>
     <Text style={{...margins, textAlign: "right", fontSize:10}}>{displayPrice(this.props.CurrentTotal, this.props.Currency)}</Text>
     </View>

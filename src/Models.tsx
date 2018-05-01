@@ -3,6 +3,7 @@ import {DefaultIcon, TransfertDefault, CategoryInput, TransfertInput, Transfert,
 import {v4} from "uuid";
 import * as _ from "lodash"
 import {GoogleSync} from "./Sync"
+import {defaultCategories} from "./defaultCategories"
 
 function autoSync() {
   AsyncStorage.getItem("autosync").then(() => {
@@ -363,10 +364,7 @@ export async function GetCategories():Promise<Category[]> {
     return AsyncStorage.getItem("categories").then(raw => {
       let result: Category[] | null = JSON.parse(raw);
       if (!result) {
-        result = [
-          { Icon : DefaultIcon({Name : "shopping-cart", Color : "#517fa4", Type : "material"}), Name : "Shopping", UUID : v4(), LastUpdate : new Date()},
-          { Icon : DefaultIcon({Name : "shopping-cart", Color : "#517fa4", Type : "material"}), Name : "Other", UUID : v4(), LastUpdate : new Date()},
-        ].map(CategoryDefault);
+        result = defaultCategories.map((c) => CategoryDefault(c as Category));
         return AsyncStorage.setItem("categories", JSON.stringify(result)).then(() => result || [])
       }
       return result.map(CategoryDefault);
@@ -380,6 +378,7 @@ export async function UpdateCategory(categoryUUID : string, input : CategoryInpu
         throw("Category not found")
       }
       Object.assign(result, input);
+      result.LastUpdate = new Date();
       return SaveCategories(categories);
     })
 }

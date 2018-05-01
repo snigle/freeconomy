@@ -5,14 +5,17 @@ import {History} from "history"
 import {connect} from "react-redux"
 import {syncHide} from "./reducer/sync"
 import {AnyAction} from "redux"
+import {GoogleSync} from "./Sync"
 
 interface PropsParams {
   history: History,
+  refresh: () => void,
 }
 
 interface Props extends PropsParams{
   synced : boolean,
   syncing : boolean,
+  error : boolean
   syncHide : any,
 }
 
@@ -26,14 +29,18 @@ const styles = {
   } as ViewStyle,
 };
 
-const refresh = (props : Props) => {
-  const previousLocation = `${props.history.location.pathname}${props.history.location.search ? "?"+props.history.location.search : ""}`
-  props.history.replace("/")
-  props.history.replace(previousLocation)
-}
 const SyncBar =  (props : Props) => {
   let content : JSX.Element = <View />
-  if (props.syncing) {
+
+  if (props.error) {
+    content = <View style={styles.content}>
+    <TouchableHighlight onPress={() => GoogleSync()}><Text style={styles.text}>Erreur lors de la Synchronisation, cliquez ici pour ré-essayer.</Text></TouchableHighlight>
+    </View>
+  } else if (props.synced) {
+    content = <View style={styles.content}>
+    <TouchableHighlight onPress={() => props.syncHide() && props.refresh()}><Text style={styles.text}>Synchronisation terminée, cliquez ici pour rafraichir.</Text></TouchableHighlight>
+    </View>
+  } else if (props.syncing) {
     content = <View style={styles.content}>
       <View style={{width:40}}>
       <ActivityIndicator size="small" color="#2689dc"/>
@@ -43,16 +50,7 @@ const SyncBar =  (props : Props) => {
       </View>
     </View>
   }
-  if (props.synced) {
-    // Remove bar at route change.
-    const unlisten = props.history.listen(() => {
-      props.syncHide()
-      unlisten()
-    })
-    content = <View style={styles.content}>
-    <TouchableHighlight onPress={() => refresh(props)}><Text style={styles.text}>Synchronisation terminée, cliquez ici pour rafraichir.</Text></TouchableHighlight>
-    </View>
-  }
+
   if (!props.synced && !props.syncing) {
     return <View />;
   }

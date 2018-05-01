@@ -133,7 +133,7 @@ class TransactionsView extends React.Component<Props,State>{
       centerComponent={{ text: this.state.Wallet.Name || "Freeconomy", style: { fontSize: 20, color: '#fff' } }}
       rightComponent={{ icon:this.state.displayOptions ? "expand-less" : "more-vert", color : "#fff", onPress:() => this.setState({...this.state, displayOptions : !this.state.displayOptions})}}
     />
-    <SyncBar history={this.props.history}/>
+    <SyncBar history={this.props.history} refresh={() => this.componentDidMount()}/>
     {options}
     {content}
     </View>

@@ -1,6 +1,6 @@
 import * as React from "react"
 import * as Models from "./Models"
-import {Category, displayPrice} from "./Types"
+import {Category, displayPrice, CategoryInput} from "./Types"
 import Loading from "./Loading"
 import WalletListItem from "./WalletListItem"
 import AddWalletView from "./AddWalletView"
@@ -34,7 +34,7 @@ class CategoriesView extends React.Component<Props,State>{
   }
 
   componentDidMount() {
-    Models.GetCategories().then(categories => this.setState({ Categories : categories}))
+    Models.GetCategories().then(categories => console.log("categories : ", JSON.stringify(categories.map((c) : CategoryInput => ({ Name : c.Name, Icon : c.Icon})))) || this.setState({ Categories : categories}))
     .catch(() => console.log("fail to load categories, need to reset ?"))
   }
 
@@ -68,7 +68,7 @@ class CategoriesView extends React.Component<Props,State>{
       centerComponent={{ text: 'Categories', style: { fontSize: 20, color: '#fff' } }}
       rightComponent={{ icon:this.state.displayOptions ? "expand-less" : "more-vert", color : "#fff", onPress:() => this.setState({...this.state, displayOptions : !this.state.displayOptions})}}
     />
-    <SyncBar history={this.props.history}/>
+    <SyncBar history={this.props.history} refresh={() => this.componentDidMount()}/>
     <View style={{flex:1}}>
     {options}
     <ScrollView >

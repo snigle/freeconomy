@@ -22,16 +22,41 @@ interface Props {
 }
 
 const icons : {name : string, type : IconType}[] = [
-  {name : "account-balance-category", type : "material"},
-  {name : "attach-money", type : "material"},
-  {name : "card-giftcard", type : "material"},
-  {name : "card-travel", type : "material"},
-  {name : "payment", type : "material"},
-  {name : "toll", type : "material"},
+  {name : "security", type : "material"},
+  {name : "healing", type : "material"},
+  {name : "phone-android", type : "material"},
   {name : "account-balance", type : "material"},
-  // {name : "cc-paypal", type : "material"},
-  // {name : "cc-visa", type : "material"},
-  // {name : "cc-mastercard", type : "material"},
+  {name : "local-bar", type : "material"},
+  {name : "card-giftcard", type : "material"},
+  {name : "local-movies", type : "material"},
+  {name : "favorite", type : "material"},
+  {name : "local-gas-station", type : "material"},
+  {name : "school", type : "material"},
+  {name : "shopping-cart", type : "material"},
+  {name : "shopping-basket", type : "material"},
+  {name : "local-cafe", type : "material"},
+  {name : "local-hotel", type : "material"},
+  {name : "language", type : "material"},
+  {name : "gavel", type : "material"},
+  {name : "backup", type : "material"},
+  {name : "stars", type : "material"},
+  {name : "local-laundry-service", type : "material"},
+  {name : "wb-sunny", type : "material"},
+  {name : "home", type : "material"},
+  {name : "today", type : "material"},
+  {name : "style", type : "material"},
+  {name : "local-parking", type : "material"},
+  {name : "euro-symbol", type : "material"},
+  {name : "attach-money", type : "material"},
+  {name : "room-service", type : "material"},
+  {name : "restaurant", type : "material"},
+  {name : "spa", type : "material"},
+  {name : "phone", type : "material"},
+  {name : "sync", type : "material"},
+  {name : "directions-bus", type : "material"},
+  {name : "beach-access", type : "material"},
+  {name : "directions-car", type : "material"},
+  {name : "flight-takeoff", type : "material"},
 ]
 class AddCategoryView extends React.Component<Props,State>{
   constructor(props:Props){
@@ -110,7 +135,7 @@ class AddCategoryView extends React.Component<Props,State>{
       <View style={{flex:1}}>
         <Header
         outerContainerStyles={{height:60}}
-          leftComponent={{ icon: 'navigate-before', color: '#fff', onPress:() => this.props.history.replace("/") }}
+          leftComponent={{ icon: 'navigate-before', color: '#fff', onPress:() => this.props.history.replace("/CategoriesView") }}
           centerComponent={{ text: 'Add Category', style: { fontSize: 20, color: '#fff' } }}
         />
         {

@@ -40,13 +40,13 @@ export default class extends React.Component<Props, State> {
       >
     <View>
     <View style={{height: 60, flexDirection: "row", alignItems: "center", justifyContent:"center"}}>
-    <View style={{flex:1}}>
-    <Icon name={this.props.Category.Icon.Name} type={this.props.Category.Icon.Type}/>
+    <View style={{width:50}}>
+    <Icon name={this.props.Category.Icon.Name} type={this.props.Category.Icon.Type} color={this.props.Category.Icon.Color} reverse/>
     </View>
-    <View style={{flex:6}}>
+    <View style={{flex:1}}>
     <Text style={margins}>{this.props.Transaction.Beneficiary}</Text>
     </View>
-    <View style={{flex:3}}>
+    <View style={{width:150}}>
     <Text style={{...margins, textAlign: "right", fontSize:18, color : this.props.Transaction.Price > 0 ? "green": "red"}}>{displayPrice(this.props.Transaction.Price, this.props.Currency)}</Text>
     <Text style={{...margins, textAlign: "right", fontSize:10}}>{displayPrice(this.props.CurrentTotal, this.props.Currency)}</Text>
     </View>
