@@ -9,6 +9,7 @@ interface Action {
 }
 interface Props {
   actions : Action[],
+  clicked ?: () => void,
 }
 export default (props: Props) => <List containerStyle={{marginTop:-1 }}>
                 {
@@ -16,7 +17,7 @@ export default (props: Props) => <List containerStyle={{marginTop:-1 }}>
                     <ListItem
                       key={i}
                       title={l.title}
-                      onPress={() => l.onPress()}
+                      onPress={() => {l.onPress(); if (props.clicked) { props.clicked()}}}
                     />
                   ))
                 }

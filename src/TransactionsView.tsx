@@ -112,7 +112,7 @@ class TransactionsView extends React.Component<Props,State>{
         {title : "Add Transaction", onPress : () => this.props.history.push(`/Wallet/${this.props.WalletUUID}/AddTransactionView`)},
         {title : "Add Transfert", onPress : () => this.props.history.push(`/Wallet/${this.props.WalletUUID}/AddTransfertView`)},
         {title: "Import from csv", onPress : () => this.props.history.push(`/ImportTransactionsView?walletUUID=${this.props.WalletUUID}`)},
-      ]} />
+      ]} clicked={() => this.setState({...this.state, displayOptions : false})}/>
     }
 
     if (!this.state.Transactions) {

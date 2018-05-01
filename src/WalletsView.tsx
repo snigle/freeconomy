@@ -45,7 +45,7 @@ class Wallets extends React.Component<Props,State>{
         {title : "Add wallet", onPress : () => this.props.history.push("/AddWalletView")},
         {title : "Synchronise", onPress : () => GoogleSync()},
         {title: "Logout", onPress : () => Models.SaveLogin({id : "", token : "", expires : new Date()})},
-      ]} />
+      ]} clicked={() => this.setState({...this.state, displayOptions : false})} />
     }
     if (!this.state.Wallets) {
      content = <Loading Message="Chargement des wallets" />;

@@ -26,6 +26,11 @@ const styles = {
   } as ViewStyle,
 };
 
+const refresh = (props : Props) => {
+  const previousLocation = `${props.history.location.pathname}${props.history.location.search ? "?"+props.history.location.search : ""}`
+  props.history.replace("/")
+  props.history.replace(previousLocation)
+}
 const SyncBar =  (props : Props) => {
   let content : JSX.Element = <View />
   if (props.syncing) {
@@ -45,7 +50,7 @@ const SyncBar =  (props : Props) => {
       unlisten()
     })
     content = <View style={styles.content}>
-    <TouchableHighlight onPress={() => props.history.replace(".")}><Text style={styles.text}>Synchronisation terminée, cliquez ici pour rafraichir.</Text></TouchableHighlight>
+    <TouchableHighlight onPress={() => refresh(props)}><Text style={styles.text}>Synchronisation terminée, cliquez ici pour rafraichir.</Text></TouchableHighlight>
     </View>
   }
   if (!props.synced && !props.syncing) {
