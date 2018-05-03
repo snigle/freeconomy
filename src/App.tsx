@@ -30,6 +30,8 @@ import ImportTransactionsView from "./ImportTransactionsView"
 import CategoriesView from "./CategoriesView"
 import AddCategoryView from "./AddCategoryView"
 import SideBar from "./SideBar"
+import ReportPie from "./ReportPie"
+
 //@ts-ignore
 import { AppBar, IconToggle, connectTheme, Icon } from 'carbon-ui'
 
@@ -85,6 +87,7 @@ const App = (props:any) =>
   <Route exact path="/" component={WalletsView}></Route>
   <Route exact path="/refresh" component={() => <View/>}></Route>
   <Route exact path="/CategoriesView" component={CategoriesView}></Route>
+  <Route exact path="/ReportPie" component={ReportPie}></Route>
   <Route path="/AddCategoryView" exact component={({match, history} : { match : match<{CategoryUUID :string}>, history: History }) => <AddCategoryView CategoryUUID={match.params.CategoryUUID} history={history}/>}></Route>
   <Route path="/AddCategoryView/:CategoryUUID" component={({match, history} : { match : match<{CategoryUUID :string}>, history: History }) => <AddCategoryView CategoryUUID={match.params.CategoryUUID} history={history}/>}></Route>
   <Route path="/DeleteCategoryView/:CategoryUUID/:Name" component={({match, history} : { match : match<{CategoryUUID :string, Name : string}>, history: History }) => <DeleteCategoryView CategoryUUID={match.params.CategoryUUID} Name={match.params.Name} history={history}/>}></Route>

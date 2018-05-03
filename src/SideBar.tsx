@@ -34,6 +34,7 @@ export default class extends React.Component<Props,any>{
     <List containerStyle={{marginTop:0}}>
     <ListItem title="Accueil" onPress={() => this.props.history.replace("/")} />
     <ListItem title="Categories" onPress={() => this.props.history.replace("/CategoriesView")} />
+    <ListItem title="Reports" onPress={() => this.props.history.replace("/ReportPie")} />
     <ListItem title="Synchronise" onPress={() => GoogleSync() && this.drawer ? this.drawer.closeDrawer() : null } />
     <ListItem title="Logout" onPress={() => Models.SaveLogin({id : "", token : "", expires : new Date()}) && this.drawer ? this.drawer.closeDrawer() : null } />
     </List>
