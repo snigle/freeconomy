@@ -7,9 +7,13 @@ import * as Sync from "./Sync"
 export default (props:any) : JSX.Element => {
   console.log("props", props)
   getLogin(props.location.hash).then(login => {
-    console.log("login ok : ", login);
+    console.log("login ok 2 : ", login);
     return Models.SaveLogin(login);
   })
-  .then(() => Sync.GoogleSync() && props.history.push("/"))
+  .then(() => {
+    console.log("login done")
+    props.history.replace("/");
+    Sync.GoogleSync()
+  })
   return <Text>Loading...</Text>
 }

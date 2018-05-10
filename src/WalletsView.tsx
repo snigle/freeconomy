@@ -10,7 +10,9 @@ import {MyLink} from "./Link"
 import {GoogleSync} from "./Sync"
 import * as _ from "lodash"
 import {Header, Divider, Card, Icon} from "react-native-elements"
+
 import MoreActions from "./MoreActions"
+import {SideBarClass} from "./SideBar"
 import SideBar from "./SideBar"
 import SyncBar from "./SyncBar"
 
@@ -24,7 +26,7 @@ interface Props {
 }
 
 class Wallets extends React.Component<Props,State>{
-  public sidebar : SideBar | null
+  public sidebar : SideBarClass | null
 
   constructor(props: Props) {
     super(props)
@@ -33,6 +35,7 @@ class Wallets extends React.Component<Props,State>{
   }
 
   componentDidMount() {
+    console.log("wallet mount");
     Models.GetWallets().then(wallets => this.setState({ Wallets : wallets}))
     .catch(() => console.log("fail to load wallets, need to reset ?"))
   }
@@ -71,7 +74,7 @@ class Wallets extends React.Component<Props,State>{
 
    }
 
-    return <SideBar history={this.props.history} ref={(sidebar: SideBar) => this.sidebar = sidebar}>
+    return <SideBar history={this.props.history} ref={(sidebar: any) => (this.sidebar = sidebar ? sidebar.getWrappedInstance() : null)}>
     <View style={{flex:1}}>
     <Header
     outerContainerStyles={{height:60}}

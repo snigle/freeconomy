@@ -8,6 +8,7 @@ import {View, Button, Text, FlatList, Platform} from "react-native"
 import {MyLink} from "./Link"
 import {History} from "history"
 import SideBar from "./SideBar"
+import {SideBarClass} from "./SideBar"
 import {Header, Icon} from "react-native-elements"
 import * as _ from "lodash"
 import MoreActions from "./MoreActions"
@@ -33,7 +34,7 @@ interface Props {
 }
 
 class TransactionsView extends React.Component<Props,State>{
-  private sidebar? : SideBar
+  private sidebar? : SideBarClass
   constructor(props: Props) {
     super(props)
     this.state = {
@@ -125,7 +126,7 @@ class TransactionsView extends React.Component<Props,State>{
    }
 
     return (
-    <SideBar history={this.props.history} ref={(sidebar: SideBar) => this.sidebar = sidebar}>
+    <SideBar history={this.props.history} ref={(sidebar: any) => (this.sidebar = sidebar ? sidebar.getWrappedInstance() : null)}>
     <View style={{flex:1}}>
     <Header
     outerContainerStyles={{height:60}}

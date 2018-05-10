@@ -21,6 +21,7 @@ import com.google.gson.Gson;
 import com.oblador.vectoricons.VectorIconsModule;
 
 import java.io.IOException;
+import java.text.DecimalFormat;
 
 
 /**
@@ -104,7 +105,7 @@ public class NewAppWidget extends AppWidgetProvider {
                         wallets[i].TotalPerYear) {
                     price += t.Total;
                 }
-                views.setTextViewText(ids[i].WalletPrice, price + " " + wallets[i].Currency.Symbol);
+                views.setTextViewText(ids[i].WalletPrice, new DecimalFormat("#.##").format(price) + " " + wallets[i].Currency.Symbol);
             } else {
                 views.setViewVisibility(ids[i].Wallet, View.GONE);
             }

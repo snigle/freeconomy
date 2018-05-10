@@ -19,6 +19,7 @@
     "gapi": "0.0.3",
     "jest": "^22.4.2",
     "lodash": "^4.17.5",
+    "moment": "^2.22.1",
     "papaparse": "^4.3.7",
     "query-string": "^5.1.0",
     "react-native": "0.54.0",
@@ -28,6 +29,7 @@
     "react-native-elements": "git://github.com/react-native-training/react-native-elements.git#rn-web",
     "react-native-navigation": "^1.1.397",
     "react-native-oauth": "^2.2.0",
+    "react-native-svg": "^6.3.1",
     "react-native-vector-icons": "^4.5.0",
     "react-navigation": "^1.4.0",
     "react-redux": "^5.0.7",
@@ -38,7 +40,8 @@
     "redux-logger": "^3.0.6",
     "redux-promise": "^0.5.3",
     "redux-thunk": "^2.2.0",
-    "uuid": "^3.2.1"
+    "uuid": "^3.2.1",
+    "victory-native": "^0.17.4"
   },
   "devDependencies": {
     "@types/core-js": "^0.9.46",
@@ -62,6 +65,7 @@
     "@types/redux-promise": "^0.5.28",
     "@types/redux-thunk": "^2.1.0",
     "@types/uuid": "^3.4.3",
+    "@types/victory": "^0.9.16",
     "babel-core": "^6.26.0",
     "babel-eslint": "^8.2.2",
     "babel-loader": "^7.1.2",
@@ -85,8 +89,9 @@
     "ts-jest": "^22.4.1",
     "typescript": "^2.7.2",
     "url-loader": "^1.0.1",
+    "victory": "^0.26.0",
     "webpack": "^3.8.1",
-    "webpack-dev-server": "^2.9.3"
+    "webpack-dev-server": "^2.11.2"
   },
   "jest": {
     "preset": "react-native",

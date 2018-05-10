@@ -16,6 +16,7 @@ const config =  {
 }
 manager.configure(config);
 export async function login():Promise<Login> {
+  console.log("loginnnnn ")
   return manager.authorize('google', {scopes: "https://www.googleapis.com/auth/drive.appfolder"})
   .then(({response}:any) => {
     console.log("response", response)

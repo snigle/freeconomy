@@ -42,8 +42,7 @@ export function GoogleSync() : Promise<any> {
     .then(() => Models.CleanDeleted());
   })
   .then(() => syncResult.newData ? store.dispatch(syncTerminate()) : store.dispatch(syncHide()))
-  .catch((err) => AsyncStorage.removeItem("login").then(() => console.log("error sync", err) || store.dispatch(syncError())))
-  });
+  }).catch((err) => console.log("error sync", err) || store.dispatch(syncError()));
   return syncPromise;
 }
 

@@ -12,6 +12,7 @@ import * as _ from "lodash"
 import {Header, Divider, Card, Icon} from "react-native-elements"
 import MoreActions from "./MoreActions"
 import SideBar from "./SideBar"
+import {SideBarClass} from "./SideBar"
 import CategoryListItem from "./CategoryListItem"
 import SyncBar from "./SyncBar"
 
@@ -25,7 +26,7 @@ interface Props {
 }
 
 class CategoriesView extends React.Component<Props,State>{
-  public sidebar : SideBar | null
+  public sidebar : SideBarClass | null
 
   constructor(props: Props) {
     super(props)
@@ -60,7 +61,7 @@ class CategoriesView extends React.Component<Props,State>{
 
    }
 
-    return <SideBar history={this.props.history} ref={(sidebar: SideBar) => this.sidebar = sidebar}>
+    return <SideBar history={this.props.history} ref={(sidebar: any) => (this.sidebar = sidebar ? sidebar.getWrappedInstance() : null)}>
     <View style={{flex:1}}>
     <Header
     outerContainerStyles={{height:60}}

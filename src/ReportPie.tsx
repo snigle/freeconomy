@@ -1,6 +1,7 @@
 import * as React from "react"
 import {View, Text, ScrollView} from "react-native"
 import SideBar from "./SideBar"
+import {SideBarClass} from "./SideBar"
 import {Header} from "react-native-elements"
 import {RouteComponentProps} from "react-router"
 import {VictoryPie} from "victory-native"
@@ -9,11 +10,13 @@ import * as _ from "lodash"
 import * as querystring from "querystring"
 import moment from "moment"
 import {Category, Transaction, displayPrice, Currency} from "./Types"
-
+import ReportByCategoryItem from "./ReportByCategoryItem"
+import {v4} from "uuid"
 interface data {
   y : number,
   label : string,
   x : string,
+  Category : Category,
 }
 interface State {
     datas : data[],
@@ -48,7 +51,7 @@ function rainbow(numOfSteps: number, step : number) : string {
 }
 
 export default class extends React.Component<RouteComponentProps<any>,State>{
-  private sidebar ?: SideBar
+  private sidebar ?: SideBarClass
 
   constructor(props: any) {
     super(props)
@@ -78,14 +81,17 @@ export default class extends React.Component<RouteComponentProps<any>,State>{
       )
       const transactionsByCategoryUUID = _.mapValues(_.groupBy(transactions, t => t.CategoryUUID),
       transactions => _.reduce(transactions, (aggregate,transaction) => aggregate+transaction.Price, 0))
-      const datas : data[] = _.values(_.mapValues(transactionsByCategoryUUID, (total, categoryUUID) => ({x:"", y : total, label:" "})))
+      const defaultCategory : Category = {UUID : v4(), Name: "Unknown" , Icon : {Name : "question", Type: "material", Color:""}, LastUpdate: new Date()}
+      const datas : data[] = _.values(_.mapValues(transactionsByCategoryUUID, (total, categoryUUID) => ({x:"", y : total, label:" ", Category : categoriesByUUID[categoryUUID] || defaultCategory})))
       console.log("datas", datas)
       this.setState({...this.state, datas : _.sortBy(_.filter(datas, d => d.y < 0).map(d => ({...d, y : -d.y})), d => - d.y)})
     })
   }
 
   render() {
-    return <SideBar history={this.props.history} ref={(sidebar: SideBar) => this.sidebar = sidebar}>
+    const total = this.state.datas.reduce((agg, d) => (agg+d.y), 0);
+    const totalMax = this.state.datas.length ? this.state.datas[0].y : 0;
+    return <SideBar history={this.props.history} ref={(sidebar: any) => (this.sidebar = sidebar ? sidebar.getWrappedInstance() : null)}>
     <View style={{flex:1}}>
     <Header
     outerContainerStyles={{height:60}}
@@ -99,10 +105,12 @@ export default class extends React.Component<RouteComponentProps<any>,State>{
     </View>
     <View style={{position:"absolute", top:60, alignSelf:"center"}}>
       <Text style={{textAlign:"center", fontSize:20, marginBottom:10}}>Total :</Text>
-      <Text style={{textAlign:"center", fontSize: 30}}>{displayPrice(this.state.datas.reduce((agg, d) => (agg+d.y), 0), this.state.Currency)}</Text>
+      <Text style={{textAlign:"center", fontSize: 30}}>{displayPrice(total, this.state.Currency)}</Text>
     </View>
     <View>
-<Text>Test</Text>
+    {this.state.datas.map((d,i) =>
+      <ReportByCategoryItem key={i} TotalMax={totalMax} Category={d.Category} Total={total} TotalCategory={d.y} Color={rainbow(this.state.datas.length, i)} Currency={this.state.Currency} history={this.props.history}/>
+    )}
     </View>
     </ScrollView>
     </View>

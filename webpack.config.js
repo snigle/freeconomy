@@ -41,14 +41,14 @@ module.exports = {
           path.resolve(__dirname, "node_modules/react-native-elements"),
           path.resolve(__dirname, "node_modules/react-native-color-wheel"),
           path.resolve(__dirname, "node_modules/react-native-vector-icons"),
-          path.resolve(__dirname, "node_modules/react-native-autocomplete-input"),
+          path.resolve(__dirname, "node_modules/victory"),
 
           // path.resolve(__dirname, "node_modules/react-native-material-ui"),
           // path.resolve(__dirname, "node_modules/react-native-vector-icons"),
           path.resolve(__dirname, "lib"),
         ],
         exclude: [
-          // path.resolve(__dirname, "node_modules")
+          //path.resolve(__dirname, "node_modules")
         ],
 
         // these are matching conditions, each accepting a regular expression or string
@@ -124,6 +124,8 @@ module.exports = {
       // a list of module name aliases
 
       "react-native": "react-native-web",
+      "victory-native": "victory",
+      "react-router-native": "react-router",
       // alias "module" -> "new-module" and "module/path/file" -> "new-module/path/file"
 
     },

@@ -5,6 +5,10 @@ import * as _ from "lodash"
 import {GoogleSync} from "./Sync"
 import {defaultCategories} from "./defaultCategories"
 
+export function CleanAll(): Promise<void> {
+  return AsyncStorage.getAllKeys().then(keys => Promise.all(keys.map(key => AsyncStorage.removeItem(key)))).then(() => {});
+}
+
 function autoSync() {
   AsyncStorage.getItem("autosync").then(() => {
     GoogleSync()
@@ -119,7 +123,7 @@ export async function CreateTransaction(...inputs : TransactionInput[]):Promise<
         .then(() => {
           const mapWalletYear : { [key:string] : { [key:number] : boolean }}= {}
           let promise : Promise<void> = Promise.resolve();
-          transactions.forEach(t => {
+          inputs.forEach(t => {
             if (!mapWalletYear[t.WalletUUID]) {
               mapWalletYear[t.WalletUUID] = {};
             }
@@ -364,8 +368,10 @@ export async function GetCategories():Promise<Category[]> {
     return AsyncStorage.getItem("categories").then(raw => {
       let result: Category[] | null = JSON.parse(raw);
       if (!result) {
-        result = defaultCategories.map((c) => CategoryDefault(c as Category));
-        return AsyncStorage.setItem("categories", JSON.stringify(result)).then(() => result || [])
+        return []
+        // TODO move it in login page
+        // result = defaultCategories.map((c) => CategoryDefault(c as Category));
+        // return AsyncStorage.setItem("categories", JSON.stringify(result)).then(() => result || [])
       }
       return result.map(CategoryDefault);
     });
