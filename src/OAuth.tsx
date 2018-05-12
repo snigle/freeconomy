@@ -23,6 +23,6 @@ export async function login():Promise<Login> {
     const today = new Date();
     const login: Login = {id : response.credentials.idToken, token : response.credentials.accessToken, expires : new Date(today.getFullYear(),today.getMonth(),today.getDate()+1)}
     console.log("save login", login);
-    return Models.SaveLogin(login).then(login => Sync.GoogleSync()).then(() => login)
+    return Models.SaveLogin(login)
   })
 }

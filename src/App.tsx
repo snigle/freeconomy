@@ -95,7 +95,7 @@ interface State {
 class App extends React.Component<any,State>{
   constructor(props : any) {
     super(props)
-    this.state = {loaded : true}
+    this.state = {loaded : false}
   }
 
   componentDidMount() {
@@ -105,7 +105,7 @@ class App extends React.Component<any,State>{
       if (value) {
         this.props.setLogged();
       }
-      this.setState({loaded : true})
+      this.setState({loaded : true});
     }).catch(() => {console.log("fail to get logged data")})
   }
 
