@@ -4,148 +4,205 @@
  * @flow
  */
 
-import * as React from 'react';
+import * as React from "react";
 import {
+  AsyncStorage,
   Platform,
+  ScrollView,
   StyleSheet,
   Text,
   View,
-  ScrollView,
-  AsyncStorage,
-} from 'react-native';
+} from "react-native";
 
-import { Route, match , RouteComponentProps} from 'react-router'
-import {withRouter} from "react-router-native"
-import {History} from "history"
-import {MyLink} from "./Link"
-import * as querystring from "querystring"
+import {History} from "history";
+import * as querystring from "querystring";
+import { match, Route , RouteComponentProps} from "react-router";
+import {withRouter} from "react-router-native";
+import {MyLink} from "./Link";
 
-import WalletsView from "./WalletsView"
-import AddWalletView from "./AddWalletView"
-import DeleteWalletView from "./DeleteWalletView"
-import DeleteCategoryView from "./DeleteCategoryView"
-import TransactionsView from "./TransactionsView"
-import AddTransactionView from "./AddTransactionView"
-import AddTransfertView from "./AddTransfertView"
-import GoogleSyncOAuthCallBack from "./GoogleSyncOAuthCallBack"
-import ImportTransactionsView from "./ImportTransactionsView"
-import CategoriesView from "./CategoriesView"
-import AddCategoryView from "./AddCategoryView"
-import SideBar from "./SideBar"
-import ReportPie from "./ReportPie"
+import AddCategoryView from "./AddCategoryView";
+import AddTransactionView from "./AddTransactionView";
+import AddTransfertView from "./AddTransfertView";
+import AddWalletView from "./AddWalletView";
+import CategoriesView from "./CategoriesView";
+import DeleteCategoryView from "./DeleteCategoryView";
+import DeleteWalletView from "./DeleteWalletView";
+import GoogleSyncOAuthCallBack from "./GoogleSyncOAuthCallBack";
+import ImportTransactionsView from "./ImportTransactionsView";
+import ReportPie from "./ReportPie";
+import SideBar from "./SideBar";
+import TransactionsView from "./TransactionsView";
+import WalletsView from "./WalletsView";
 
-//@ts-ignore
-import { AppBar, IconToggle, connectTheme, Icon } from 'carbon-ui'
+// @ts-ignore
+import { AppBar, connectTheme, Icon, IconToggle } from "carbon-ui";
 
 // Redux
-import { Provider, connect } from "react-redux";
-import { createStore, applyMiddleware, compose } from "redux";
-import thunk from "redux-thunk";
-import promise from "redux-promise";
+import { connect, Provider } from "react-redux";
+import { applyMiddleware, compose, createStore } from "redux";
 import {createLogger} from "redux-logger";
+import promise from "redux-promise";
+import thunk from "redux-thunk";
+import LoginView from "./LoginView";
 import reducer from "./reducer";
-import LoginView from './LoginView';
-import { setLogged } from './reducer/login';
+import { setLogged } from "./reducer/login";
 
 const styles = StyleSheet.create({
   container: {
+    alignItems: "center",
+    backgroundColor: "#F5FCFF",
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#F5FCFF',
+    justifyContent: "center",
+  },
+  instructions: {
+    color: "#333333",
+    marginBottom: 5,
+    textAlign: "center",
   },
   welcome: {
     fontSize: 20,
-    textAlign: 'center',
     margin: 10,
-  },
-  instructions: {
-    textAlign: 'center',
-    color: '#333333',
-    marginBottom: 5,
+    textAlign: "center",
   },
 });
 
-interface Props{
-  match : match<any>
+interface IProps {
+  match: match<any>;
 }
 
-function queryString(search :string, key : string) : string {
-  const value = querystring.parse(search.replace("?",""))[key]
+function queryString(search: string, key: string): string {
+  const value = querystring.parse(search.replace("?", ""))[key];
   if (Array.isArray(value)) {
-    return value[0]
+    return value[0];
   }
-  return value
+  return value;
 }
 
 const logger = createLogger();
 const enhancer = compose(
-  applyMiddleware(thunk, promise, logger)
+  applyMiddleware(thunk, promise, logger),
 );
 export const store = createStore(reducer, {}, enhancer);
 
-interface Props {
-  logged: boolean
-  setLogger: ()=>void
+interface IProps {
+  logged: boolean;
+  setLogger: () => void;
 }
 
-interface State {
-  loaded : boolean
+interface IState {
+  loaded: boolean;
 }
-class App extends React.Component<any,State>{
-  constructor(props : any) {
-    super(props)
-    this.state = {loaded : false}
+class App extends React.Component<any, IState> {
+  constructor(props: any) {
+    super(props);
+    this.state = {loaded : false};
   }
 
-  componentDidMount() {
-    console.log("app component did mount");
-    AsyncStorage.getItem("logged").then(value => {
-      console.log("is logged", value)
+  public componentDidMount() {
+    AsyncStorage.getItem("logged").then((value) => {
       if (value) {
-        this.props.setLogged();
+            this.props.setLogged();
       }
       this.setState({loaded : true});
-    }).catch(() => {console.log("fail to get logged data")})
+    }).catch(() => {console.log("fail to get logged data"); });
   }
 
-  render() {
-    console.log("render", this.state.loaded, this.props.logged);
+  public render() {
     if (!this.state.loaded) {
-      return <Text>Loading Application</Text>
+      return <Text>Loading Application</Text>;
     }
     if (!this.props.logged) {
-      return <View style={{flex:1}}>
+      return <View style={{flex: 1}}>
           <Route path="/" component={LoginView} />
           <Route path="/oauthCallback" component={GoogleSyncOAuthCallBack} />
-        </View>
+        </View>;
     }
-    AsyncStorage.setItem("logged","ok")
-    console.log("render routes")
-    return   <View style={{flex:1}}>
+    AsyncStorage.setItem("logged", "ok");
+    return   <View style={{flex: 1}}>
         <Route exact path="/" component={WalletsView}></Route>
         <Route exact path="/refresh" component={() => <View/>}></Route>
         <Route exact path="/CategoriesView" component={CategoriesView}></Route>
         <Route exact path="/ReportPie" component={ReportPie}></Route>
-        <Route path="/AddCategoryView" exact component={({match, history} : { match : match<{CategoryUUID :string}>, history: History }) => <AddCategoryView CategoryUUID={match.params.CategoryUUID} history={history}/>}></Route>
-        <Route path="/AddCategoryView/:CategoryUUID" component={({match, history} : { match : match<{CategoryUUID :string}>, history: History }) => <AddCategoryView CategoryUUID={match.params.CategoryUUID} history={history}/>}></Route>
-        <Route path="/DeleteCategoryView/:CategoryUUID/:Name" component={({match, history} : { match : match<{CategoryUUID :string, Name : string}>, history: History }) => <DeleteCategoryView CategoryUUID={match.params.CategoryUUID} Name={match.params.Name} history={history}/>}></Route>
+        <Route
+          path="/AddCategoryView"
+          exact
+          component={(props: RouteComponentProps<{CategoryUUID: string}>) =>
+           <AddCategoryView CategoryUUID={props.match.params.CategoryUUID} history={props.history}/>}>
+        </Route>
+        <Route
+          path="/AddCategoryView/:CategoryUUID"
+          component={(props: RouteComponentProps<{CategoryUUID: string}>) =>
+          <AddCategoryView CategoryUUID={props.match.params.CategoryUUID} history={props.history}/>}>
+        </Route>
+        <Route
+          path="/DeleteCategoryView/:CategoryUUID/:Name"
+          component={(props: RouteComponentProps<{CategoryUUID: string, Name: string}>) =>
+           <DeleteCategoryView
+             CategoryUUID={props.match.params.CategoryUUID}
+             Name={props.match.params.Name}
+             history={props.history}/>
+           }>
+         </Route>
         <Route path="/AddWalletView" exact component={AddWalletView}></Route>
-        <Route path="/AddWalletView/:WalletUUID" component={({match, history} : { match : match<{WalletUUID :string}>, history: History }) => <AddWalletView WalletUUID={match.params.WalletUUID} history={history}/>}></Route>
-        <Route path="/DeleteWalletView/:WalletUUID/:Name" component={({match, history} : { match : match<{WalletUUID :string, Name : string}>, history: History }) => <DeleteWalletView WalletUUID={match.params.WalletUUID} Name={match.params.Name} history={history}/>}></Route>
-        <Route path="/Wallet/:WalletUUID/TransactionsView" component={(props : RouteComponentProps<any>) => <TransactionsView WalletUUID={props.match.params.WalletUUID} history={props.history} Search={queryString(props.location.search,"search")}/>}></Route>
-        <Route path="/Wallet/:WalletUUID/AddTransactionView" exact component={(props : any) => <AddTransactionView WalletUUID={props.match.params.WalletUUID} history={props.history}/>} />
-        <Route path="/Wallet/:WalletUUID/AddTransactionView/:TransactionUUID" component={({match, history} : any) => <AddTransactionView WalletUUID={match.params.WalletUUID} TransactionUUID={match.params.TransactionUUID} history={history}/>} />
-        <Route path="/Wallet/:WalletUUID/AddTransfertView" exact component={(props : RouteComponentProps<any>) => <AddTransfertView WalletUUID={props.match.params.WalletUUID} history={props.history}/>} />
-        <Route path="/Wallet/:WalletUUID/AddTransfertView/:TransfertUUID" component={({match, history} : any) => <AddTransfertView WalletUUID={match.params.WalletUUID} TransfertUUID={match.params.TransfertUUID} history={history}/>} />
+        <Route
+          path="/AddWalletView/:WalletUUID"
+          component={(props: RouteComponentProps<{WalletUUID: string}>) =>
+          <AddWalletView WalletUUID={props.match.params.WalletUUID} history={props.history}/>}>
+        </Route>
+        <Route
+          path="/DeleteWalletView/:WalletUUID/:Name"
+          component={(props: RouteComponentProps<{WalletUUID: string, Name: string}>) =>
+          <DeleteWalletView
+            WalletUUID={props.match.params.WalletUUID}
+            Name={props.match.params.Name}
+            history={props.history}/>
+          }>
+        </Route>
+        <Route
+          path="/Wallet/:WalletUUID/TransactionsView"
+          component={(props: RouteComponentProps<{WalletUUID: string}>) =>
+            <TransactionsView WalletUUID={props.match.params.WalletUUID}
+              history={props.history}
+              Search={queryString(props.location.search, "search")}/>
+          }>
+        </Route>
+        <Route
+          path="/Wallet/:WalletUUID/AddTransactionView"
+          exact
+          component={(props: RouteComponentProps<{WalletUUID: string}>) =>
+            <AddTransactionView WalletUUID={props.match.params.WalletUUID} history={props.history}/>}
+        />
+        <Route
+          path="/Wallet/:WalletUUID/AddTransactionView/:TransactionUUID"
+          component={(props: RouteComponentProps<{WalletUUID: string, TransactionUUID: string}>) =>
+          <AddTransactionView
+            WalletUUID={props.match.params.WalletUUID}
+            TransactionUUID={props.match.params.TransactionUUID}
+            history={props.history}/>
+          }
+        />
+        <Route
+          path="/Wallet/:WalletUUID/AddTransfertView"
+          exact component={(props: RouteComponentProps<{WalletUUID: string}>) =>
+            <AddTransfertView WalletUUID={props.match.params.WalletUUID} history={props.history}/>}
+        />
+        <Route
+          path="/Wallet/:WalletUUID/AddTransfertView/:TransfertUUID"
+          component={(props: RouteComponentProps<{WalletUUID: string, TransfertUUID: string}>) =>
+          <AddTransfertView
+            WalletUUID={props.match.params.WalletUUID}
+            TransfertUUID={props.match.params.TransfertUUID}
+            history={props.history}/>
+          }
+        />
         <Route path="/oauthCallback" component={GoogleSyncOAuthCallBack} />
         <Route path="/ImportTransactionsView" component={ImportTransactionsView} />
-      </View>
+      </View>;
   }
 }
 
-const AppWithStore = withRouter(connect((state : any, props : any) : Props => ({
+const AppWithStore = withRouter(connect((state: any, props: any): IProps => ({
   ...state.login,
-}), { setLogged : setLogged })(App));
+}), { setLogged })(App));
 
-export default () => <Provider store={store}><AppWithStore/></Provider>
+export default () => <Provider store={store}><AppWithStore/></Provider>;

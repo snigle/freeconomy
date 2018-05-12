@@ -40,8 +40,10 @@
     "redux-logger": "^3.0.6",
     "redux-promise": "^0.5.3",
     "redux-thunk": "^2.2.0",
+    "tslint": "^5.10.0",
     "uuid": "^3.2.1",
-    "victory-native": "^0.17.4"
+    "victory-native": "^0.17.4",
+    "yarn": "^1.6.0"
   },
   "devDependencies": {
     "@types/core-js": "^0.9.46",
