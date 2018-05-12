@@ -7,18 +7,13 @@
 import * as React from "react";
 import {
   AsyncStorage,
-  Platform,
-  ScrollView,
-  StyleSheet,
   Text,
   View,
 } from "react-native";
 
-import {History} from "history";
 import * as querystring from "querystring";
 import { match, Route , RouteComponentProps} from "react-router";
 import {withRouter} from "react-router-native";
-import {MyLink} from "./Link";
 
 import AddCategoryView from "./AddCategoryView";
 import AddTransactionView from "./AddTransactionView";
@@ -30,7 +25,6 @@ import DeleteWalletView from "./DeleteWalletView";
 import GoogleSyncOAuthCallBack from "./GoogleSyncOAuthCallBack";
 import ImportTransactionsView from "./ImportTransactionsView";
 import ReportPie from "./ReportPie";
-import SideBar from "./SideBar";
 import TransactionsView from "./TransactionsView";
 import WalletsView from "./WalletsView";
 
@@ -46,25 +40,6 @@ import thunk from "redux-thunk";
 import LoginView from "./LoginView";
 import reducer from "./reducer";
 import { setLogged } from "./reducer/login";
-
-const styles = StyleSheet.create({
-  container: {
-    alignItems: "center",
-    backgroundColor: "#F5FCFF",
-    flex: 1,
-    justifyContent: "center",
-  },
-  instructions: {
-    color: "#333333",
-    marginBottom: 5,
-    textAlign: "center",
-  },
-  welcome: {
-    fontSize: 20,
-    margin: 10,
-    textAlign: "center",
-  },
-});
 
 interface IProps {
   match: match<any>;
