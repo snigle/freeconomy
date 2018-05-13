@@ -80,7 +80,7 @@ class LoginView extends React.Component<IProps, IState> {
     return <View style={{flex: 1}}>
       <Card
         title="Welcome in Freeconomy"
-        image={require("../assets/login.jpg")}>
+        image={require("../images/login.jpg")}>
         <Text>
           Manage you money balance to know what you really have to spend.
         </Text>
@@ -94,7 +94,9 @@ class LoginView extends React.Component<IProps, IState> {
           onPress={() => this.login()}
         />
         <TouchableHighlight onPress={() => this.loginLocally()}>
-          <Text style={{color : "#9999", textAlign: "center", marginTop: 10}}>Or Try the application locally, all datas will be removed at logout.</Text>
+          <Text style={{color : "#9999", textAlign: "center", marginTop: 10}}>
+            Or Try the application locally, all datas will be removed at logout.
+          </Text>
         </TouchableHighlight>
     </Card>
     </View>;
