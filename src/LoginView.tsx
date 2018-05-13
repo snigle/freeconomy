@@ -1,16 +1,16 @@
 import * as React from "react";
-import { Text, View, TouchableHighlight } from "react-native";
+import { Text, TouchableHighlight, View } from "react-native";
 // @ts-ignore
 // import { Button } from "react-native-elements";
 // tslint:disable-next-line
-import { Card, Icon, Button, ButtonIcon} from "react-native-elements";
+import { Button, ButtonIcon, Card, Icon} from "react-native-elements";
 import { connect } from "react-redux";
+import {defaultCategories} from "./defaultCategories";
+import * as defaultWallets from "./defaultWallets";
 import * as Models from "./Models";
 import * as OAuth from "./OAuth";
 import { setLogged } from "./reducer/login";
 import { syncHide } from "./reducer/sync";
-import {defaultCategories} from "./defaultCategories"
-import * as defaultWallets from "./defaultWallets"
 
 interface IProps {
   synced: boolean;
@@ -36,20 +36,20 @@ class LoginView extends React.Component<IProps, IState> {
     this.setState({loading : true});
   }
 
-  public addDefaultCategories() : Promise<void> {
+  public addDefaultCategories(): Promise<void> {
     return Models.CreateCategory(...defaultCategories).then(() => {});
   }
 
-  public addDefaultWallets() : Promise<void> {
-    return Models.CreateWallet(defaultWallets.Money).then(() => 
-      Models.CreateWallet(defaultWallets.Bank)
-    ).then(() => {})
+  public addDefaultWallets(): Promise<void> {
+    return Models.CreateWallet(defaultWallets.Money).then(() =>
+      Models.CreateWallet(defaultWallets.Bank),
+    ).then(() => {});
   }
 
-  public addDefaultDatas() : Promise<void>{
+  public addDefaultDatas(): Promise<void> {
       return Promise.all([
-        Models.GetCategories().then(categories => categories.length? {} : this.addDefaultCategories()),
-        Models.GetWallets().then(wallets => wallets.length? {} : this.addDefaultWallets()),
+        Models.GetCategories().then((categories) => categories.length ? {} : this.addDefaultCategories()),
+        Models.GetWallets().then((wallets) => wallets.length ? {} : this.addDefaultWallets()),
       ]).then(() => {});
   }
 
@@ -94,7 +94,7 @@ class LoginView extends React.Component<IProps, IState> {
           onPress={() => this.login()}
         />
         <TouchableHighlight onPress={() => this.loginLocally()}>
-          <Text style={{color : "#9999", textAlign:"center", marginTop:10}}>Or Try the application locally, all datas will be removed at logout.</Text>
+          <Text style={{color : "#9999", textAlign: "center", marginTop: 10}}>Or Try the application locally, all datas will be removed at logout.</Text>
         </TouchableHighlight>
     </Card>
     </View>;
