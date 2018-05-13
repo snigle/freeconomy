@@ -17,7 +17,7 @@ interface File {
 }
 
 export const getURL = (id?: string): string => {
-  const redirect_uri = window.top ? window.location.origin : window.location.origin;
+  const redirect_uri = window.location.origin + window.location.pathname;
   // TODO add path in callback parameter as query
   let url = "https://accounts.google.com/o/oauth2/v2/auth?scope=" + encodeURIComponent("https://www.googleapis.com/auth/drive.appfolder email profile") + "&state=drive&redirect_uri=" + encodeURIComponent(redirect_uri) + "&response_type=token&client_id=" + encodeURIComponent(GOOGLE_CLIENT_ID) + "&include_granted_scopes=true";
   if (id) {

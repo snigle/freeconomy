@@ -35,7 +35,7 @@ class LoginView extends React.Component<IProps, IState> {
   }
 
   public login() {
-    Models.CleanAll().then(() => OAuth.login());
+    Models.CleanAll().then(() => OAuth.login()).then(() => Sync.GoogleSync(false));
     this.setState({loading : true});
   }
 
