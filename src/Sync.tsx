@@ -10,7 +10,7 @@ import {Category, Login, Transaction, Transfert, Wallet} from "./Types";
 let syncPromise: Promise<any> = Promise.resolve();
 
 interface SyncResult { newData: boolean; }
-export function GoogleSync(): Promise<any> {
+export function GoogleSync(autohide: boolean = true): Promise<any> {
   const syncResult: SyncResult = {newData : false};
   syncPromise = syncPromise.then(() => {
   store.dispatch(syncStart());
@@ -41,7 +41,7 @@ export function GoogleSync(): Promise<any> {
     .then(([wallets, transactions, transfert]) => Models.RefreshAllTotalWallet(transactions, transfert))
     .then(() => Models.CleanDeleted());
   })
-  .then(() => syncResult.newData ? store.dispatch(syncTerminate()) : store.dispatch(syncHide()));
+  .then(() => syncResult.newData || !autohide ? store.dispatch(syncTerminate()) : store.dispatch(syncHide()));
   }).catch((err) => console.log("error sync", err) || store.dispatch(syncError()));
   return syncPromise;
 }

@@ -5,14 +5,17 @@ import { Text, TouchableHighlight, View } from "react-native";
 // tslint:disable-next-line
 import { Button, ButtonIcon, Card, Icon} from "react-native-elements";
 import { connect } from "react-redux";
+import {RouteComponentProps} from "react-router";
 import {defaultCategories} from "./defaultCategories";
 import * as defaultWallets from "./defaultWallets";
+import {getLogin} from "./GoogleSync";
 import * as Models from "./Models";
 import * as OAuth from "./OAuth";
 import { setLogged } from "./reducer/login";
 import { syncHide } from "./reducer/sync";
+import * as Sync from "./Sync";
 
-interface IProps {
+interface IProps extends RouteComponentProps<any> {
   synced: boolean;
   syncing: boolean;
   error: boolean;
@@ -28,7 +31,7 @@ class LoginView extends React.Component<IProps, IState> {
 
   constructor(props: IProps) {
       super(props);
-      this.state = {loading : false};
+      this.state = {loading : true};
   }
 
   public login() {
@@ -62,12 +65,28 @@ class LoginView extends React.Component<IProps, IState> {
   }
 
   public componentDidUpdate() {
+    console.log("update props", this.props);
     if (this.props.synced) {
       this.addDefaultDatas().then(() => {
-        this.props.syncHide();
+        console.log("set logged");
         this.props.setLogged();
+        this.props.syncHide();
       });
     }
+  }
+
+  public componentDidMount() {
+    // For web only, detect token in uri and try to login.
+    getLogin(this.props.location.pathname).then((login) => {
+      console.log("login ok 2 : ", login);
+      return Models.SaveLogin(login);
+    })
+    .then(() => {
+      console.log("login done");
+      this.props.history.replace("/");
+      Sync.GoogleSync(false);
+      this.setState({loading : false});
+    }).catch(() => this.setState({loading : false}));
   }
 
   public render() {
@@ -103,7 +122,7 @@ class LoginView extends React.Component<IProps, IState> {
   }
 }
 
-export default connect((state: any, props: any): IProps => ({
+export default connect((state: any, props: IPropsParams): IProps => ({
   ...state.sync,
   ...state.login,
   ...props,
