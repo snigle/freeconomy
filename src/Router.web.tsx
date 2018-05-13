@@ -1,15 +1,15 @@
-import * as React from "react"
-import { View } from "react-native"
-import { BrowserRouter } from 'react-router-dom'
-import App from './App'
-//@ts-ignore
-import {WebStyles} from "carbon-ui"
+// @ts-ignore
+import {WebStyles} from "carbon-ui";
+import * as React from "react";
+import { View } from "react-native";
+import { HashRouter } from "react-router-dom";
+import App from "./App";
 
-const Router = <BrowserRouter>
-  <View style={{flex :1}}>
+const Router = <HashRouter>
+  <View style={{flex : 1}}>
   <WebStyles />
   <App/>
   </View>
-</BrowserRouter>
+</HashRouter>;
 
 export default () => Router;
