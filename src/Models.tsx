@@ -10,8 +10,11 @@ export function CleanAll(): Promise<void> {
 }
 
 function autoSync() {
-  AsyncStorage.getItem("autosync").then(() => {
-    GoogleSync()
+  AsyncStorage.getItem("autosync").then((value) => {
+    console.log("autosync?", value);
+    if (value) {
+      GoogleSync();
+    }
   }).catch(() => {});
 }
 
@@ -369,9 +372,6 @@ export async function GetCategories():Promise<Category[]> {
       let result: Category[] | null = JSON.parse(raw);
       if (!result) {
         return []
-        // TODO move it in login page
-        // result = defaultCategories.map((c) => CategoryDefault(c as Category));
-        // return AsyncStorage.setItem("categories", JSON.stringify(result)).then(() => result || [])
       }
       return result.map(CategoryDefault);
     });
