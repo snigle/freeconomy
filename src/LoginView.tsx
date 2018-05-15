@@ -14,6 +14,7 @@ import * as OAuth from "./OAuth";
 import { setLogged } from "./reducer/login";
 import { syncHide } from "./reducer/sync";
 import * as Sync from "./Sync";
+import t from "./translator";
 
 interface IProps extends RouteComponentProps<any> {
   synced: boolean;
@@ -98,7 +99,7 @@ class LoginView extends React.Component<IProps, IState> {
     }
     return <View style={{flex: 1}}>
       <Card
-        title="Welcome in Freeconomy"
+        title={t.t("login.welcome")}
         image={require("../images/login.jpg")}>
         <Text>
           Manage you money balance to know what you really have to spend.
@@ -122,7 +123,7 @@ class LoginView extends React.Component<IProps, IState> {
   }
 }
 
-export default connect((state: any, props: IPropsParams): IProps => ({
+export default connect((state: any, props: any): IProps => ({
   ...state.sync,
   ...state.login,
   ...props,

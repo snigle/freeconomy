@@ -58,7 +58,7 @@ async function syncCollection<CollectionType extends Collection>(
   return Driver.downloadFileSafe(login, collectionName)
     .then((collection) => {
     if (!collection) {
-      thrownew; Error((`fail to get collection ${collectionName} from the sync provider`));
+      throw new Error((`fail to get collection ${collectionName} from the sync provider`));
     }
     return collection;
   }).then((collection) => collection.filter((e) => e.UUID && !deleted[e.UUID]))

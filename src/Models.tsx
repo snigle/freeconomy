@@ -50,7 +50,7 @@ export async function UpdateWallet(walletUUID: string, input: WalletInput): Prom
     return GetWallets().then((wallets) => {
       const wallet = wallets.find((w) => w.UUID === walletUUID);
       if (!wallet) {
-        thrownew; Error(("fail to find wallet"));
+        throw new Error(("fail to find wallet"));
       }
       Object.assign(wallet, {
           Name : input.Name,
@@ -190,7 +190,7 @@ export async function UpdateTransaction(transactionUUID: string, input: Transact
     return GetAllTransactions().then((transactions) => {
       const transaction = transactions.find((t) => t.UUID === transactionUUID);
       if (!transaction) {
-        thrownew; Error(("transaction not found"));
+        throw new Error(("transaction not found"));
       }
       const old = {...transaction};
       Object.assign(transaction, {
@@ -215,7 +215,7 @@ export async function UpdateTransfert(transactionUUID: string, input: TransfertI
     return GetTransferts().then((transactions) => {
       const transaction = transactions.find((t) => t.UUID === transactionUUID);
       if (!transaction) {
-        thrownew; Error(("transaction not found"));
+        throw new Error(("transaction not found"));
       }
       const old: Transfert = {...transaction, To : {...transaction.To}, From : {...transaction.From}};
       Object.assign(transaction, {
@@ -323,7 +323,7 @@ export async function GetTransaction(transactionUUID: string): Promise<Transacti
     .then((transactions) => transactions.find((t) => t.UUID === transactionUUID))
     .then((transaction) => {
       if (!transaction) {
-        thrownew; Error(("transaction not found"));
+        throw new Error(("transaction not found"));
       } else {
         return transaction;
       }
@@ -345,7 +345,7 @@ export async function GetTransfert(UUID: string): Promise<Transfert> {
     .then((list) => list.find((t) => t.UUID === UUID))
     .then((t) => {
       if (!t) {
-        thrownew; Error(("transaction not found"));
+        throw new Error(("transaction not found"));
       } else {
         return t;
       }
@@ -380,7 +380,7 @@ export async function UpdateCategory(categoryUUID: string, input: CategoryInput)
     return GetCategories().then((categories) => {
       const result = categories.find((c) => c.UUID === categoryUUID);
       if (!result) {
-        thrownew; Error(("Category not found"));
+        throw new Error(("Category not found"));
       }
       Object.assign(result, input);
       result.LastUpdate = new Date();
@@ -392,7 +392,7 @@ export async function GetCategory(categoryUUID: string): Promise<Category> {
     return GetCategories().then((categories) => {
       const result = categories.find((c) => c.UUID === categoryUUID);
       if (!result) {
-        thrownew; Error(("Category not found"));
+        throw new Error(("Category not found"));
       }
       return result;
     });
@@ -436,7 +436,7 @@ export async function GetLogin(): Promise<Login> {
   return AsyncStorage.getItem("login").then((raw) => {
     const result: Login | null = JSON.parse(raw);
     if (!result) {
-      thrownew; Error(("login not found"));
+      throw new Error(("login not found"));
     }
     result.expires = new Date(result.expires);
     return result;
