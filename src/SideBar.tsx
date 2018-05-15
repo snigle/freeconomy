@@ -9,6 +9,7 @@ import * as Models from "./Models"
 import {Overlay} from "react-native-elements"
 import { connect } from "react-redux";
 import { setLogout } from "./reducer/login";
+import t from "./translator";
 
 interface PropsParams {
   history : History
@@ -48,11 +49,11 @@ export class SideBarClass extends React.Component<Props,State>{
   <ScrollView>
     <Text style={{textAlign:"center", margin:10, fontSize:18}}>Freeconomy</Text>
     <List containerStyle={{marginTop:0}}>
-    <ListItem title="Accueil" onPress={() => this.props.history.replace("/")} />
-    <ListItem title="Categories" onPress={() => this.props.history.replace("/CategoriesView")} />
-    <ListItem title="Reports" onPress={() => this.props.history.replace("/ReportPie")} />
-    <ListItem title="Synchronise" onPress={() => GoogleSync() && this.drawer ? this.drawer.closeDrawer() : null } />
-    <ListItem title="Logout" onPress={() => this.setState({logout : true}) || (this.drawer ? this.drawer.closeDrawer() : null)} />
+    <ListItem title={t.t("sideBar.home")} onPress={() => this.props.history.replace("/")} />
+    <ListItem title={t.t("sideBar.categories")} onPress={() => this.props.history.replace("/CategoriesView")} />
+    <ListItem title={t.t("sideBar.reports")} onPress={() => this.props.history.replace("/ReportPie")} />
+    <ListItem title={t.t("sideBar.sync")} onPress={() => GoogleSync() && this.drawer ? this.drawer.closeDrawer() : null } />
+    <ListItem title={t.t("sideBar.logout")} onPress={() => this.setState({logout : true}) || (this.drawer ? this.drawer.closeDrawer() : null)} />
     </List>
   </ScrollView>
   }
@@ -64,13 +65,13 @@ export class SideBarClass extends React.Component<Props,State>{
       <Overlay isVisible={this.state.logout} containerStyle={{padding:0}}>
         <Header
         outerContainerStyles={{height:60}}
-          centerComponent={{ text: 'Are you sure to logout ?', style: { fontSize: 20, color: '#fff' } }}
+          centerComponent={{ text: t.t("sideBar.logoutConfirm"), style: { fontSize: 20, color: '#fff' } }}
           rightComponent={{ icon: "close", color : "#fff", onPress:() => this.setState({logout:false})}}
         />
-        <Text>Are you sure to logout ? All not synced data will be removed. Be sure to sync all your data before logout.</Text>
+        <Text>{t.t("sideBar.logoutConfirmText")}</Text>
         <View style={{flexDirection:"column"}}>
-          <Button title="Cancel" onPress={() => this.setState({logout:false})}/>
-          <Button title="Logout" onPress={() => this.logout()}/>
+          <Button title={t.t("common.cancel")} onPress={() => this.setState({logout:false})}/>
+          <Button title={t.t("sideBar.logout")} onPress={() => this.logout()}/>
         </View>
       </Overlay>
       </DrawerLayout>

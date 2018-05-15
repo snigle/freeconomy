@@ -102,20 +102,20 @@ class LoginView extends React.Component<IProps, IState> {
         title={t.t("login.welcome")}
         image={require("../images/login.jpg")}>
         <Text>
-          Manage you money balance to know what you really have to spend.
+          {t.t("login.line1")}
         </Text>
         <Text style={{marginBottom: 10}}>
-          Categorize your transactions to know your monthly budget!
+          {t.t("login.line2")}
         </Text>
         <Button
           icon={<Icon name="person" color="#ffff" /> as ButtonIcon}
           buttonStyle={{borderRadius: 0, marginLeft: 0, marginRight: 0, marginBottom: 0}}
-          text="Login with Google"
+          text={t.t("login.buttonWithGoogle")}
           onPress={() => this.login()}
         />
         <TouchableHighlight onPress={() => this.loginLocally()}>
           <Text style={{color : "#9999", textAlign: "center", marginTop: 10}}>
-            Or Try the application locally, all datas will be removed at logout.
+            {t.t("login.locally")}
           </Text>
         </TouchableHighlight>
     </Card>
