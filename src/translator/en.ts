@@ -1,6 +1,13 @@
 export default {
   common : {
+    title : "Freeconomy",
     cancel : "Cancel",
+    name : "Name",
+    description : "Description",
+    icon : "Icon",
+    save : "Save",
+    saveAndNew : "Save and New",
+    loading: "Loading",
   },
   login : {
     buttonWithGoogle : "Login with Google",
@@ -16,6 +23,22 @@ export default {
     sync : "Synchronize",
     logout : "Logout",
     logoutConfirm : "Are you sure to logout ?",
-    logoutConfirmText : "Are you sure to logout ? All not synced data will be removed. Be sure to sync all your data before logout."
-  }
+    logoutConfirmText : "Are you sure to logout ?" +
+    "All not synced data will be removed. Be sure to sync all your data before logout.",
+  },
+  walletsView : {
+    loading : "Loading wallets",
+    add : "Add wallet",
+    wallets : "Wallets",
+  },
+  addWalletView : {
+    currencyCode : "Currency Code",
+    symbol : "Symbol",
+  },
+  transactionsView : {
+    addTransaction : "Add Transaction",
+    addTransfert : "Add Transfert",
+    importFromCSV : "Import from CSV",
+    loading : "Loading transactions",
+  },
 };
