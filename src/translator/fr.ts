@@ -8,6 +8,7 @@ export default {
     save : "Enregistrer",
     saveAndNew : "Enregistrer et Nouveau",
     loading: "Chargement",
+    price : "Prix",
   },
   login : {
     buttonWithGoogle : "Connexion avec Google",
@@ -41,5 +42,9 @@ export default {
     addTransfert : "Ajouter un virement",
     importFromCSV : "Importer depuis un CSV",
     loading : "Chargement des transactions",
+  },
+  addTransactionView: {
+    beneficiary : "Bénéficiaire",
+    comment : "Commentaire",
   },
 };

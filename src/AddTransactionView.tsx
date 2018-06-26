@@ -3,13 +3,14 @@ import { TextField } from "carbon-ui";
 import {History} from "history";
 import * as _ from "lodash";
 import * as React from "react";
-import {Button, Picker, StyleSheet, Text, TouchableHighlight, View} from "react-native";
+import {Button, Picker, Text, TouchableHighlight, View} from "react-native";
 // @ts-ignore
 import Autocomplete from "react-native-autocomplete-input";
 import {Header, Icon} from "react-native-elements";
 import DatePicker from "./DatePicker";
 import {MyLink} from "./Link";
 import * as Models from "./Models";
+import t from "./translator";
 import {Category, Transaction, TransactionInput} from "./Types";
 
 interface IState extends TransactionInput {
@@ -73,7 +74,9 @@ class AddTransactionView extends React.Component<IProps, IState> {
     }
 
     Promise.all([
-      Models.GetCategories().then((c) => _.sortBy(_.uniqBy(c, (c) => c.Name), "Name")),
+      Models.GetCategories().then((categories) =>
+        _.sortBy(_.uniqBy(categories, (category) => category.Name), "Name"),
+      ),
       Models.GetAllTransactions(this.props.WalletUUID),
       getTransactionPromise,
     ]).then(([categories, transactions]) => {
@@ -84,7 +87,7 @@ class AddTransactionView extends React.Component<IProps, IState> {
 
       // Create map[beneficiary]categoryuuid to permits autocomplete beneficiary and category
       const autocomplete: Autocomplete[] = _.values(
-      _.mapValues(_.groupBy<Transaction>(transactions, (t) => t.Beneficiary),
+      _.mapValues(_.groupBy<Transaction>(transactions, (tr) => tr.Beneficiary),
         (groupedTransactions, beneficiary) => {
           const result: IAutoComplete = { Beneficiary : beneficiary, CategoryUUID : "", Occurrencies : 0};
           const last = _.last(groupedTransactions);
@@ -143,12 +146,21 @@ class AddTransactionView extends React.Component<IProps, IState> {
       ).slice(0, 10);
       console.log("display", this.state);
       content = <View>
-      <TextField placeholder="Benificiary" onChangeText={(v: string) => this.changeBenificiary(v)} value={this.state.Beneficiary}/>
-          {(autocomplete.length === 1 && autocomplete[0].Beneficiary === this.state.Beneficiary)  || autocomplete.map((e) =>
-            <TouchableHighlight key={e.Beneficiary} onPress={() => this.autoCompleteClick(e)} style={{backgroundColor : "#2689dc0f", padding: 2}}>
-            <Text>{e.Beneficiary}</Text>
-          </TouchableHighlight>)}
-        <TextField placeholder="Comment" onChangeText={(v: string) => this.changeComment(v)} value={this.state.Comment}/>
+        <TextField
+          placeholder={t.t("addTransactionView.beneficiary")}
+          onChangeText={(v: string) => this.changeBenificiary(v)} value={this.state.Beneficiary}/>
+        {(autocomplete.length === 1 && autocomplete[0].Beneficiary === this.state.Beneficiary) ||
+          autocomplete.map((e) =>
+            <TouchableHighlight
+              key={e.Beneficiary}
+              onPress={() => this.autoCompleteClick(e)}
+              style={{backgroundColor : "#2689dc0f", padding: 2}}>
+                <Text>{e.Beneficiary}</Text>
+            </TouchableHighlight>)
+        }
+        <TextField
+          placeholder={t.t("addTransactionView.comment")}
+          onChangeText={(v: string) => this.changeComment(v)} value={this.state.Comment}/>
         <Picker
           style={{marginTop: 10}}
           mode="dropdown"
@@ -163,17 +175,28 @@ class AddTransactionView extends React.Component<IProps, IState> {
         <View style={{marginTop: 10}}>
         <DatePicker value={this.state.Date} callback={(date: Date) => this.changeDate(date)}/>
         </View>
-        <TextField keyboardType="numeric" placeholder="Price" onChangeText={(v: string) => this.changePrice(v)} value={this.state.PriceText}/>
-        <Button title="Save" onPress={() => this.save()}/>
+        <TextField
+          keyboardType="numeric"
+          placeholder={t.t("common.price")}
+          onChangeText={(v: string) => this.changePrice(v)}
+          value={this.state.PriceText}/>
+        <Button title={t.t("common.save")} onPress={() => this.save()}/>
       </View>;
     }
     return (
       <View>
       <Header
       outerContainerStyles={{height: 60}}
-        leftComponent={<MyLink to={`/Wallet/${this.state.WalletUUID}/TransactionsView`}><Icon name="arrow-back" /></MyLink>}
-        centerComponent={{ text: "Add Transaction", style: { fontSize: 20, color: "#fff" } }}
-        rightComponent={this.props.TransactionUUID ? <View /> : <MyLink to="AddTransfertView" replace><Icon name="sync" /></MyLink>}
+        leftComponent={
+          <MyLink to={`/Wallet/${this.state.WalletUUID}/TransactionsView`}>
+            <Icon name="arrow-back" />
+          </MyLink>
+        }
+        centerComponent={{ text: t.t("transactionsView.addTransaction"), style: { fontSize: 20, color: "#fff" } }}
+        rightComponent={
+          this.props.TransactionUUID ? <View /> :
+          <MyLink to="AddTransfertView" replace><Icon name="sync" /></MyLink>
+        }
       />
         {content}
       </View>
@@ -182,27 +205,13 @@ class AddTransactionView extends React.Component<IProps, IState> {
 
   public save() {
     this.setState({...this.state, Loading : true });
-    let savePromise: Promise<any>;
-    if (this.props.TransactionUUID) {
-      savePromise = Models.UpdateTransaction(this.props.TransactionUUID, this.state);
-    } else {
-      savePromise = Models.CreateTransaction(this.state);
-    }
+    const savePromise: Promise<any> = this.props.TransactionUUID ?
+      Models.UpdateTransaction(this.props.TransactionUUID, this.state) :
+      Models.CreateTransaction(this.state);
     savePromise.then(() => {
       this.props.history.goBack();
     }).catch((err: any) => console.log("error", err));
   }
 }
-
-const styles = StyleSheet.create({
-  autocompleteContainer: {
-    flex: 1,
-    left: 0,
-    position: "absolute",
-    right: 0,
-    top: 0,
-    zIndex: 999,
-  },
-});
 
 export default AddTransactionView;
