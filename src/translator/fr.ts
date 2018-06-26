@@ -9,6 +9,9 @@ export default {
     saveAndNew : "Enregistrer et Nouveau",
     loading: "Chargement",
     price : "Prix",
+    back : "Retour",
+    edit : "Modifier",
+    remove : "Supprimer",
   },
   login : {
     buttonWithGoogle : "Connexion avec Google",
@@ -46,5 +49,9 @@ export default {
   addTransactionView: {
     beneficiary : "Bénéficiaire",
     comment : "Commentaire",
+  },
+  categoriesView: {
+    loading : "Chargement des catégories",
+    addCategory : "Ajouter une Catégorie",
   },
 };

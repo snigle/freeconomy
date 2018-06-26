@@ -4,19 +4,20 @@ import {View, Text, Button, TouchableHighlight} from "react-native"
 import {Category} from "./Types"
 import {History} from "history"
 import {Icon} from "react-native-elements"
+import t from "./translator"
 
-interface Props {
+interface IProps {
   Category : Category,
   Categories : Category[],
   history: History,
 }
 
-interface State {
+interface IState {
   displayOption : boolean
 }
 
-export default class extends React.Component<Props, State>{
-  constructor(props : Props) {
+export default class extends React.Component<IProps, IState>{
+  constructor(props : IProps) {
     super(props)
     this.state = {displayOption : false}
   }
@@ -25,8 +26,8 @@ export default class extends React.Component<Props, State>{
     let options, dialog : JSX.Element | null;
     if (this.state.displayOption) {
       options = <View>
-      <Button onPress={() => this.props.history.push(`/AddCategoryView/${this.props.Category.UUID}`)} title="Modifier"/>
-      <Button onPress={() => this.props.history.push(`/DeleteCategoryView/${this.props.Category.UUID}/${this.props.Category.Name}`)} title="Supprimer"/>
+      <Button onPress={() => this.props.history.push(`/AddCategoryView/${this.props.Category.UUID}`)} title={t.t("common.edit")}/>
+      <Button onPress={() => this.props.history.push(`/DeleteCategoryView/${this.props.Category.UUID}/${this.props.Category.Name}`)} title={t.t("common.remove")}/>
       </View>
     }
     return (
