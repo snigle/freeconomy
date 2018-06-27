@@ -1,41 +1,28 @@
-import * as React from "react"
-import {History} from "history"
-import {Button, Text, View, Modal} from "react-native"
-import * as Models from "./Models"
-//@ts-ignore
-import { FlatButton, Dialog } from "carbon-ui"
-interface Props {
-  Name : string,
-  WalletUUID : string,
-  history : History,
+import {History} from "history";
+import * as React from "react";
+import {Button, Modal, Text, View} from "react-native";
+import * as Models from "./Models";
+import t from "./translator";
+
+interface IProps {
+  Name: string;
+  WalletUUID: string;
+  history: History;
 }
-export default (props : Props) => <View>
+export default (props: IProps) => <View>
 <Modal
           animationType="slide"
           transparent={false}
           visible
           onRequestClose={() => {
-            alert('Modal has been closed.');
+            alert("Modal has been closed.");
           }}
           >
-<Text>{`Supprimer ${props.Name} ?`}</Text>
-<Text>{`Êtes vous sûr de vouloir supprimer le wallet ${props.Name} et toute ses transactions ?`}</Text>
-<Button title="Cancel" onPress={() => props.history.goBack()}/>
-<Button title="Ok" onPress={() => Models.DeleteWallet(props.WalletUUID).then(() => props.history.goBack())} />
+<Text>{t.t("common.removeName", { name : props.Name})}</Text>
+<Text>{t.t("deleteWalletView.areYouSure", { name : props.Name })}</Text>
+<Button title={t.t("common.cancel")} onPress={() => props.history.goBack()}/>
+<Button
+  title={t.t("common.remove")}
+  onPress={() => Models.DeleteWallet(props.WalletUUID).then(() => props.history.goBack())} />
 </Modal>
-</View>
-/*
-export default (props : Props) => <View>
-<Dialog
-  title={`Supprimer ${props.Name} ?`}
-  active
-  onOverlayPress={() => props.history.goBack()}
-  actions={[
-    <FlatButton><Button title="Cancel" onPress={() => props.history.goBack()}/></FlatButton>,
-    <FlatButton><Button title="Ok" onPress={() => Models.DeleteWallet(props.WalletUUID).then(() => props.history.goBack())} /></FlatButton>
-  ]}
->
-  <Text>{`Êtes vous sûr de vouloir supprimer le wallet ${props.Name} et toute ses transactions ?`}</Text>
-</Dialog>
-</View>
-*/
+</View>;

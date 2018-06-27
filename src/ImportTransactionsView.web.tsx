@@ -1,46 +1,41 @@
-import * as React from "react"
-import {Text, View, AsyncStorage, TextInput, Button} from "react-native"
-import {RouteProps, RouterProps, RouteComponentProps} from "react-router"
-import * as queryString from "querystring"
-import * as Papa from "papaparse"
-import {MyLink} from "./Link"
-import * as Models from "./Models"
-import {DefaultIcon, Transaction, Category, Wallet, CategoryInput} from "./Types"
-import {v4} from "uuid"
-import GroupTransactionsByDay from "./GroupTransactionsByDay"
-import {History} from "history"
-import {Header, Icon} from "react-native-elements"
+import * as Papa from "papaparse";
+import * as queryString from "querystring";
+import * as React from "react";
+import {AsyncStorage, Button, Text, TextInput, View} from "react-native";
+import {Header, Icon} from "react-native-elements";
+import {RouteComponentProps} from "react-router";
+import {v4} from "uuid";
+import GroupTransactionsByDay from "./GroupTransactionsByDay";
+import {MyLink} from "./Link";
+import * as Models from "./Models";
+import {Category, CategoryInput, DefaultIcon, Transaction, Wallet} from "./Types";
 
-interface Props extends RouteProps{
-  history : History
-}
-
-interface State {
-  WalletUUID : string,
-  Lines : string[][],
-  Categories : Category[],
-  Wallets : Wallet[],
+interface IState {
+  WalletUUID: string;
+  Lines: string[][];
+  Categories: Category[];
+  Wallets: Wallet[];
 
   // Computed
-  CategoriesToImport : CategoryInput[],
-  TransactionsToImport : Transaction[],
+  CategoriesToImport: CategoryInput[];
+  TransactionsToImport: Transaction[];
 
   // Inputs
-  CategoryName : string,
-  Beneficiary : string,
-  Date : string,
-  Price : string,
-  Comment : string,
+  CategoryName: string;
+  Beneficiary: string;
+  Date: string;
+  Price: string;
+  Comment: string;
 }
 
-const keys : Keys[] = ["CategoryName" , "Beneficiary" , "Date" , "Price" , "Comment"]
-const mandatory : Keys[]= ["Beneficiary", "CategoryName", "Date", "Price"]
-type Keys = "CategoryName" | "Beneficiary" | "Date" | "Price" | "Comment"
-export default class extends React.Component<RouteComponentProps<any>,State> {
-  constructor(props : RouteComponentProps<any>) {
-    super(props)
+const keys: Keys[] = ["CategoryName" , "Beneficiary" , "Date" , "Price" , "Comment"];
+const mandatory: Keys[] = ["Beneficiary", "CategoryName", "Date", "Price"];
+type Keys = "CategoryName" | "Beneficiary" | "Date" | "Price" | "Comment";
+export default class extends React.Component<RouteComponentProps<any>, IState> {
+  constructor(props: RouteComponentProps<any>) {
+    super(props);
     console.log("props", props);
-    let state = {
+    const state = {
       WalletUUID : "",
       Lines : [],
       CategoryName : "",
@@ -52,31 +47,31 @@ export default class extends React.Component<RouteComponentProps<any>,State> {
       TransactionsToImport : [],
       Categories : [],
       Wallets : [],
-      }
+      };
     if (props.location) {
-      const toto = queryString.parse(props.location.search.replace("?",""))
+      const toto = queryString.parse(props.location.search.replace("?", ""));
       state.WalletUUID = Array.isArray(toto.walletUUID) ? toto.walletUUID[0] : toto.walletUUID;
     }
     this.state = state;
   }
 
-  async componentDidMount() {
+  public async componentDidMount() {
     Promise.all([
-      Models.GetCategories().then(categories => this.setState({...this.state, Categories : categories})),
-      Models.GetWallets().then(wallets => this.setState({...this.state, Wallets : wallets})),
-    AsyncStorage.getItem("csv").then(result => result && this.handleCSVContent(result)),
-    ])
+      Models.GetCategories().then((categories) => this.setState({...this.state, Categories : categories})),
+      Models.GetWallets().then((wallets) => this.setState({...this.state, Wallets : wallets})),
+    AsyncStorage.getItem("csv").then((result) => result && this.handleCSVContent(result)),
+    ]);
   }
 
-  bindInput(key : Keys, value : string) {
+  public bindInput(key: Keys, value: string) {
     const state = {...this.state};
-    const number = parseInt(value);
+    const numberValue = parseInt(value, 10);
     if (!this.state.Lines[0]) {
-      return
+      return;
     }
     // Nombre entre 1 et n : ok
-    if (number >= 0 && number < this.state.Lines[0].length) {
-      state[key] = ""+number;
+    if (numberValue >= 0 && numberValue < this.state.Lines[0].length) {
+      state[key] = "" + numberValue;
     }
     // Vide => vide
     if (value === "") {
@@ -85,106 +80,126 @@ export default class extends React.Component<RouteComponentProps<any>,State> {
     this.setState(state);
   }
 
-  render() {
-    let content : JSX.Element;
+  public render() {
+    let content: JSX.Element;
 
     if (this.state.TransactionsToImport.length) {
       content = (
-        <View style={{flex:1}}>
+        <View style={{flex: 1}}>
         <Text> Voulez vous importer toutes ces transactions ? </Text>
         <Button title="Importer" onPress={() => this.import()} />
-        <GroupTransactionsByDay WalletUUID={this.state.WalletUUID} Transfert={[]} Wallets={this.state.Wallets} Categories={this.state.Categories} Transactions={this.state.TransactionsToImport} history={this.props.history} Currency={{Code : "EUR", Symbol : "€"}}/>
+        <GroupTransactionsByDay
+          WalletUUID={this.state.WalletUUID}
+          Transfert={[]}
+          Wallets={this.state.Wallets}
+          Categories={this.state.Categories}
+          Transactions={this.state.TransactionsToImport}
+          history={this.props.history}
+          Currency={{Code : "EUR", Symbol : "€"}}/>
         </View>
-      )
+      );
     } else if (this.state.Lines.length) {
       content = (
         <View>
           <Text>Associate importation fields with a column number of your CSV</Text>
           <View>
-          {keys.map(k => (
+          {keys.map((k) => (
             <View style={{flexDirection : "row"}}>
               <Text>{k} : </Text>
-            <TextInput keyboardType="numeric" key={k} onChangeText={(e) => this.bindInput(k, e)} placeholder="Column Name" value={this.state[k]}/>
+            <TextInput
+              key={k}
+              keyboardType="numeric"
+              onChangeText={(e) => this.bindInput(k, e)}
+              placeholder="Column Name"
+              value={this.state[k]}/>
             </View>
           ))}
-            <View style={{flexDirection:"row"}}>
-              <View style={{flex:1}}>
+            <View style={{flexDirection: "row"}}>
+              <View style={{flex: 1}}>
                 <Button title="Cancel" onPress={() => this.cancel()}/>
               </View>
-              <View style={{flex:1}}>
+              <View style={{flex: 1}}>
                 <Button title="Import" onPress={() => this.generateTransactions()}/>
               </View>
 
             </View>
           </View>
           <Text>Your CSV file : </Text>
-          <View style={{flex : 10, flexDirection:"column"}}>
-            <View style={{flexDirection:"row", alignSelf: 'stretch'}}>
-              {this.state.Lines[0] && this.state.Lines[0].map((l,i) =>
-                <Text style={{flex : 1, textAlign:"center"}} key={i}>{i}</Text>
+          <View style={{flex : 10, flexDirection: "column"}}>
+            <View style={{flexDirection: "row", alignSelf: "stretch"}}>
+              {this.state.Lines[0] && this.state.Lines[0].map((l, i) =>
+                <Text style={{flex : 1, textAlign: "center"}} key={i}>{i}</Text>,
               )}
             </View>
-            {this.state.Lines.slice(0,15).map((l,i) =>
-              <View style={{flexDirection:"row", alignSelf: 'stretch'}} key={i}>
-                {l.map( (m,j) =>
-                  <Text style={{flex : 1, textAlign:"center"}} key={j}>{m}</Text>
+            {this.state.Lines.slice(0, 15).map((l, i) =>
+              <View style={{flexDirection: "row", alignSelf: "stretch"}} key={i}>
+                {l.map((m, j) =>
+                  <Text style={{flex : 1, textAlign: "center"}} key={j}>{m}</Text>,
                 )}
-              </View>
+              </View>,
             )}
           </View>
         </View>
-      )
+      );
     } else {
-      content = <input style={{flex : 1}} type="file" accept=".csv" onChange={(event) => event.target.files && this.handleFile(event.target.files[0])}/>
+      content = <input
+        style={{flex : 1}}
+        type="file"
+        accept=".csv"
+        onChange={(event) => event.target.files && this.handleFile(event.target.files[0])}/>;
     }
     return (
     <View style={{flex: 1}}>
       <Header
-      outerContainerStyles={{height:60}}
-        leftComponent={<MyLink to={`/Wallet/${this.state.WalletUUID}/TransactionsView`}><Icon name="arrow-back" /></MyLink>}
-        centerComponent={{ text: `Import in wallet ${this.state.WalletUUID}`, style: { fontSize: 20, color: '#fff' } }}
+      outerContainerStyles={{height: 60}}
+        leftComponent={
+          <MyLink to={`/Wallet/${this.state.WalletUUID}/TransactionsView`}>
+            <Icon name="arrow-back" />
+          </MyLink>
+        }
+        centerComponent={{ text: `Import in wallet ${this.state.WalletUUID}`, style: { fontSize: 20, color: "#fff" } }}
       />
       {content}
-    </View>)
+    </View>);
   }
 
-  handleFile(file : File) {
-    var reader = new FileReader();
+  public handleFile(file: File) {
+    const reader = new FileReader();
     reader.onload = (event) => this.handleCSVContent(reader.result);
     reader.readAsText(file);
   }
 
-  handleCSVContent(string : string) {
-    console.log("handle csv", string)
-    AsyncStorage.setItem("csv", string);
-    const csv = Papa.parse(string, {dynamicTyping : true});
-    this.setState({...this.state, Lines : csv.data})
-    console.log("file read", csv.data.slice(0,5));
+  public handleCSVContent(stringValue: string) {
+    console.log("handle csv", stringValue);
+    AsyncStorage.setItem("csv", stringValue);
+    const csv = Papa.parse(stringValue, {dynamicTyping : true});
+    this.setState({...this.state, Lines : csv.data});
+    console.log("file read", csv.data.slice(0, 5));
   }
 
-  cancel() {
+  public cancel() {
     AsyncStorage.removeItem("csv");
     this.setState({Lines : []});
   }
 
-  generateTransactions() {
-    if (!mandatory.reduce((agg, current)=> (agg && this.state[current] !== ""), true)){
-      console.log("missing mandatory field")
-      return
+  public generateTransactions() {
+    if (!mandatory.reduce((agg, current) => (agg && this.state[current] !== ""), true)) {
+      console.log("missing mandatory field");
+      return;
     }
 
-    const state = {...this.state}
+    const state = {...this.state};
 
     // Get list of category to import and create map Name => UUID
-    Models.GetCategories().then(categories => {
-      const alreadyImportedMap : {[key:string] : string} = {}
-      categories.forEach(t => alreadyImportedMap[t.Name] = t.UUID)
+    Models.GetCategories().then((categories) => {
+      const alreadyImportedMap: {[key: string]: string} = {};
+      categories.forEach((t) => alreadyImportedMap[t.Name] = t.UUID);
       return alreadyImportedMap;
-    }).then(alreadyImportedMap => {
-      const categories : Category[] = [];
-      const categoryAdded : {[key:string] : string} = {};
+    }).then((alreadyImportedMap) => {
+      const categories: Category[] = [];
+      const categoryAdded: {[key: string]: string} = {};
       this.state.Lines.forEach((line) => {
-        const categoryName = line[parseInt(this.state.CategoryName)]
+        const categoryName = line[parseInt(this.state.CategoryName, 10)];
         if (categoryAdded[categoryName] || alreadyImportedMap[categoryName]) {
           return;
         }
@@ -193,45 +208,45 @@ export default class extends React.Component<RouteComponentProps<any>,State> {
           Icon : DefaultIcon({Name : "shopping-cart", Color : "#517fa4", Type : "material"}),
           LastUpdate : new Date(),
           Name : categoryName,
-        }
+        };
         categories.push(c);
-        categoryAdded[c.Name] = c.UUID
-      })
+        categoryAdded[c.Name] = c.UUID;
+      });
       state.CategoriesToImport = categories;
-      return {...alreadyImportedMap, ...categoryAdded}
-    }).then(categoryNameToUUID => {
+      return {...alreadyImportedMap, ...categoryAdded};
+    }).then((categoryNameToUUID) => {
       return Models.GetAllTransactions(this.state.WalletUUID).then(
-        transactions => {
-          const alreadyImportedMap : {[key:string] : boolean} = {}
-          transactions.forEach(t => alreadyImportedMap[t.Beneficiary+t.Date+t.Price] = true)
+        (transactions) => {
+          const alreadyImportedMap: {[key: string]: boolean} = {};
+          transactions.forEach((t) => alreadyImportedMap[t.Beneficiary + t.Date + t.Price] = true);
           return alreadyImportedMap;
-        }
-      ).then(alreadyImportedMap => {
-        let transactions : Transaction[] = this.state.Lines.map((line) : Transaction => ({
+        },
+      ).then((alreadyImportedMap) => {
+        let transactions: Transaction[] = this.state.Lines.map((line): Transaction => ({
           UUID : v4(),
           WalletUUID : this.state.WalletUUID,
-          CategoryUUID : categoryNameToUUID[line[parseInt(this.state.CategoryName)]],
+          CategoryUUID : categoryNameToUUID[line[parseInt(this.state.CategoryName, 10)]],
           LastUpdate : new Date(),
-          Beneficiary : line[parseInt(this.state.Beneficiary)],
-          Date : new Date(line[parseInt(this.state.Date)]),
-          Price : parseFloat(line[parseInt(this.state.Price)]),
-          Comment : this.state.Comment && line[parseInt(this.state.Comment)],
+          Beneficiary : line[parseInt(this.state.Beneficiary, 10)],
+          Date : new Date(line[parseInt(this.state.Date, 10)]),
+          Price : parseFloat(line[parseInt(this.state.Price, 10)]),
+          Comment : this.state.Comment && line[parseInt(this.state.Comment, 10)],
         }));
         console.log("transactions from csv", transactions);
-        transactions = transactions.filter(t => !alreadyImportedMap[t.Beneficiary+t.Date+t.Price])
+        transactions = transactions.filter((t) => !alreadyImportedMap[t.Beneficiary + t.Date + t.Price]);
         console.log("transactions to import", transactions);
         state.TransactionsToImport = transactions;
-      })
+      });
     }).then(() => {
       this.setState(state);
-    })
+    });
 
   }
 
-  import() {
+  public import() {
     Models.CreateCategory(...this.state.CategoriesToImport).then(() =>
-      Models.CreateTransaction(...this.state.TransactionsToImport)
-    ).then(() => AsyncStorage.removeItem("csv")).then(() => this.props.history.push("/"))
+      Models.CreateTransaction(...this.state.TransactionsToImport),
+    ).then(() => AsyncStorage.removeItem("csv")).then(() => this.props.history.push("/"));
   }
 
 }

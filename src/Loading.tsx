@@ -1,17 +1,17 @@
-import * as React from "react"
-import {Text} from "react-native"
+import * as React from "react";
+import {Text} from "react-native";
 
-interface Props {
-  Message : string
+interface IProps {
+  Message: string;
 }
 
-class Loading extends React.Component<Props,object>{
-  constructor(props: Props) {
+class Loading extends React.Component<IProps, object> {
+  constructor(props: IProps) {
     super(props);
   }
-  render(){
+  public render() {
     return <Text>{this.props.Message}</Text>;
   }
 }
 
-export default Loading
+export default Loading;

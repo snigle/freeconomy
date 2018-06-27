@@ -1,8 +1,9 @@
 import {WalletInput} from "./Types";
+import t from "./translator";
 
 export const Money: WalletInput = {
-  Name : "Money",
-  Description : "Wallet",
+  Name : t.t("defaultWallets.cash"),
+  Description : t.t("defaultWallets.cashDescription"),
   Icon : {
     Name : "toll",
     Type : "material",
@@ -15,8 +16,8 @@ export const Money: WalletInput = {
 };
 
 export const Bank: WalletInput = {
-  Name : "Bank Account",
-  Description : "Bank with credit card",
+  Name : t.t("defaultWallets.bank"),
+  Description : t.t("defaultWallets.bankDescription"),
   Icon : {
     Name : "credit-card",
     Type : "material",

@@ -1,7 +1,7 @@
 import {AsyncStorage} from "react-native";
 import {store} from "./App";
 import * as Driver from "./GoogleSync";
-import {Collection} from "./GoogleSync";
+import {ICollection} from "./GoogleSync";
 import * as Models from "./Models";
 import * as OAuth from "./OAuth";
 import {syncError, syncHide, syncStart, syncTerminate} from "./reducer/sync";
@@ -26,7 +26,7 @@ export function GoogleSync(autohide: boolean = true): Promise<any> {
     // Enable synchronisation auto when update models.
     AsyncStorage.setItem("autosync", "ok");
     // Synchronisation
-    return syncCollection<Collection>(login, "deleted", Models.GetAllDeleted, Models.SaveDeleted, {}, syncResult)
+    return syncCollection<ICollection>(login, "deleted", Models.GetAllDeleted, Models.SaveDeleted, {}, syncResult)
       .then((deleted): {[key: string]: boolean} => {
       const result: {[key: string]: boolean} = {};
       deleted.forEach((deleted) => result[deleted.UUID] = true);
@@ -46,7 +46,7 @@ export function GoogleSync(autohide: boolean = true): Promise<any> {
   return syncPromise;
 }
 
-async function syncCollection<CollectionType extends Collection>(
+async function syncCollection<CollectionType extends ICollection>(
   login: Login,
   collectionName: string,
   GetModels: () => Promise<CollectionType[]>,
@@ -64,19 +64,19 @@ async function syncCollection<CollectionType extends Collection>(
   }).then((collection) => collection.filter((e) => e.UUID && !deleted[e.UUID]))
   .then((collection) =>
     GetModels().then((collection) => collection.filter((e) => e.UUID && !deleted[e.UUID]))
-    .then((elements): {local: Collection[], online: Collection[]} => ({ local : elements, online : collection})),
+    .then((elements): {local: ICollection[], online: ICollection[]} => ({ local : elements, online : collection})),
   )
   .then(({local, online}) => {
-    const localByUUIDs: {[key: string]: Collection} = {};
+    const localByUUIDs: {[key: string]: ICollection} = {};
     local.forEach((c) => localByUUIDs[c.UUID] = c);
-    const onlineByUUIDs: {[key: string]: Collection} = {};
+    const onlineByUUIDs: {[key: string]: ICollection} = {};
     online.forEach((c) => onlineByUUIDs[c.UUID] = c);
     const uuids: string[] = Object.keys({...localByUUIDs, ...onlineByUUIDs});
     console.log("local", local, localByUUIDs);
     console.log("online", online, onlineByUUIDs);
     console.log("uuids", uuids);
     // Update local data
-    const result: Collection[] = [];
+    const result: ICollection[] = [];
     uuids.forEach((uuid) => {
       const local = localByUUIDs[uuid];
       const online = onlineByUUIDs[uuid];

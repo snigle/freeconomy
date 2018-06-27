@@ -1,31 +1,27 @@
-import * as React from "react"
-import {View, Text} from "react-native"
-import {RouteProps} from "react-router"
-import * as queryString from "querystring"
+import * as queryString from "querystring";
+import * as React from "react";
+import {Text, View} from "react-native";
+import {RouteProps} from "react-router";
 
-interface Props extends RouteProps{
-
+interface IState {
+  WalletUUID: string;
 }
 
-interface State {
-  WalletUUID : string
-}
-
-export default class extends React.Component<RouteProps,State> {
-  constructor(props : RouteProps) {
-    super(props)
+export default class extends React.Component<RouteProps, IState> {
+  constructor(props: RouteProps) {
+    super(props);
     console.log("props", props);
     if (props.location) {
-      const toto = queryString.parse(props.location.search.replace("?",""))
-      this.state = {WalletUUID : Array.isArray(toto.walletUUID) ? toto.walletUUID[0] : toto.walletUUID}
+      const toto = queryString.parse(props.location.search.replace("?", ""));
+      this.state = {WalletUUID : Array.isArray(toto.walletUUID) ? toto.walletUUID[0] : toto.walletUUID};
     } else {
-      this.state = {WalletUUID : ""}
+      this.state = {WalletUUID : ""};
     }
   }
 
-  render() {
+  public render() {
     return <View>
       <Text>Import in wallet {this.state.WalletUUID} non disponible sur mobile</Text>
-    </View>
+    </View>;
   }
 }
