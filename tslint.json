@@ -10,7 +10,8 @@
       "no-unused-expression": true,
       "no-empty": [true, "allow-empty-functions"],
       "object-literal-sort-keys": false,
-      "no-var-requires" : false
+      "no-var-requires" : false,
+      "one-variable-per-declaration" :false
     },
     "rulesDirectory": []
 }

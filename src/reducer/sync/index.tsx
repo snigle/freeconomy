@@ -1,63 +1,63 @@
-import {AnyAction} from "redux"
+import { AnyAction } from "redux";
 
-interface Action extends AnyAction {
-    sync : Sync
+interface IAction extends AnyAction {
+  sync: ISync;
 }
 
-interface Sync{
-  syncing : boolean,
-  synced : boolean,
-  error : boolean,
+interface ISync {
+  syncing: boolean;
+  synced: boolean;
+  error: boolean;
 }
 
 const DEFAULT_STATE = {
   syncing: false,
   synced: false,
-  error : false,
+  error: false,
 };
 
-const UPDATE_SYNC = "UPDATE_SYNC"
+const UPDATE_SYNC = "UPDATE_SYNC";
 
-export const syncStart = () : Action => ({
-  type : UPDATE_SYNC,
-  sync : {
-    syncing : true,
-    synced :false,
-    error : false,
-  },
-});
-
-export const syncTerminate = () : Action => ({
-  type : UPDATE_SYNC,
-  sync : {
-    syncing : false,
-    synced :true,
+export const syncStart = (): IAction => ({
+  type: UPDATE_SYNC,
+  sync: {
+    syncing: true,
+    synced: false,
     error: false,
   },
 });
 
-export const syncHide = () : Action => ({
-  type : UPDATE_SYNC,
-  sync : {
-    syncing : false,
-    synced :false,
-    error : false,
+export const syncTerminate = (): IAction => ({
+  type: UPDATE_SYNC,
+  sync: {
+    syncing: false,
+    synced: true,
+    error: false,
   },
 });
 
-export const syncError = () : Action => ({
-  type : UPDATE_SYNC,
-  sync : {
-    syncing : false,
-    synced :false,
-    error : true,
+export const syncHide = (): IAction => ({
+  type: UPDATE_SYNC,
+  sync: {
+    syncing: false,
+    synced: false,
+    error: false,
   },
 });
 
-export default function(state = DEFAULT_STATE, action : Action) : Sync {
-  switch(action.type) {
+export const syncError = (): IAction => ({
+  type: UPDATE_SYNC,
+  sync: {
+    syncing: false,
+    synced: false,
+    error: true,
+  },
+});
+
+export default function(state = DEFAULT_STATE, action: IAction): ISync {
+  switch (action.type) {
     case UPDATE_SYNC: {
-      return {...action.sync}
+      return { ...action.sync };
     }
     default:
       return state;

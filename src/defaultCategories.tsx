@@ -1,7 +1,7 @@
 import t from "./translator";
-import {CategoryInput} from "./Types";
+import { ICategoryInput } from "./Types";
 
-export const defaultCategories: CategoryInput[] = [
+export const defaultCategories: ICategoryInput[] = [
   {
     Name: t.t("defaultCategories.insurance"),
     Icon: {

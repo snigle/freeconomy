@@ -1,22 +1,22 @@
 // @ts-ignore
 import { TextField } from "carbon-ui";
-import {History} from "history";
+import { History } from "history";
 import * as _ from "lodash";
 import * as React from "react";
-import {Button, Picker, Text, TouchableHighlight, View} from "react-native";
+import { Button, Picker, Text, TouchableHighlight, View } from "react-native";
 // @ts-ignore
 import Autocomplete from "react-native-autocomplete-input";
-import {Header, Icon} from "react-native-elements";
+import { Header, Icon } from "react-native-elements";
 import DatePicker from "./DatePicker";
-import {MyLink} from "./Link";
+import { MyLink } from "./Link";
 import * as Models from "./Models";
 import t from "./translator";
-import {Category, Transaction, TransactionInput} from "./Types";
+import { ICategory, ITransaction, ITransactionInput } from "./Types";
 
-interface IState extends TransactionInput {
+interface IState extends ITransactionInput {
   Loading: boolean;
   PriceText: string;
-  Categories: Category[];
+  Categories: ICategory[];
   autocomplete: Autocomplete[];
 }
 
@@ -41,17 +41,17 @@ class AddTransactionView extends React.Component<IProps, IState> {
     super(props);
     const date = new Date();
     this.state = {
-      Beneficiary : "",
-      Comment : "",
-      CategoryUUID : "",
-      WalletUUID : props.WalletUUID,
-      Price : 0,
-      PriceText : "-0",
-      Date : date,
-      Categories : [],
-      autocomplete : [],
+      Beneficiary: "",
+      Comment: "",
+      CategoryUUID: "",
+      WalletUUID: props.WalletUUID,
+      Price: 0,
+      PriceText: "-0",
+      Date: date,
+      Categories: [],
+      autocomplete: [],
 
-      Loading : true,
+      Loading: true,
     };
   }
 
@@ -59,15 +59,16 @@ class AddTransactionView extends React.Component<IProps, IState> {
     let getTransactionPromise: Promise<any>;
     if (this.props.TransactionUUID) {
       getTransactionPromise = Models.GetTransaction(this.props.TransactionUUID).then((transaction) => {
-        this.setState({...this.state,
-                       Beneficiary : transaction.Beneficiary,
-                       CategoryUUID : transaction.CategoryUUID,
-                       Comment : transaction.Comment,
-                       Price : transaction.Price,
-                       PriceText : "" + transaction.Price,
-                       Date: transaction.Date,
-                       WalletUUID : transaction.WalletUUID,
-      });
+        this.setState({
+          ...this.state,
+          Beneficiary: transaction.Beneficiary,
+          CategoryUUID: transaction.CategoryUUID,
+          Comment: transaction.Comment,
+          Price: transaction.Price,
+          PriceText: "" + transaction.Price,
+          Date: transaction.Date,
+          WalletUUID: transaction.WalletUUID,
+        });
       });
     } else {
       getTransactionPromise = Promise.resolve();
@@ -87,53 +88,53 @@ class AddTransactionView extends React.Component<IProps, IState> {
 
       // Create map[beneficiary]categoryuuid to permits autocomplete beneficiary and category
       const autocomplete: Autocomplete[] = _.values(
-      _.mapValues(_.groupBy<Transaction>(transactions, (tr) => tr.Beneficiary),
-        (groupedTransactions, beneficiary) => {
-          const result: IAutoComplete = { Beneficiary : beneficiary, CategoryUUID : "", Occurrencies : 0};
-          const last = _.last(groupedTransactions);
-          if (last) {
-            result.CategoryUUID = last.CategoryUUID;
-          }
-          result.Occurrencies = groupedTransactions.length;
-          return result;
-        },
-      ),
-    ).sort((a, b) => b.Occurrencies - a.Occurrencies);
+        _.mapValues(_.groupBy<ITransaction>(transactions, (tr) => tr.Beneficiary),
+          (groupedTransactions, beneficiary) => {
+            const result: IAutoComplete = { Beneficiary: beneficiary, CategoryUUID: "", Occurrencies: 0 };
+            const last = _.last(groupedTransactions);
+            if (last) {
+              result.CategoryUUID = last.CategoryUUID;
+            }
+            result.Occurrencies = groupedTransactions.length;
+            return result;
+          },
+        ),
+      ).sort((a, b) => b.Occurrencies - a.Occurrencies);
       console.log("autocomplete", autocomplete);
-      this.setState({...this.state, Categories : categories, autocomplete, Loading : false});
+      this.setState({ ...this.state, Categories: categories, autocomplete, Loading: false });
     });
   }
 
   public changeBenificiary(text: string) {
-    this.setState({...this.state, Beneficiary : text});
+    this.setState({ ...this.state, Beneficiary: text });
   }
   public autoCompleteClick(autocomplete: Autocomplete) {
     let categoryUUID = this.state.CategoryUUID;
     if (_.find(this.state.Categories, (c) => c.UUID === autocomplete.CategoryUUID)) {
       categoryUUID = autocomplete.CategoryUUID;
     }
-    this.setState({...this.state, Beneficiary : autocomplete.Beneficiary, CategoryUUID: categoryUUID});
+    this.setState({ ...this.state, Beneficiary: autocomplete.Beneficiary, CategoryUUID: categoryUUID });
   }
   public changeComment(text: string) {
-    this.setState({...this.state, Comment : text});
+    this.setState({ ...this.state, Comment: text });
   }
   public changeCategory(uuid: string) {
     console.log("change category", uuid);
-    this.setState({...this.state, CategoryUUID : uuid});
+    this.setState({ ...this.state, CategoryUUID: uuid });
   }
   public changePrice(priceText: string) {
     const price = parseFloat(priceText);
     if (!price && priceText !== "-" && priceText !== "") {
       return;
     }
-    this.setState({...this.state, Price : price || 0, PriceText : priceText});
+    this.setState({ ...this.state, Price: price || 0, PriceText: priceText });
   }
   public changeDate(date: Date) {
-    this.setState({...this.state, Date : date});
+    this.setState({ ...this.state, Date: date });
   }
   public toggleIsIncome() {
     const price = -this.state.Price;
-    this.setState({...this.state, PriceText : `${price}`, Price : price});
+    this.setState({ ...this.state, PriceText: `${price}`, Price: price });
   }
 
   public render() {
@@ -148,21 +149,21 @@ class AddTransactionView extends React.Component<IProps, IState> {
       content = <View>
         <TextField
           placeholder={t.t("addTransactionView.beneficiary")}
-          onChangeText={(v: string) => this.changeBenificiary(v)} value={this.state.Beneficiary}/>
+          onChangeText={(v: string) => this.changeBenificiary(v)} value={this.state.Beneficiary} />
         {(autocomplete.length === 1 && autocomplete[0].Beneficiary === this.state.Beneficiary) ||
           autocomplete.map((e) =>
             <TouchableHighlight
               key={e.Beneficiary}
               onPress={() => this.autoCompleteClick(e)}
-              style={{backgroundColor : "#2689dc0f", padding: 2}}>
-                <Text>{e.Beneficiary}</Text>
+              style={{ backgroundColor: "#2689dc0f", padding: 2 }}>
+              <Text>{e.Beneficiary}</Text>
             </TouchableHighlight>)
         }
         <TextField
           placeholder={t.t("addTransactionView.comment")}
-          onChangeText={(v: string) => this.changeComment(v)} value={this.state.Comment}/>
+          onChangeText={(v: string) => this.changeComment(v)} value={this.state.Comment} />
         <Picker
-          style={{marginTop: 10}}
+          style={{ marginTop: 10 }}
           mode="dropdown"
           selectedValue={this.state.CategoryUUID}
           onValueChange={(itemValue, itemIndex) => this.changeCategory(itemValue)}>
@@ -172,39 +173,39 @@ class AddTransactionView extends React.Component<IProps, IState> {
             )
           }
         </Picker>
-        <View style={{marginTop: 10}}>
-        <DatePicker value={this.state.Date} callback={(date: Date) => this.changeDate(date)}/>
+        <View style={{ marginTop: 10 }}>
+          <DatePicker value={this.state.Date} callback={(date: Date) => this.changeDate(date)} />
         </View>
         <TextField
           keyboardType="numeric"
           placeholder={t.t("common.price")}
           onChangeText={(v: string) => this.changePrice(v)}
-          value={this.state.PriceText}/>
-        <Button title={t.t("common.save")} onPress={() => this.save()}/>
+          value={this.state.PriceText} />
+        <Button title={t.t("common.save")} onPress={() => this.save()} />
       </View>;
     }
     return (
       <View>
-      <Header
-      outerContainerStyles={{height: 60}}
-        leftComponent={
-          <MyLink to={`/Wallet/${this.state.WalletUUID}/TransactionsView`}>
-            <Icon name="arrow-back" />
-          </MyLink>
-        }
-        centerComponent={{ text: t.t("transactionsView.addTransaction"), style: { fontSize: 20, color: "#fff" } }}
-        rightComponent={
-          this.props.TransactionUUID ? <View /> :
-          <MyLink to="AddTransfertView" replace><Icon name="sync" /></MyLink>
-        }
-      />
+        <Header
+          outerContainerStyles={{ height: 60 }}
+          leftComponent={
+            <MyLink to={`/Wallet/${this.state.WalletUUID}/TransactionsView`}>
+              <Icon name="arrow-back" />
+            </MyLink>
+          }
+          centerComponent={{ text: t.t("transactionsView.addTransaction"), style: { fontSize: 20, color: "#fff" } }}
+          rightComponent={
+            this.props.TransactionUUID ? <View /> :
+              <MyLink to="AddTransfertView" replace><Icon name="sync" /></MyLink>
+          }
+        />
         {content}
       </View>
     );
   }
 
   public save() {
-    this.setState({...this.state, Loading : true });
+    this.setState({ ...this.state, Loading: true });
     const savePromise: Promise<any> = this.props.TransactionUUID ?
       Models.UpdateTransaction(this.props.TransactionUUID, this.state) :
       Models.CreateTransaction(this.state);
