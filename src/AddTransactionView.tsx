@@ -3,7 +3,7 @@ import { TextField } from "carbon-ui";
 import { History } from "history";
 import * as _ from "lodash";
 import * as React from "react";
-import { Button, Picker, Text, TouchableHighlight, View } from "react-native";
+import { Button, Picker, ScrollView, Text, TouchableHighlight, View } from "react-native";
 // @ts-ignore
 import Autocomplete from "react-native-autocomplete-input";
 import { Header, Icon } from "react-native-elements";
@@ -185,7 +185,7 @@ class AddTransactionView extends React.Component<IProps, IState> {
       </View>;
     }
     return (
-      <View>
+      <View style={{ flex: 1 }}>
         <Header
           outerContainerStyles={{ height: 60 }}
           leftComponent={
@@ -199,7 +199,9 @@ class AddTransactionView extends React.Component<IProps, IState> {
               <MyLink to="AddTransfertView" replace><Icon name="sync" /></MyLink>
           }
         />
-        {content}
+        <ScrollView style={{ flex: 1 }}>
+          {content}
+        </ScrollView>
       </View>
     );
   }
