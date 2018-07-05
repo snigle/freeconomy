@@ -1,6 +1,6 @@
 import * as moment from "moment";
 // tslint:disable-next-line:no-submodule-imports
-import "moment/locale/fr";
+import "moment/min/moment-with-locales";
 import I18n, { getLanguages } from "react-native-i18n";
 import en from "./en";
 import fr from "./fr";
