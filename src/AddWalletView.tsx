@@ -39,6 +39,7 @@ class AddWalletView extends React.Component<IProps, IState> {
     this.state = {
       Name: "",
       Description: "",
+      Solde: 0,
       Currency: { Code: "EUR", Symbol: "€" },
       Icon: { Name: "account-balance-wallet", Color: "#517fa4", Type: "material" },
       Loading: true,
@@ -55,6 +56,7 @@ class AddWalletView extends React.Component<IProps, IState> {
           Description: wallet.Description,
           Currency: wallet.Currency,
           Icon: wallet.Icon,
+          Solde: wallet.Solde,
         });
       });
     } else {
@@ -67,6 +69,9 @@ class AddWalletView extends React.Component<IProps, IState> {
   }
   public changeDescription(text: string) {
     this.setState({ ...this.state, Description: text });
+  }
+  public changeSolde(text: string) {
+    this.setState({ ...this.state, Solde: parseFloat(text) });
   }
   public changeCurrencyCode(text: string) {
     this.setState({ ...this.state, Currency: { ...this.state.Currency, Code: text } });
@@ -92,6 +97,10 @@ class AddWalletView extends React.Component<IProps, IState> {
           placeholder={t.t("common.description")}
           onChangeText={(v: string) => this.changeDescription(v)}
           value={this.state.Description} />
+        <TextField
+          placeholder="Solde courant"
+          onChangeText={(v: string) => this.changeSolde(v)}
+          value={this.state.Solde} />
 
         <View style={{ flexDirection: "row" }}>
           <View style={{ flex: 1 }}>

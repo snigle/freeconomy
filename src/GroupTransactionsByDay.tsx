@@ -91,7 +91,8 @@ export default function
     return { Transfert: transfert, Total: 0, Price: price, Date: transfert.Date };
   }));
   pricedTransaction = _.sortBy(pricedTransaction, (p) => -p.Date.getTime());
-  let total = 0;
+  const wallet = _.find(props.Wallets, (w) => w.UUID === props.WalletUUID);
+  let total = wallet ? wallet.Solde : 0;
   pricedTransaction.reverse().forEach((t) => {
     total += t.Price;
     t.Total = total;

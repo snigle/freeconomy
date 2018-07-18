@@ -2,7 +2,7 @@ import { History } from "history";
 import * as React from "react";
 import { Button, ScrollView, TouchableHighlight, View } from "react-native";
 import DrawerLayout, { DrawerLayoutProperties } from "react-native-drawer-layout";
-import { Card, Header, List, ListItem, Text } from "react-native-elements";
+import { Card, Header, ListItem, Text } from "react-native-elements";
 // @ts-ignore
 // tslint:disable-next-line:no-duplicate-imports
 import { Overlay } from "react-native-elements";
@@ -49,7 +49,7 @@ export class SideBarClass extends React.Component<IProps, IState> {
       renderNavigationView={() =>
         <ScrollView>
           <Text style={{ textAlign: "center", margin: 10, fontSize: 18 }}>Freeconomy</Text>
-          <List containerStyle={{ marginTop: 0 }}>
+          <View style={{ marginTop: 0 }}>
             <ListItem title={t.t("sideBar.home")} onPress={() => this.props.history.replace("/")} />
             <ListItem title={t.t("sideBar.categories")} onPress={() => this.props.history.replace("/CategoriesView")} />
             <ListItem title={t.t("sideBar.reports")} onPress={() => this.props.history.replace("/ReportPie")} />
@@ -59,7 +59,7 @@ export class SideBarClass extends React.Component<IProps, IState> {
             <ListItem
               title={t.t("sideBar.logout")}
               onPress={() => this.setState({ logout: true }) || (this.drawer ? this.drawer.closeDrawer() : null)} />
-          </List>
+          </View>
         </ScrollView>
       }
       ref={(drawer) => {

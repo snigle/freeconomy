@@ -58,7 +58,10 @@ export default class extends React.Component<IProps, IState> {
             <View style={{ flex: 2 }}>
               <Text style={{ ...margins, textAlign: "right" }}>
                 {displayPrice(
-                  this.props.Wallet.TotalPerYear.reduce((aggregate, current) => aggregate += current.Total, 0),
+                  this.props.Wallet.TotalPerYear.reduce(
+                    (aggregate, current) => aggregate += current.Total,
+                    this.props.Wallet.Solde,
+                  ),
                   this.props.Wallet.Currency,
                 )}
               </Text>

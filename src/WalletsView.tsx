@@ -53,7 +53,7 @@ class Wallets extends React.Component<IProps, IState> {
       content = _.map(groupWallet, (wallets, currencyCode) => {
         const total: number = wallets.reduce((sumTotal, w) =>
           sumTotal + w.TotalPerYear.reduce((sumPerWallet, totalYear) =>
-            totalYear.Total + sumPerWallet, 0), 0);
+            totalYear.Total + sumPerWallet, w.Solde), 0);
         console.log("wallets", wallets);
 
         return <Card

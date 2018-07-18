@@ -55,6 +55,7 @@ export async function CreateWallet(input: IWalletInput): Promise<IWallet[]> {
     Description: input.Description,
     Currency: input.Currency,
     Icon: input.Icon,
+    Solde: input.Solde,
   }]),
   ).then(SaveWallets);
 }
@@ -75,6 +76,7 @@ export async function UpdateWallet(walletUUID: string, input: IWalletInput): Pro
       Currency: input.Currency,
       Icon: input.Icon,
       LastUpdate: new Date(),
+      Solde: input.Solde,
     });
     return wallets;
   },

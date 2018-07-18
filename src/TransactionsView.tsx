@@ -1,9 +1,8 @@
-// @ts-ignore
-import { connectTheme, Divider, FlatButton } from "carbon-ui";
 import { History } from "history";
 import * as React from "react";
 import { View } from "react-native";
 import { Header } from "react-native-elements";
+import { Route, RouteComponentProps } from "react-router";
 import GroupTransactionsByDay from "./GroupTransactionsByDay";
 import Loading from "./Loading";
 import * as Models from "./Models";
@@ -12,6 +11,7 @@ import SideBar, { SideBarClass } from "./SideBar";
 import SyncBar from "./SyncBar";
 import t from "./translator";
 import { ICategory, ITransaction, ITransfert, IWallet } from "./Types";
+import UpdateSoldeView from "./UpdateSoldeView";
 
 interface IState {
   Transactions: ITransaction[];
@@ -45,6 +45,7 @@ class TransactionsView extends React.Component<IProps, IState> {
         Name: "",
         TotalPerYear: [],
         UUID: "",
+        Solde: 0,
       },
       Wallets: [],
       Transactions: [],
@@ -131,6 +132,10 @@ class TransactionsView extends React.Component<IProps, IState> {
           title: t.t("transactionsView.importFromCSV"),
           onPress: () => this.props.history.push(`/ImportTransactionsView?walletUUID=${this.props.WalletUUID}`),
         },
+        {
+          title: t.t("transactionsView.updateSolde"),
+          onPress: () => this.props.history.push(`/Wallet/${this.props.WalletUUID}/TransactionsView/UpdateSoldeView`),
+        },
       ]} clicked={() => this.setState({ ...this.state, displayOptions: false })} />;
     }
 
@@ -162,6 +167,14 @@ class TransactionsView extends React.Component<IProps, IState> {
           <SyncBar history={this.props.history} refresh={() => this.componentDidMount()} />
           {options}
           {content}
+          <Route
+            path="/Wallet/:WalletUUID/TransactionsView/UpdateSoldeView"
+            component={(props: RouteComponentProps<{ WalletUUID: string }>) =>
+              <UpdateSoldeView
+                WalletUUID={props.match.params.WalletUUID}
+                history={props.history} />
+            }
+          />
         </View>
       </SideBar>);
   }
