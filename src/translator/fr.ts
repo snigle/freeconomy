@@ -13,6 +13,7 @@ export default {
     edit: "Modifier",
     remove: "Supprimer",
     removeName: "Supprimer %{name} ?",
+    update: "Mettre à jour",
   },
   login: {
     buttonWithGoogle: "Connexion avec Google",
@@ -40,12 +41,14 @@ export default {
   addWalletView: {
     currencyCode: "Nom de la monnaie",
     symbol: "Symbole",
+    solde: "Solde Initial",
   },
   transactionsView: {
     addTransaction: "Ajouter une opération",
     addTransfert: "Ajouter un virement",
     importFromCSV: "Importer depuis un CSV",
     loading: "Chargement des transactions",
+    updateSolde: "Modifier le total",
   },
   addTransactionView: {
     beneficiary: "Bénéficiaire",
@@ -104,5 +107,10 @@ export default {
   },
   reportPie: {
     title: "Rapport des dépenses",
+  },
+  updateSoldeView: {
+    newBalance: "Nouveau total",
+    currentBalance: "Solde total courant : ",
+    title: "Mettre à jour le total du compte %{name}",
   },
 };

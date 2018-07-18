@@ -14,6 +14,7 @@ import { IconType, IWalletInput } from "./Types";
 
 interface IState extends IWalletInput {
   Loading: boolean;
+  SoldeText: string;
 }
 
 interface IProps {
@@ -43,6 +44,7 @@ class AddWalletView extends React.Component<IProps, IState> {
       Currency: { Code: "EUR", Symbol: "€" },
       Icon: { Name: "account-balance-wallet", Color: "#517fa4", Type: "material" },
       Loading: true,
+      SoldeText: "",
     };
   }
 
@@ -57,6 +59,7 @@ class AddWalletView extends React.Component<IProps, IState> {
           Currency: wallet.Currency,
           Icon: wallet.Icon,
           Solde: wallet.Solde,
+          SoldeText: `${wallet.Solde}`,
         });
       });
     } else {
@@ -71,7 +74,7 @@ class AddWalletView extends React.Component<IProps, IState> {
     this.setState({ ...this.state, Description: text });
   }
   public changeSolde(text: string) {
-    this.setState({ ...this.state, Solde: parseFloat(text) });
+    this.setState({ ...this.state, Solde: parseFloat(text), SoldeText: text });
   }
   public changeCurrencyCode(text: string) {
     this.setState({ ...this.state, Currency: { ...this.state.Currency, Code: text } });
@@ -98,9 +101,9 @@ class AddWalletView extends React.Component<IProps, IState> {
           onChangeText={(v: string) => this.changeDescription(v)}
           value={this.state.Description} />
         <TextField
-          placeholder="Solde courant"
+          placeholder={t.t("addWalletView.solde")}
           onChangeText={(v: string) => this.changeSolde(v)}
-          value={this.state.Solde} />
+          value={this.state.SoldeText} />
 
         <View style={{ flexDirection: "row" }}>
           <View style={{ flex: 1 }}>

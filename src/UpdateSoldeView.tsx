@@ -6,6 +6,7 @@ import { Text, View } from "react-native";
 // @ts-ignore
 import { Button, Divider, Overlay } from "react-native-elements";
 import * as Models from "./Models";
+import t from "./translator";
 import { displayPrice, IWallet } from "./Types";
 
 interface IState {
@@ -63,14 +64,17 @@ class UpdateSoldeView extends React.Component<IProps, IState> {
                     marginBottom: 10,
                 }}>
                     <Text style={{ fontSize: 18, flex: 1 }}>
-                        Uptdate current balance of {this.state.Wallet.Name}
+                        {t.t("updateSoldeView.title", { name: this.state.Wallet.Name })}
                     </Text>
                 </View  >
                 {this.state.error && <Text>{this.state.error}</Text>}
-                <Text>Solde courrant : {displayPrice(this.state.solde, this.state.Wallet.Currency)}</Text>
-                <TextField placeholder="New total balance" type="number" name="Balance" value={this.state.soldeEdit}
-                    onChangeText={(t: string) => this.changeSolde(t)} />
-                <Button onPress={() => this.updateSolde()} text="Update" />
+                <Text>
+                    {t.t("updateSoldeView.currentBalance")}
+                    {displayPrice(this.state.solde, this.state.Wallet.Currency)}
+                </Text>
+                <TextField placeholder={t.t("updateSoldeView.newBalance")} type="number" value={this.state.soldeEdit}
+                    onChangeText={(text: string) => this.changeSolde(text)} />
+                <Button onPress={() => this.updateSolde()} text={t.t("common.update")} />
             </View>
         </Overlay>;
     }
