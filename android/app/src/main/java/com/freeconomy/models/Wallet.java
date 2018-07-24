@@ -16,4 +16,5 @@ public class Wallet {
     public String Description;
     public Currency Currency;
     public Icon Icon;
+    public Double Solde;
 }

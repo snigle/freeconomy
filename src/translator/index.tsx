@@ -1,6 +1,4 @@
 import * as moment from "moment";
-// tslint:disable-next-line:no-submodule-imports
-import "moment/min/moment-with-locales";
 import I18n, { getLanguages } from "react-native-i18n";
 import en from "./en";
 import fr from "./fr";
@@ -17,7 +15,7 @@ getLanguages().then((languages) => {
 })
   .then((lang) => {
     I18n.locale = lang;
-    moment.locale(lang);
+    // moment.locale([lang, "en"]);
   });
 
 export default I18n;

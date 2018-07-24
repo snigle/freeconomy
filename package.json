@@ -15,13 +15,14 @@
     "babel-plugin-transform-remove-console": "^6.9.1",
     "babel-polyfill": "^6.26.0",
     "babel-runtime": "^6.26.0",
-    "carbon-ui": "git://github.com/tuckerconnelly/carbon-ui",
+    "carbon-ui": "git://github.com/tuckerconnelly/carbon-ui.git",
     "colorsys": "^1.0.20",
     "gapi": "0.0.3",
     "history": "^4.7.2",
+    "i18n-js": "3.0.3",
     "jest": "^22.4.2",
     "lodash": "^4.17.5",
-    "moment": "^2.22.1",
+    "moment": "^2.22.2",
     "papaparse": "^4.3.7",
     "query-string": "^5.1.0",
     "react": "^16.3.0-alpha.1",
@@ -48,8 +49,7 @@
     "uranium": "^0.1.0",
     "uuid": "^3.2.1",
     "victory-native": "^0.17.4",
-    "yarn": "^1.6.0",
-    "i18n-js": "3.0.3"
+    "yarn": "^1.6.0"
   },
   "devDependencies": {
     "@types/core-js": "^0.9.46",

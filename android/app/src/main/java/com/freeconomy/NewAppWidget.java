@@ -102,7 +102,7 @@ public class NewAppWidget extends AppWidgetProvider {
                 views.setViewVisibility(ids[i].Wallet, View.VISIBLE);
                 views.setTextViewText(ids[i].WalletName, wallets[i].Name);
                 views.setInt(ids[i].WalletBox, "setBackgroundColor", Color.parseColor(wallets[i].Icon.Color));
-                float price = 0;
+                Double price = wallets[i].Solde;
                 for (TotalYear t : wallets[i].TotalPerYear) {
                     price += t.Total;
                 }
