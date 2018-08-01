@@ -177,7 +177,7 @@ class AddTransactionView extends React.Component<IProps, IState> {
         <Header
           outerContainerStyles={{ height: 60 }}
           leftComponent={
-            <MyLink to={`/Wallet/${this.props.WalletUUID}/TransactionsView`}>
+            <MyLink to={`/TransactionsView?walletUUID=${this.props.WalletUUID}`}>
               <Icon name="arrow-back" />
             </MyLink>
           }

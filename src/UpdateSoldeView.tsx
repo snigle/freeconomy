@@ -80,7 +80,7 @@ class UpdateSoldeView extends React.Component<IProps, IState> {
     }
 
     public goBack() {
-        this.props.history.replace(`/Wallet/${this.props.WalletUUID}/TransactionsView`);
+        this.props.history.replace(`/TransactionsView?walletUUID=${this.props.WalletUUID}`);
     }
 
     public updateSolde() {

@@ -2,16 +2,17 @@ import * as _ from "lodash";
 import moment from "moment";
 import * as querystring from "querystring";
 import * as React from "react";
-import { ScrollView, Text, View } from "react-native";
+import { ScrollView, Text, TouchableHighlight, View } from "react-native";
 import { Header } from "react-native-elements";
 import { RouteComponentProps } from "react-router";
 import { v4 } from "uuid";
 import { VictoryPie } from "victory-native";
-import * as Models from "./Models";
+import * as Models from "../Models";
+import MoreActions from "../MoreActions";
+import SideBar, { SideBarClass } from "../SideBar";
+import t from "../translator";
+import { displayPrice, ICategory, ICurrency, ITransaction } from "../Types";
 import ReportByCategoryItem from "./ReportByCategoryItem";
-import SideBar, { SideBarClass } from "./SideBar";
-import t from "./translator";
-import { displayPrice, ICategory, ICurrency, ITransaction } from "./Types";
 
 interface Idata {
   y: number;
@@ -21,10 +22,15 @@ interface Idata {
 }
 interface IState {
   datas: Idata[];
+  Currency: ICurrency;
+  displayOptions: boolean;
+  Filters?: IFilters;
+}
+
+interface IFilters {
   begin: moment.Moment;
   end: moment.Moment;
-  currencyCode: string;
-  Currency: ICurrency;
+  currencyCode?: string;
 }
 
 function rainbow(numOfSteps: number, step: number): string {
@@ -60,6 +66,15 @@ export default class extends React.Component<RouteComponentProps<any>, IState> {
 
   constructor(props: any) {
     super(props);
+    this.state = {
+      datas: [],
+      Currency: { Code: "", Symbol: "?" },
+      displayOptions: false,
+    };
+
+  }
+
+  public parseFilters(props: RouteComponentProps<any>): IFilters {
     const queryParams = querystring.parse(props.location.search.replace("?", ""));
     let begin = moment().startOf("month");
     let end = moment();
@@ -69,25 +84,45 @@ export default class extends React.Component<RouteComponentProps<any>, IState> {
     if (queryParams.end) {
       end = moment(queryParams.end);
     }
-    this.state = {
-      datas: [],
+    return {
       begin, end,
-      currencyCode: queryParams.currency && queryParams.currency.length ? queryParams.currency[0] : "EUR",
-      Currency: { Code: "EUR", Symbol: "€" },
+      currencyCode: _.isArray(queryParams.currency) ? _.first(queryParams.currency) : queryParams.currency,
     };
+  }
 
+  public componentDidUpdate(prevProps: RouteComponentProps<any>) {
+    const prevFilters = this.parseFilters(prevProps);
+    const filters = this.parseFilters(this.props);
+    if (!_.isEqual(prevFilters, filters)) {
+      this.componentDidMount();
+    }
   }
 
   public componentDidMount() {
+    const filtersPromise = Promise.resolve(this.parseFilters(this.props)).then((filters) =>
+      filters.currencyCode ? Promise.resolve(filters) :
+        // Get Wallet with more transactions if no currency precised
+        Models.GetAllTransactions().then((transactions) =>
+          _.first(_.sortBy(_.map(_.mapValues(_.groupBy(transactions, (tr) => tr.WalletUUID),
+            (values) => values.length),
+            (value, key) => ({ WalletUUID: key, nbTransactions: value })),
+            ["+nbTransactions"]),
+          )).then((transaction) =>
+            transaction ? Models.GetWallet(transaction.WalletUUID).then((w) => w.Currency.Code) :
+              this.state.Currency.Code,
+        ).then((currencyCode) => ({ ...filters, currencyCode })),
+    );
     Promise.all([
       Models.GetAllTransactions(),
       Models.GetWallets(),
       Models.GetCategories(),
-    ]).then(([transactions, wallets, categories]) => {
+      filtersPromise,
+    ]).then(([transactions, wallets, categories, filters]) => {
       const categoriesByUUID: { [key: string]: ICategory } = _.mapValues(_.groupBy(categories, "UUID"), (c) => c[0]);
-      wallets = wallets.filter((w) => w.Currency.Code === this.state.currencyCode);
+      wallets = wallets.filter((w) => w.Currency.Code === filters.currencyCode);
       transactions = transactions.filter((transaction) =>
-        moment(transaction.Date).isAfter(this.state.begin) && moment(transaction.Date).isBefore(this.state.end) &&
+        moment(transaction.Date).isAfter(filters.begin) &&
+        moment(transaction.Date).isBefore(filters.end) &&
         wallets.find((w) => w.UUID === transaction.WalletUUID),
       );
       const transactionsByCategoryUUID = _.mapValues(
@@ -108,6 +143,7 @@ export default class extends React.Component<RouteComponentProps<any>, IState> {
       this.setState({
         ...this.state,
         datas: _.sortBy(_.filter(datas, (d) => d.y < 0).map((d) => ({ ...d, y: -d.y })), (d) => - d.y),
+        Filters: filters,
       });
     });
   }
@@ -115,6 +151,29 @@ export default class extends React.Component<RouteComponentProps<any>, IState> {
   public render() {
     const total = this.state.datas.reduce((agg, d) => (agg + d.y), 0);
     const totalMax = this.state.datas.length ? this.state.datas[0].y : 0;
+    let options = <View></View>;
+    if (this.state.displayOptions) {
+      options = <MoreActions actions={[
+        {
+          title: t.t("ReportPie.thisMonth"), onPress: () =>
+            this.props.history.replace("/ReportPie?" + querystring.stringify({})),
+        },
+        {
+          title: t.t("ReportPie.lastMonth"), onPress: () =>
+            this.props.history.replace("/ReportPie?" + querystring.stringify({
+              begin: moment().add(-1, "month").startOf("month").toISOString(),
+              end: moment().startOf("month").toISOString(),
+            })),
+        },
+        {
+          title: t.t("ReportPie.thisYear"), onPress: () =>
+            this.props.history.replace("/ReportPie?" + querystring.stringify({
+              begin: moment().startOf("year").toISOString(),
+              end: moment().endOf("year").toISOString(),
+            })),
+        },
+      ]} clicked={() => this.setState({ ...this.state, displayOptions: false })} />;
+    }
     return <SideBar
       history={this.props.history}
       ref={(sidebar: any) => (this.sidebar = sidebar ? sidebar.getWrappedInstance() : null)}>
@@ -123,7 +182,13 @@ export default class extends React.Component<RouteComponentProps<any>, IState> {
           outerContainerStyles={{ height: 60 }}
           leftComponent={{ icon: "menu", color: "#fff", onPress: () => this.sidebar && this.sidebar.openDrawer() }}
           centerComponent={{ text: t.t("reportPie.title"), style: { fontSize: 20, color: "#fff" } }}
+          rightComponent={{
+            icon: this.state.displayOptions ? "expand-less" : "more-vert",
+            color: "#fff",
+            onPress: () => this.setState({ ...this.state, displayOptions: !this.state.displayOptions }),
+          }}
         />
+        {options}
         <ScrollView style={{ flex: 1 }}>
           <View style={{ alignSelf: "center", height: 200 }}>
             <VictoryPie height={200}
@@ -138,15 +203,25 @@ export default class extends React.Component<RouteComponentProps<any>, IState> {
           </View>
           <View>
             {this.state.datas.map((d, i) =>
-              <ReportByCategoryItem
+              <TouchableHighlight
                 key={i}
-                TotalMax={totalMax}
-                Category={d.Category}
-                Total={total}
-                TotalCategory={d.y}
-                Color={rainbow(this.state.datas.length, i)}
-                Currency={this.state.Currency}
-                history={this.props.history} />,
+                onPress={() => this.props.history.push(
+                  `TransactionsByBeneficiary?` +
+                  querystring.stringify({
+                    categoryName: d.Category.Name,
+                    begin: this.state.Filters && this.state.Filters.begin.toISOString(),
+                    end: this.state.Filters && this.state.Filters.end.toISOString(),
+                    currencyCode: this.state.Filters && this.state.Filters.currencyCode,
+                  }),
+                )}><View>
+                  <ReportByCategoryItem
+                    TotalMax={totalMax}
+                    Category={d.Category}
+                    TotalCategory={d.y}
+                    Color={rainbow(this.state.datas.length, i)}
+                    Currency={this.state.Currency}
+                    history={this.props.history} />
+                </View></TouchableHighlight>,
             )}
           </View>
         </ScrollView>

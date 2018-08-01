@@ -21,7 +21,7 @@ interface IPricedTransaction {
 
 interface IProps {
   Transactions: ITransaction[];
-  WalletUUID: string;
+  WalletUUID?: string;
   Transfert: ITransfert[];
   Currency: ICurrency;
   Categories: ICategory[];
@@ -61,7 +61,7 @@ function displayTransaction(transactionByDay: ITransactionByDay, props: IProps):
               history={props.history}
               CurrentTotal={transaction.Total}
               Wallets={props.Wallets}
-              WalletUUID={props.WalletUUID} />;
+              income={props.WalletUUID ? props.WalletUUID === transaction.Transfert.From.WalletUUID : true} />;
           }
           return <View key={element.key || i}>{element}<Divider /></View>;
         })

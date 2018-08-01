@@ -1,12 +1,11 @@
 import { History } from "history";
 import * as React from "react";
-import { Platform, ProgressBarAndroid, ProgressViewIOS, Text, View } from "react-native";
+import { Platform, ProgressBarAndroid, ProgressViewIOS, Text, TouchableHighlight, View } from "react-native";
 import { Icon } from "react-native-elements";
-import { displayPrice, ICategory, ICurrency } from "./Types";
+import { displayPrice, ICategory, ICurrency } from "../Types";
 
 interface IProps {
   Category: ICategory;
-  Total: number;
   TotalCategory: number;
   TotalMax: number;
   Color: string;
@@ -15,7 +14,8 @@ interface IProps {
 }
 
 export default (props: IProps) => (
-  <View style={{ height: 60, flexDirection: "row", alignItems: "center", justifyContent: "center" }}>
+  <View
+    style={{ height: 60, flexDirection: "row", alignItems: "center", justifyContent: "center" }}>
     <View style={{ width: 80 }}>
       <Icon name={props.Category.Icon.Name} type={props.Category.Icon.Type} color={props.Color} reverse />
     </View>

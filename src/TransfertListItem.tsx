@@ -13,9 +13,9 @@ interface IProps {
   Transfert: ITransfert;
   CurrentTotal: number;
   Currency: ICurrency;
-  WalletUUID: string;
   Wallets: IWallet[];
   history: History;
+  income: boolean;
 }
 
 interface IState {
@@ -36,11 +36,10 @@ export default class extends React.Component<IProps, IState> {
     let price = 0;
     const walletFrom = _.find(this.props.Wallets, (w) => (w.UUID === this.props.Transfert.From.WalletUUID));
     const walletTo = _.find(this.props.Wallets, (w) => (w.UUID === this.props.Transfert.To.WalletUUID));
-    const income = this.props.WalletUUID === this.props.Transfert.To.WalletUUID;
-    if (!income) {
+    if (!this.props.income) {
       description = `Transfert to ${walletTo ? walletTo.Name : "Wallet"}`;
       price = -this.props.Transfert.From.Price;
-    } else if (income) {
+    } else {
       description = `Transfert from ${walletFrom ? walletFrom.Name : "Wallet"}`;
       price = this.props.Transfert.To.Price;
     }

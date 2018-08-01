@@ -12,8 +12,8 @@ import {
 } from "react-native";
 
 import * as querystring from "querystring";
-import { match, Route , RouteComponentProps} from "react-router";
-import {withRouter} from "react-router-native";
+import { match, Route, RouteComponentProps } from "react-router";
+import { withRouter } from "react-router-native";
 
 import AddCategoryView from "./AddCategoryView";
 import AddTransactionView from "./AddTransactionView";
@@ -24,7 +24,8 @@ import DeleteCategoryView from "./DeleteCategoryView";
 import DeleteWalletView from "./DeleteWalletView";
 import GoogleSyncOAuthCallBack from "./GoogleSyncOAuthCallBack";
 import ImportTransactionsView from "./ImportTransactionsView";
-import ReportPie from "./ReportPie";
+import ReportPie from "./reports/ReportPie";
+import TransactionsByBeneficiary from "./reports/TransactionsByBeneficiary";
 import TransactionsView from "./TransactionsView";
 import WalletsView from "./WalletsView";
 
@@ -34,7 +35,7 @@ import { AppBar, connectTheme, Icon, IconToggle } from "carbon-ui";
 // Redux
 import { connect, Provider } from "react-redux";
 import { applyMiddleware, compose, createStore } from "redux";
-import {createLogger} from "redux-logger";
+import { createLogger } from "redux-logger";
 import promise from "redux-promise";
 import thunk from "redux-thunk";
 import LoginView from "./LoginView";
@@ -70,16 +71,16 @@ interface IState {
 class App extends React.Component<any, IState> {
   constructor(props: any) {
     super(props);
-    this.state = {loaded : false};
+    this.state = { loaded: false };
   }
 
   public componentDidMount() {
     AsyncStorage.getItem("logged").then((value) => {
       if (value) {
-            this.props.setLogged();
+        this.props.setLogged();
       }
-      this.setState({loaded : true});
-    }).catch(() => {console.log("fail to get logged data"); });
+      this.setState({ loaded: true });
+    }).catch(() => { console.log("fail to get logged data"); });
   }
 
   public render() {
@@ -87,92 +88,89 @@ class App extends React.Component<any, IState> {
       return <Text>Loading Application</Text>;
     }
     if (!this.props.logged) {
-      return <View style={{flex: 1}}>
-          <Route path="/" component={LoginView} />
-          <Route path="/oauthCallback" component={GoogleSyncOAuthCallBack} />
-        </View>;
+      return <View style={{ flex: 1 }}>
+        <Route path="/" component={LoginView} />
+        <Route path="/oauthCallback" component={GoogleSyncOAuthCallBack} />
+      </View>;
     }
     AsyncStorage.setItem("logged", "ok");
-    return   <View style={{flex: 1}}>
-        <Route exact path="/" component={WalletsView}></Route>
-        <Route exact path="/refresh" component={() => <View/>}></Route>
-        <Route exact path="/CategoriesView" component={CategoriesView}></Route>
-        <Route exact path="/ReportPie" component={ReportPie}></Route>
-        <Route
-          path="/AddCategoryView"
-          exact
-          component={(props: RouteComponentProps<{CategoryUUID: string}>) =>
-           <AddCategoryView CategoryUUID={props.match.params.CategoryUUID} history={props.history}/>}>
-        </Route>
-        <Route
-          path="/AddCategoryView/:CategoryUUID"
-          component={(props: RouteComponentProps<{CategoryUUID: string}>) =>
-          <AddCategoryView CategoryUUID={props.match.params.CategoryUUID} history={props.history}/>}>
-        </Route>
-        <Route
-          path="/DeleteCategoryView/:CategoryUUID/:Name"
-          component={(props: RouteComponentProps<{CategoryUUID: string, Name: string}>) =>
-           <DeleteCategoryView
-             CategoryUUID={props.match.params.CategoryUUID}
-             Name={props.match.params.Name}
-             history={props.history}/>
-           }>
-         </Route>
-        <Route path="/AddWalletView" exact component={AddWalletView}></Route>
-        <Route
-          path="/AddWalletView/:WalletUUID"
-          component={(props: RouteComponentProps<{WalletUUID: string}>) =>
-          <AddWalletView WalletUUID={props.match.params.WalletUUID} history={props.history}/>}>
-        </Route>
-        <Route
-          path="/DeleteWalletView/:WalletUUID/:Name"
-          component={(props: RouteComponentProps<{WalletUUID: string, Name: string}>) =>
+    return <View style={{ flex: 1 }}>
+      <Route exact path="/" component={WalletsView}></Route>
+      <Route exact path="/refresh" component={() => <View />}></Route>
+      <Route exact path="/CategoriesView" component={CategoriesView}></Route>
+      <Route exact path="/ReportPie" component={ReportPie}></Route>
+      <Route exact path="/TransactionsByBeneficiary" component={TransactionsByBeneficiary}></Route>
+      <Route
+        path="/AddCategoryView"
+        exact
+        component={(props: RouteComponentProps<{ CategoryUUID: string }>) =>
+          <AddCategoryView CategoryUUID={props.match.params.CategoryUUID} history={props.history} />}>
+      </Route>
+      <Route
+        path="/AddCategoryView/:CategoryUUID"
+        component={(props: RouteComponentProps<{ CategoryUUID: string }>) =>
+          <AddCategoryView CategoryUUID={props.match.params.CategoryUUID} history={props.history} />}>
+      </Route>
+      <Route
+        path="/DeleteCategoryView/:CategoryUUID/:Name"
+        component={(props: RouteComponentProps<{ CategoryUUID: string, Name: string }>) =>
+          <DeleteCategoryView
+            CategoryUUID={props.match.params.CategoryUUID}
+            Name={props.match.params.Name}
+            history={props.history} />
+        }>
+      </Route>
+      <Route path="/AddWalletView" exact component={AddWalletView}></Route>
+      <Route
+        path="/AddWalletView/:WalletUUID"
+        component={(props: RouteComponentProps<{ WalletUUID: string }>) =>
+          <AddWalletView WalletUUID={props.match.params.WalletUUID} history={props.history} />}>
+      </Route>
+      <Route
+        path="/DeleteWalletView/:WalletUUID/:Name"
+        component={(props: RouteComponentProps<{ WalletUUID: string, Name: string }>) =>
           <DeleteWalletView
             WalletUUID={props.match.params.WalletUUID}
             Name={props.match.params.Name}
-            history={props.history}/>
-          }>
-        </Route>
-        <Route
-          path="/Wallet/:WalletUUID/TransactionsView"
-          component={(props: RouteComponentProps<{WalletUUID: string}>) =>
-            <TransactionsView WalletUUID={props.match.params.WalletUUID}
-              history={props.history}
-              Search={queryString(props.location.search, "search")}/>
-          }>
-        </Route>
-        <Route
-          path="/Wallet/:WalletUUID/AddTransactionView"
-          exact
-          component={(props: RouteComponentProps<{WalletUUID: string}>) =>
-            <AddTransactionView WalletUUID={props.match.params.WalletUUID} history={props.history}/>}
-        />
-        <Route
-          path="/Wallet/:WalletUUID/AddTransactionView/:TransactionUUID"
-          component={(props: RouteComponentProps<{WalletUUID: string, TransactionUUID: string}>) =>
+            history={props.history} />
+        }>
+      </Route>
+      <Route
+        path="/TransactionsView"
+        component={TransactionsView}>
+      </Route>
+      <Route
+        path="/Wallet/:WalletUUID/AddTransactionView"
+        exact
+        component={(props: RouteComponentProps<{ WalletUUID: string }>) =>
+          <AddTransactionView WalletUUID={props.match.params.WalletUUID} history={props.history} />}
+      />
+      <Route
+        path="/Wallet/:WalletUUID/AddTransactionView/:TransactionUUID"
+        component={(props: RouteComponentProps<{ WalletUUID: string, TransactionUUID: string }>) =>
           <AddTransactionView
             WalletUUID={props.match.params.WalletUUID}
             TransactionUUID={props.match.params.TransactionUUID}
-            history={props.history}/>
-          }
-        />
-        <Route
-          path="/Wallet/:WalletUUID/AddTransfertView"
-          exact component={(props: RouteComponentProps<{WalletUUID: string}>) =>
-            <AddTransfertView WalletUUID={props.match.params.WalletUUID} history={props.history}/>}
-        />
-        <Route
-          path="/Wallet/:WalletUUID/AddTransfertView/:TransfertUUID"
-          component={(props: RouteComponentProps<{WalletUUID: string, TransfertUUID: string}>) =>
+            history={props.history} />
+        }
+      />
+      <Route
+        path="/Wallet/:WalletUUID/AddTransfertView"
+        exact component={(props: RouteComponentProps<{ WalletUUID: string }>) =>
+          <AddTransfertView WalletUUID={props.match.params.WalletUUID} history={props.history} />}
+      />
+      <Route
+        path="/Wallet/:WalletUUID/AddTransfertView/:TransfertUUID"
+        component={(props: RouteComponentProps<{ WalletUUID: string, TransfertUUID: string }>) =>
           <AddTransfertView
             WalletUUID={props.match.params.WalletUUID}
             TransfertUUID={props.match.params.TransfertUUID}
-            history={props.history}/>
-          }
-        />
-        <Route path="/oauthCallback" component={GoogleSyncOAuthCallBack} />
-        <Route path="/ImportTransactionsView" component={ImportTransactionsView} />
-      </View>;
+            history={props.history} />
+        }
+      />
+      <Route path="/oauthCallback" component={GoogleSyncOAuthCallBack} />
+      <Route path="/ImportTransactionsView" component={ImportTransactionsView} />
+    </View>;
   }
 }
 
@@ -180,4 +178,4 @@ const AppWithStore = withRouter(connect((state: any, props: any): IProps => ({
   ...state.login,
 }), { setLogged })(App));
 
-export default () => <Provider store={store}><AppWithStore/></Provider>;
+export default () => <Provider store={store}><AppWithStore /></Provider>;

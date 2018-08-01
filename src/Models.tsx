@@ -7,6 +7,7 @@ import {
   ICategory,
   ICategoryInput,
   ICollection,
+  ICurrency,
   ILogin,
   ITransaction,
   ITransactionInput,
@@ -497,4 +498,14 @@ export async function GetLogin(): Promise<ILogin> {
 
 export async function SaveLogin(login: ILogin): Promise<ILogin> {
   return AsyncStorage.setItem("login", JSON.stringify(login)).then(() => login);
+}
+
+export async function GetCurrency(currencyCode: string): Promise<ICurrency> {
+  return GetWallets().then((wallets) => {
+    const wallet = _.find(wallets, (w) => w.Currency.Code === currencyCode);
+    if (!wallet) {
+      throw new Error(("currency not found"));
+    }
+    return wallet.Currency;
+  });
 }
