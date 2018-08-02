@@ -1,4 +1,6 @@
 import { History } from "history";
+import * as _ from "lodash";
+import * as querystring from "querystring";
 import * as React from "react";
 import { Button, ScrollView, TouchableHighlight, View } from "react-native";
 import DrawerLayout, { DrawerLayoutProperties } from "react-native-drawer-layout";
@@ -11,7 +13,7 @@ import * as Models from "./Models";
 import { setLogout } from "./reducer/login";
 import { GoogleSync } from "./Sync";
 import t from "./translator";
-
+import { ICurrency } from "./Types";
 interface IPropsParams {
   history: History;
 }
@@ -21,6 +23,7 @@ interface IProps extends IPropsParams {
 
 interface IState {
   logout: boolean;
+  defaultCurrency: ICurrency;
 }
 
 export class SideBarClass extends React.Component<IProps, IState> {
@@ -28,7 +31,7 @@ export class SideBarClass extends React.Component<IProps, IState> {
   constructor(props: IProps) {
     super(props);
     this.drawer = null;
-    this.state = { logout: false };
+    this.state = { logout: false, defaultCurrency: { Code: "", Symbol: "?" } };
   }
 
   public openDrawer() {
@@ -39,6 +42,22 @@ export class SideBarClass extends React.Component<IProps, IState> {
 
   public logout() {
     Models.CleanAll().then(() => this.props.setLogout());
+  }
+
+  public componentDidMount() {
+    // Get Wallet with more transactions if no currency precised
+    Models.GetAllTransactions().then((transactions) =>
+      _.first(_.sortBy(_.map(_.mapValues(_.groupBy(transactions, (tr) => tr.WalletUUID),
+        (values) => values.length),
+        (value, key) => ({ WalletUUID: key, nbTransactions: value })),
+        ["+nbTransactions"]),
+      )).then((transaction) => {
+        if (transaction) {
+          return Models.GetWallet(transaction.WalletUUID).then((w) =>
+            this.setState({ ...this.state, defaultCurrency: w.Currency }));
+        }
+      },
+    );
   }
 
   public render() {
@@ -52,7 +71,11 @@ export class SideBarClass extends React.Component<IProps, IState> {
           <View style={{ marginTop: 0 }}>
             <ListItem title={t.t("sideBar.home")} onPress={() => this.props.history.replace("/")} />
             <ListItem title={t.t("sideBar.categories")} onPress={() => this.props.history.replace("/CategoriesView")} />
-            <ListItem title={t.t("sideBar.reports")} onPress={() => this.props.history.replace("/ReportPie")} />
+            <ListItem
+              title={t.t("sideBar.reports")}
+              onPress={() => this.props.history.replace(
+                "/ReportPie?" + querystring.stringify({ currencyCode: this.state.defaultCurrency.Code }),
+              )} />
             <ListItem
               title={t.t("sideBar.sync")}
               onPress={() => GoogleSync() && this.drawer ? this.drawer.closeDrawer() : null} />

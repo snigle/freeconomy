@@ -3,6 +3,7 @@ import * as moment from "moment";
 import en from "./en";
 import fr from "./fr";
 
+I18n.defaultLocale = "en";
 I18n.fallbacks = true;
 
 I18n.translations = {

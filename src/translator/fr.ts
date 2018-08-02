@@ -107,6 +107,11 @@ export default {
   },
   reportPie: {
     title: "Rapport des dépenses",
+    thisMonth: "Ce mois-ci",
+    lastMonth: "Le mois dernier",
+    thisYear: "Cette année",
+    lastYear: "L'année dernière",
+    all: "Toute les opérations",
   },
   updateSoldeView: {
     newBalance: "Nouveau total",

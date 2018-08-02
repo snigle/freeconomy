@@ -106,6 +106,11 @@ export default {
   },
   reportPie: {
     title: "Outcome report",
+    thisMonth: "Current Month",
+    lastMonth: "Last Month",
+    thisYear: "This Year",
+    lastYear: "Last Year",
+    all: "All transactions",
   },
   updateSoldeView: {
     newBalance: "New Balance Value",

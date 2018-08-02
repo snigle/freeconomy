@@ -24,7 +24,6 @@ interface IState {
   datas: Idata[];
   Currency: ICurrency;
   displayOptions: boolean;
-  Filters?: IFilters;
 }
 
 interface IFilters {
@@ -64,7 +63,7 @@ function rainbow(numOfSteps: number, step: number): string {
 export default class extends React.Component<RouteComponentProps<any>, IState> {
   private sidebar?: SideBarClass;
 
-  constructor(props: any) {
+  constructor(props: RouteComponentProps<any>) {
     super(props);
     this.state = {
       datas: [],
@@ -86,7 +85,7 @@ export default class extends React.Component<RouteComponentProps<any>, IState> {
     }
     return {
       begin, end,
-      currencyCode: _.isArray(queryParams.currency) ? _.first(queryParams.currency) : queryParams.currency,
+      currencyCode: _.isArray(queryParams.currencyCode) ? _.first(queryParams.currencyCode) : queryParams.currencyCode,
     };
   }
 
@@ -99,25 +98,15 @@ export default class extends React.Component<RouteComponentProps<any>, IState> {
   }
 
   public componentDidMount() {
-    const filtersPromise = Promise.resolve(this.parseFilters(this.props)).then((filters) =>
-      filters.currencyCode ? Promise.resolve(filters) :
-        // Get Wallet with more transactions if no currency precised
-        Models.GetAllTransactions().then((transactions) =>
-          _.first(_.sortBy(_.map(_.mapValues(_.groupBy(transactions, (tr) => tr.WalletUUID),
-            (values) => values.length),
-            (value, key) => ({ WalletUUID: key, nbTransactions: value })),
-            ["+nbTransactions"]),
-          )).then((transaction) =>
-            transaction ? Models.GetWallet(transaction.WalletUUID).then((w) => w.Currency.Code) :
-              this.state.Currency.Code,
-        ).then((currencyCode) => ({ ...filters, currencyCode })),
-    );
+    const filters = this.parseFilters(this.props);
+    console.log("did mount", filters);
     Promise.all([
       Models.GetAllTransactions(),
       Models.GetWallets(),
       Models.GetCategories(),
-      filtersPromise,
-    ]).then(([transactions, wallets, categories, filters]) => {
+      filters.currencyCode ?
+        Models.GetCurrency(filters.currencyCode) : Promise.resolve(this.state.Currency),
+    ]).then(([transactions, wallets, categories, currency]) => {
       const categoriesByUUID: { [key: string]: ICategory } = _.mapValues(_.groupBy(categories, "UUID"), (c) => c[0]);
       wallets = wallets.filter((w) => w.Currency.Code === filters.currencyCode);
       transactions = transactions.filter((transaction) =>
@@ -143,7 +132,7 @@ export default class extends React.Component<RouteComponentProps<any>, IState> {
       this.setState({
         ...this.state,
         datas: _.sortBy(_.filter(datas, (d) => d.y < 0).map((d) => ({ ...d, y: -d.y })), (d) => - d.y),
-        Filters: filters,
+        Currency: currency,
       });
     });
   }
@@ -151,25 +140,46 @@ export default class extends React.Component<RouteComponentProps<any>, IState> {
   public render() {
     const total = this.state.datas.reduce((agg, d) => (agg + d.y), 0);
     const totalMax = this.state.datas.length ? this.state.datas[0].y : 0;
+    const filters = this.parseFilters(this.props);
     let options = <View></View>;
     if (this.state.displayOptions) {
       options = <MoreActions actions={[
         {
-          title: t.t("ReportPie.thisMonth"), onPress: () =>
-            this.props.history.replace("/ReportPie?" + querystring.stringify({})),
-        },
-        {
-          title: t.t("ReportPie.lastMonth"), onPress: () =>
+          title: t.t("reportPie.thisMonth"), onPress: () =>
             this.props.history.replace("/ReportPie?" + querystring.stringify({
-              begin: moment().add(-1, "month").startOf("month").toISOString(),
-              end: moment().startOf("month").toISOString(),
+              currencyCode: filters.currencyCode,
             })),
         },
         {
-          title: t.t("ReportPie.thisYear"), onPress: () =>
+          title: t.t("reportPie.lastMonth"), onPress: () =>
+            this.props.history.replace("/ReportPie?" + querystring.stringify({
+              begin: moment().add(-1, "month").startOf("month").toISOString(),
+              end: moment().startOf("month").toISOString(),
+              currencyCode: filters.currencyCode,
+            })),
+        },
+        {
+          title: t.t("reportPie.thisYear"), onPress: () =>
             this.props.history.replace("/ReportPie?" + querystring.stringify({
               begin: moment().startOf("year").toISOString(),
               end: moment().endOf("year").toISOString(),
+              currencyCode: filters.currencyCode,
+            })),
+        },
+        {
+          title: t.t("reportPie.lastYear"), onPress: () =>
+            this.props.history.replace("/ReportPie?" + querystring.stringify({
+              begin: moment().add(-1, "year").startOf("year").toISOString(),
+              end: moment().startOf("year").toISOString(),
+              currencyCode: filters.currencyCode,
+            })),
+        },
+        {
+          title: t.t("reportPie.all"), onPress: () =>
+            this.props.history.replace("/ReportPie?" + querystring.stringify({
+              begin: moment().add(-100, "year").startOf("year").toISOString(),
+              end: moment().toISOString(),
+              currencyCode: filters.currencyCode,
             })),
         },
       ]} clicked={() => this.setState({ ...this.state, displayOptions: false })} />;
@@ -209,9 +219,9 @@ export default class extends React.Component<RouteComponentProps<any>, IState> {
                   `TransactionsByBeneficiary?` +
                   querystring.stringify({
                     categoryName: d.Category.Name,
-                    begin: this.state.Filters && this.state.Filters.begin.toISOString(),
-                    end: this.state.Filters && this.state.Filters.end.toISOString(),
-                    currencyCode: this.state.Filters && this.state.Filters.currencyCode,
+                    begin: filters && filters.begin.toISOString(),
+                    end: filters && filters.end.toISOString(),
+                    currencyCode: filters && filters.currencyCode,
                   }),
                 )}><View>
                   <ReportByCategoryItem
