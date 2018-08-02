@@ -2,7 +2,7 @@ import * as _ from "lodash";
 import moment from "moment";
 import * as querystring from "querystring";
 import * as React from "react";
-import { ScrollView, Text, TouchableHighlight, View } from "react-native";
+import { ScrollView, Text, TouchableHighlight, View, ActivityIndicator } from "react-native";
 import { Header } from "react-native-elements";
 import { RouteComponentProps } from "react-router";
 import { v4 } from "uuid";
@@ -24,6 +24,7 @@ interface IState {
   datas: Idata[];
   Currency: ICurrency;
   displayOptions: boolean;
+  loading: boolean;
 }
 
 interface IFilters {
@@ -69,6 +70,7 @@ export default class extends React.Component<RouteComponentProps<any>, IState> {
       datas: [],
       Currency: { Code: "", Symbol: "?" },
       displayOptions: false,
+      loading: true,
     };
 
   }
@@ -98,6 +100,7 @@ export default class extends React.Component<RouteComponentProps<any>, IState> {
   }
 
   public componentDidMount() {
+    this.setState({ ...this.state, loading: true });
     const filters = this.parseFilters(this.props);
     console.log("did mount", filters);
     Promise.all([
@@ -133,6 +136,7 @@ export default class extends React.Component<RouteComponentProps<any>, IState> {
         ...this.state,
         datas: _.sortBy(_.filter(datas, (d) => d.y < 0).map((d) => ({ ...d, y: -d.y })), (d) => - d.y),
         Currency: currency,
+        loading: false,
       });
     });
   }
@@ -199,43 +203,47 @@ export default class extends React.Component<RouteComponentProps<any>, IState> {
           }}
         />
         {options}
-        <ScrollView style={{ flex: 1 }}>
-          <View style={{ alignSelf: "center", height: 200 }}>
-            <VictoryPie height={200}
-              padding={5}
-              innerRadius={70}
-              data={this.state.datas}
-              colorScale={this.state.datas.map((v, k) => rainbow(this.state.datas.length, k + 1))} />
-          </View>
-          <View style={{ position: "absolute", top: 60, alignSelf: "center" }}>
-            <Text style={{ textAlign: "center", fontSize: 20, marginBottom: 10 }}>Total :</Text>
-            <Text style={{ textAlign: "center", fontSize: 30 }}>{displayPrice(total, this.state.Currency)}</Text>
-          </View>
-          <View>
-            {this.state.datas.map((d, i) =>
-              <TouchableHighlight
-                key={i}
-                onPress={() => this.props.history.push(
-                  `TransactionsByBeneficiary?` +
-                  querystring.stringify({
-                    categoryName: d.Category.Name,
-                    begin: filters && filters.begin.toISOString(),
-                    end: filters && filters.end.toISOString(),
-                    currencyCode: filters && filters.currencyCode,
-                  }),
-                )}><View>
-                  <ReportByCategoryItem
-                    TotalMax={totalMax}
-                    Category={d.Category}
-                    TotalCategory={d.y}
-                    Color={rainbow(this.state.datas.length, i)}
-                    Currency={this.state.Currency}
-                    history={this.props.history} />
-                </View></TouchableHighlight>,
-            )}
-          </View>
-        </ScrollView>
+        {this.state.loading ?
+          <View><ActivityIndicator size="large" color="#0000ff" /></View>
+          :
+          <ScrollView style={{ flex: 1 }}>
+            <View style={{ alignSelf: "center", height: 200 }}>
+              <VictoryPie height={200}
+                padding={5}
+                innerRadius={70}
+                data={this.state.datas}
+                colorScale={this.state.datas.map((v, k) => rainbow(this.state.datas.length, k + 1))} />
+            </View>
+            <View style={{ position: "absolute", top: 60, alignSelf: "center" }}>
+              <Text style={{ textAlign: "center", fontSize: 20, marginBottom: 10 }}>Total :</Text>
+              <Text style={{ textAlign: "center", fontSize: 30 }}>{displayPrice(total, this.state.Currency)}</Text>
+            </View>
+            <View>
+              {this.state.datas.map((d, i) =>
+                <TouchableHighlight
+                  key={i}
+                  onPress={() => this.props.history.push(
+                    `TransactionsByBeneficiary?` +
+                    querystring.stringify({
+                      categoryName: d.Category.Name,
+                      begin: filters && filters.begin.toISOString(),
+                      end: filters && filters.end.toISOString(),
+                      currencyCode: filters && filters.currencyCode,
+                    }),
+                  )}><View>
+                    <ReportByCategoryItem
+                      TotalMax={totalMax}
+                      Category={d.Category}
+                      TotalCategory={d.y}
+                      Color={rainbow(this.state.datas.length, i)}
+                      Currency={this.state.Currency}
+                      history={this.props.history} />
+                  </View></TouchableHighlight>,
+              )}
+            </View>
+          </ScrollView>
+        }
       </View>
     </SideBar>;
+    }
   }
-}

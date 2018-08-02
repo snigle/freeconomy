@@ -56,7 +56,7 @@ export default class extends React.Component<IProps, IState> {
       <View>
         <View style={{ height: 60, flexDirection: "row", alignItems: "center", justifyContent: "center" }}>
           <View style={{ width: 50 }}>
-            <Icon name="sync" reverse color="#FF0000" />
+            <Icon name="sync" reverse color={this.props.income ? "#00AA00" : "#EE0000"} />
           </View>
           <View style={{ flex: 1 }}>
             <Text style={margins}>{description}</Text>

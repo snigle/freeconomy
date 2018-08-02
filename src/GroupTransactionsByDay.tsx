@@ -61,7 +61,7 @@ function displayTransaction(transactionByDay: ITransactionByDay, props: IProps):
               history={props.history}
               CurrentTotal={transaction.Total}
               Wallets={props.Wallets}
-              income={props.WalletUUID ? props.WalletUUID === transaction.Transfert.From.WalletUUID : true} />;
+              income={props.WalletUUID ? props.WalletUUID === transaction.Transfert.To.WalletUUID : true} />;
           }
           return <View key={element.key || i}>{element}<Divider /></View>;
         })
