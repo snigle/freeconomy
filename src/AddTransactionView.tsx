@@ -3,7 +3,10 @@ import { TextField } from "carbon-ui";
 import { History } from "history";
 import * as _ from "lodash";
 import * as React from "react";
-import { Button, Picker, ScrollView, Text, TextInput, TextStyle, TouchableHighlight, View } from "react-native";
+import {
+  Button, Picker, Platform, ScrollView,
+  Text, TextInput, TextStyle, TouchableHighlight, View,
+} from "react-native";
 // @ts-ignore
 import Autocomplete from "react-native-autocomplete-input";
 import { Colors, Header, Icon } from "react-native-elements";
@@ -62,6 +65,8 @@ const styles: IStyle = {
 };
 
 class AddTransactionView extends React.Component<IProps, IState> {
+  public scrollview: any | null = null;
+
   constructor(props: IProps) {
     super(props);
     const date = new Date();
@@ -209,6 +214,7 @@ class AddTransactionView extends React.Component<IProps, IState> {
           }}
           keyboardType="numeric"
           onChangeText={(v: string) => this.changePrice(v)}
+          onFocus={() => Platform.OS !== "web" && this.scrollview && this.scrollview.scrollToEnd()}
           value={this.state.PriceText} />
         <View style={{ flexDirection: "row" }} >
           <View style={{ flex: 1, padding: 5 }}>
@@ -234,8 +240,9 @@ class AddTransactionView extends React.Component<IProps, IState> {
             this.props.TransactionUUID ? <View /> :
               <MyLink to="AddTransfertView" replace><Icon name="sync" /></MyLink>
           }
-        />
-        <ScrollView style={{ flex: 1 }} keyboardDismissMode="on-drag" keyboardShouldPersistTaps="always">
+        />;
+        <ScrollView ref={(scrollview) => this.scrollview = scrollview}
+          style={{ flex: 1 }} keyboardDismissMode="on-drag" keyboardShouldPersistTaps="always">
           {content}
         </ScrollView>
       </View>
