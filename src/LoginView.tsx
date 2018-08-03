@@ -1,14 +1,14 @@
 import * as React from "react";
-import { Text, TouchableHighlight, View } from "react-native";
+import { AsyncStorage, Text, TouchableHighlight, View } from "react-native";
 // @ts-ignore
 // import { Button } from "react-native-elements";
 // tslint:disable-next-line
-import { Button, ButtonIcon, Card, Icon} from "react-native-elements";
+import { Button, ButtonIcon, Card, Icon } from "react-native-elements";
 import { connect } from "react-redux";
-import {RouteComponentProps} from "react-router";
-import {defaultCategories} from "./defaultCategories";
+import { RouteComponentProps } from "react-router";
+import { defaultCategories } from "./defaultCategories";
 import * as defaultWallets from "./defaultWallets";
-import {getLogin} from "./GoogleSync";
+import { getLogin } from "./GoogleSync";
 import * as Models from "./Models";
 import * as OAuth from "./OAuth";
 import { setLogged } from "./reducer/login";
@@ -31,37 +31,37 @@ interface IState {
 class LoginView extends React.Component<IProps, IState> {
 
   constructor(props: IProps) {
-      super(props);
-      this.state = {loading : true};
+    super(props);
+    this.state = { loading: true };
   }
 
   public login() {
     Models.CleanAll().then(() => OAuth.login()).then(() => Sync.GoogleSync(false));
-    this.setState({loading : true});
+    this.setState({ loading: true });
   }
 
   public addDefaultCategories(): Promise<void> {
-    return Models.CreateCategory(...defaultCategories).then(() => {});
+    return Models.CreateCategory(...defaultCategories).then(() => { });
   }
 
   public addDefaultWallets(): Promise<void> {
     return Models.CreateWallet(defaultWallets.Money).then(() =>
       Models.CreateWallet(defaultWallets.Bank),
-    ).then(() => {});
+    ).then(() => { });
   }
 
   public addDefaultDatas(): Promise<void> {
-      return Promise.all([
-        Models.GetCategories().then((categories) => categories.length ? {} : this.addDefaultCategories()),
-        Models.GetWallets().then((wallets) => wallets.length ? {} : this.addDefaultWallets()),
-      ]).then(() => {});
+    return Promise.all([
+      Models.GetCategories().then((categories) => categories.length ? {} : this.addDefaultCategories()),
+      Models.GetWallets().then((wallets) => wallets.length ? {} : this.addDefaultWallets()),
+    ]).then(() => { });
   }
 
   public loginLocally() {
-    this.setState({loading : true});
+    this.setState({ loading: true });
     Models.CleanAll().then(() => this.addDefaultDatas()).then(() => {
       this.props.setLogged();
-      this.setState({loading : false});
+      this.setState({ loading: false });
     });
   }
 
@@ -77,17 +77,20 @@ class LoginView extends React.Component<IProps, IState> {
   }
 
   public componentDidMount() {
+    console.log("component did mount");
     // For web only, detect token in uri and try to login.
     getLogin(this.props.location.pathname).then((login) => {
       console.log("login ok 2 : ", login);
       return Models.SaveLogin(login);
     })
-    .then(() => {
-      console.log("login done");
-      this.props.history.replace("/");
-      Sync.GoogleSync(false);
-      this.setState({loading : false});
-    }).catch(() => this.setState({loading : false}));
+      .then(() => {
+        console.log("login done");
+        AsyncStorage.getItem("redirect_path")
+          .then((path) => this.props.history.replace(path || "/"))
+          .catch(() => this.props.history.replace("/"));
+        Sync.GoogleSync(false);
+        this.setState({ loading: false });
+      }).catch(() => this.setState({ loading: false }));
   }
 
   public render() {
@@ -97,28 +100,28 @@ class LoginView extends React.Component<IProps, IState> {
     if (this.state.loading) {
       return <Text>Loging to Google...</Text>;
     }
-    return <View style={{flex: 1}}>
+    return <View style={{ flex: 1 }}>
       <Card
         title={t.t("login.welcome")}
         image={require("../images/login.jpg")}>
         <Text>
           {t.t("login.line1")}
         </Text>
-        <Text style={{marginBottom: 10}}>
+        <Text style={{ marginBottom: 10 }}>
           {t.t("login.line2")}
         </Text>
         <Button
           icon={<Icon name="person" color="#ffff" /> as ButtonIcon}
-          buttonStyle={{borderRadius: 0, marginLeft: 0, marginRight: 0, marginBottom: 0}}
+          buttonStyle={{ borderRadius: 0, marginLeft: 0, marginRight: 0, marginBottom: 0 }}
           text={t.t("login.buttonWithGoogle")}
           onPress={() => this.login()}
         />
         <TouchableHighlight onPress={() => this.loginLocally()}>
-          <Text style={{color : "#9999", textAlign: "center", marginTop: 10}}>
+          <Text style={{ color: "#9999", textAlign: "center", marginTop: 10 }}>
             {t.t("login.locally")}
           </Text>
         </TouchableHighlight>
-    </Card>
+      </Card>
     </View>;
   }
 }

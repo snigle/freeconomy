@@ -6,7 +6,7 @@ export default {
     description: "Description",
     icon: "Icone",
     save: "Enregistrer",
-    saveAndNew: "Enregistrer et Nouveau",
+    saveAndNew: "Enrg. et Nouveau",
     loading: "Chargement",
     price: "Prix",
     back: "Retour",
