@@ -60,6 +60,7 @@ export const getLogin = (pathname: string): Promise<ILogin> => {
 };
 
 export const getFileFromName = (login: ILogin, filename: string, noCache: boolean): Promise<IFile> => {
+  console.log("get file from name", login, filename);
   let params = "spaces=appDataFolder";
   params += "&q=" + encodeURIComponent(`name='${filename.replace(/'/g, "\'")}'`);
   params += "&orderBy=createdTime desc";
@@ -68,7 +69,16 @@ export const getFileFromName = (login: ILogin, filename: string, noCache: boolea
       Authorization: `Bearer ${login.token}`,
     }),
     cache: noCache ? "reload" : "force-cache",
-  }).then((response) => response.json())
+  }).then((response) => {
+    console.log("response", response);
+    if (response.status < 300) {
+      return response.json();
+    } else if (response.status === 404) {
+      return null;
+    } else {
+      throw new Error("fail");
+    }
+  })
     .then((json) => ((json.files && json.files.length) || null) && json.files[0]);
 };
 
@@ -104,6 +114,7 @@ export const uploadFile = (login: ILogin, id: string, json: ICollection[]): Prom
 };
 
 export const createFile = (login: ILogin, filename: string): Promise<IFile> => {
+  console.log("create file", login, filename);
   return fetch("https://content.googleapis.com/drive/v3/files", {
     method: "POST",
     headers: new Headers({
@@ -121,6 +132,7 @@ export const createFile = (login: ILogin, filename: string): Promise<IFile> => {
 };
 
 export const downloadFileSafe = (login: ILogin, filename: string): Promise<ICollection[]> => {
+  console.log("downloadFileSafe", login, filename);
   // Check if file exist and get it's ID
   return getFileFromName(login, filename, false)
     .then((file) => !file ? createFile(login, filename) : file)

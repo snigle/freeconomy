@@ -55,7 +55,7 @@ const SyncBar = (props: IProps) => {
     </View>;
   }
 
-  if (!props.synced && !props.syncing) {
+  if (!props.synced && !props.syncing && !props.error) {
     return <View />;
   }
   return <View style={{ padding: 3, backgroundColor: "#ffc90745" }}>
