@@ -4,8 +4,8 @@ import { History } from "history";
 import * as _ from "lodash";
 import * as React from "react";
 import {
-  Button, Picker, Platform, ScrollView,
-  Text, TextInput, TextStyle, TouchableHighlight, View,
+  AsyncStorage, Button, Picker, Platform,
+  ScrollView, Text, TextInput, TextStyle, TouchableHighlight, View,
 } from "react-native";
 // @ts-ignore
 import Autocomplete from "react-native-autocomplete-input";
@@ -254,20 +254,24 @@ class AddTransactionView extends React.Component<IProps, IState> {
     const savePromise: Promise<any> = this.props.TransactionUUID ?
       Models.UpdateTransaction(this.props.TransactionUUID, this.state) :
       Models.CreateTransaction(this.state);
-    savePromise.then(() => {
-      if (!andNew) {
-        this.props.history.goBack();
-      } else {
-        this.setState({
-          ...this.state,
-          Beneficiary: "",
-          Comment: "",
-          Price: 0,
-          PriceText: "-0",
-          Loading: false,
-        });
-      }
-    }).catch((err: any) => console.log("error", err));
+    Promise.all([
+      AsyncStorage.setItem("redirect_path", `/TransactionsView?walletUUID=${this.state.WalletUUID}`),
+      savePromise,
+    ])
+      .then(() => {
+        if (!andNew) {
+          this.props.history.goBack();
+        } else {
+          this.setState({
+            ...this.state,
+            Beneficiary: "",
+            Comment: "",
+            Price: 0,
+            PriceText: "-0",
+            Loading: false,
+          });
+        }
+      }).catch((err: any) => console.log("error", err));
   }
 }
 

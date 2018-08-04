@@ -87,7 +87,8 @@ class LoginView extends React.Component<IProps, IState> {
         console.log("login done");
         AsyncStorage.getItem("redirect_path")
           .then((path) => this.props.history.replace(path || "/"))
-          .catch(() => this.props.history.replace("/"));
+          .catch(() => this.props.history.replace("/"))
+          .then(() => AsyncStorage.removeItem("redirect_path"));
         Sync.GoogleSync(false);
         this.setState({ loading: false });
       }).catch(() => this.setState({ loading: false }));
