@@ -3,8 +3,9 @@ import { TextField } from "carbon-ui";
 import { History } from "history";
 import * as _ from "lodash";
 import * as React from "react";
-import { Button, Picker, Text, View } from "react-native";
+import { Button, Picker, Text, TextInput, View } from "react-native";
 import { Header, Icon } from "react-native-elements";
+import { styles } from "./AddTransactionView";
 import DatePicker from "./DatePicker";
 import { MyLink } from "./Link";
 import * as Models from "./Models";
@@ -140,9 +141,12 @@ class AddTransactionView extends React.Component<IProps, IState> {
                 )
               }
             </Picker>
-            <TextField
+            <Text style={styles.label}>{t.t("common.price")}</Text>
+            <TextInput
+              style={{
+                ...styles.input,
+              }}
               keyboardType="numeric"
-              placeholder={t.t("common.price")}
               onChangeText={(v: string) => this.changePriceFrom(v)}
               value={this.state.PriceFrom} />
           </View>
@@ -157,11 +161,14 @@ class AddTransactionView extends React.Component<IProps, IState> {
                 )
               }
             </Picker>
-            <TextField
+            <Text style={styles.label}>{t.t("common.price")}</Text>
+            <TextInput
+              style={{
+                ...styles.input,
+              }}
               keyboardType="numeric"
-              placeholder={t.t("common.price")}
-              onChangeText={(v: string) => this.changePriceTo(v)}
-              value={this.state.PriceTo} />
+              onChangeText={(v: string) => this.changePriceFrom(v)}
+              value={this.state.PriceFrom} />
           </View>
         </View>
         <DatePicker value={this.state.Date} callback={(date: Date) => this.changeDate(date)} />
@@ -169,7 +176,14 @@ class AddTransactionView extends React.Component<IProps, IState> {
           placeholder={t.t("addTransactionView.comment")}
           onChangeText={(v: string) => this.changeComment(v)}
           value={this.state.Comment} />
-        <Button title={t.t("common.save")} onPress={() => this.save()} />
+        <View style={{ flexDirection: "row" }} >
+          <View style={{ flex: 1, padding: 5 }}>
+            <Button title={t.t("common.save")} onPress={() => this.save()} />
+          </View>
+          <View style={{ flex: 1, padding: 5 }}>
+            <Button title={t.t("common.saveAndNew")} onPress={() => this.save(true)} />
+          </View>
+        </View>
       </View>;
     }
     return (
@@ -194,7 +208,7 @@ class AddTransactionView extends React.Component<IProps, IState> {
     );
   }
 
-  public save() {
+  public save(andNew: boolean = false) {
     this.setState({ ...this.state, Loading: true });
     const savePromise: Promise<any> =
       this.props.TransfertUUID ?
@@ -202,7 +216,11 @@ class AddTransactionView extends React.Component<IProps, IState> {
         Models.CreateTransfert(this.state);
 
     savePromise.then(() => {
-      this.props.history.goBack();
+      if (!andNew) {
+        this.props.history.goBack();
+      } else {
+        this.props.history.replace(`/Wallet/${this.props.WalletUUID}/AddTransfertView`);
+      }
     }).catch((err: any) => console.log("error", err));
   }
 }

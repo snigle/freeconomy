@@ -8,7 +8,6 @@ import {
   ScrollView, Text, TextInput, TextStyle, TouchableHighlight, View,
 } from "react-native";
 // @ts-ignore
-import Autocomplete from "react-native-autocomplete-input";
 import { Colors, Header, Icon } from "react-native-elements";
 import DatePicker from "./DatePicker";
 import { MyLink } from "./Link";
@@ -20,7 +19,7 @@ interface IState extends ITransactionInput {
   Loading: boolean;
   PriceText: string;
   Categories: ICategory[];
-  autocomplete: Autocomplete[];
+  autocomplete: IAutoComplete[];
 }
 
 interface IProps {
@@ -33,6 +32,7 @@ interface IAutoComplete {
   Beneficiary: string;
   CategoryUUID: string;
   Occurrencies: number;
+  PriceText: string;
 }
 
 function cleanTextToSearch(text: string): string {
@@ -45,7 +45,7 @@ interface IStyle {
   borderGreen: string;
   borderRed: string;
 }
-const styles: IStyle = {
+export const styles: IStyle = {
   label: {
     fontSize: 12,
     color: "rgba(0, 0, 0, 0.38)",
@@ -117,13 +117,25 @@ class AddTransactionView extends React.Component<IProps, IState> {
       }
 
       // Create map[beneficiary]categoryuuid to permits autocomplete beneficiary and category
-      const autocomplete: Autocomplete[] = _.values(
+      const autocomplete: IAutoComplete[] = _.values(
         _.mapValues(_.groupBy<ITransaction>(transactions, (tr) => tr.Beneficiary),
           (groupedTransactions, beneficiary) => {
-            const result: IAutoComplete = { Beneficiary: beneficiary, CategoryUUID: "", Occurrencies: 0 };
+            const result: IAutoComplete = {
+              Beneficiary: beneficiary,
+              CategoryUUID: "",
+              Occurrencies: 0,
+              PriceText: "-0",
+            };
             const last = _.last(groupedTransactions);
             if (last) {
               result.CategoryUUID = last.CategoryUUID;
+            }
+            const maxPriceOccurence = _.first(_.maxBy(
+              _.toPairs(_.countBy(_.map(groupedTransactions, (tr) => tr.Price), (e) => e)),
+              (pair) => _.last(pair),
+            ));
+            if (maxPriceOccurence) {
+              result.PriceText = `` + maxPriceOccurence;
             }
             result.Occurrencies = groupedTransactions.length;
             return result;
@@ -138,12 +150,18 @@ class AddTransactionView extends React.Component<IProps, IState> {
   public changeBenificiary(text: string) {
     this.setState({ ...this.state, Beneficiary: text });
   }
-  public autoCompleteClick(autocomplete: Autocomplete) {
+  public autoCompleteClick(autocomplete: IAutoComplete) {
     let categoryUUID = this.state.CategoryUUID;
     if (_.find(this.state.Categories, (c) => c.UUID === autocomplete.CategoryUUID)) {
       categoryUUID = autocomplete.CategoryUUID;
     }
-    this.setState({ ...this.state, Beneficiary: autocomplete.Beneficiary, CategoryUUID: categoryUUID });
+    this.setState({
+      ...this.state,
+      Beneficiary: autocomplete.Beneficiary,
+      CategoryUUID: categoryUUID,
+      Price: parseFloat(autocomplete.PriceText),
+      PriceText: autocomplete.PriceText,
+    });
   }
   public changeComment(text: string) {
     this.setState({ ...this.state, Comment: text });
@@ -262,14 +280,7 @@ class AddTransactionView extends React.Component<IProps, IState> {
         if (!andNew) {
           this.props.history.goBack();
         } else {
-          this.setState({
-            ...this.state,
-            Beneficiary: "",
-            Comment: "",
-            Price: 0,
-            PriceText: "-0",
-            Loading: false,
-          });
+          this.props.history.replace(`/Wallet/${this.props.WalletUUID}/AddTransactionView`);
         }
       }).catch((err: any) => console.log("error", err));
   }
