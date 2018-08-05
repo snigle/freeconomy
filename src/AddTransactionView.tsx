@@ -240,7 +240,7 @@ class AddTransactionView extends React.Component<IProps, IState> {
             this.props.TransactionUUID ? <View /> :
               <MyLink to="AddTransfertView" replace><Icon name="sync" /></MyLink>
           }
-        />;
+        />
         <ScrollView ref={(scrollview) => this.scrollview = scrollview}
           style={{ flex: 1 }} keyboardDismissMode="on-drag" keyboardShouldPersistTaps="always">
           {content}
