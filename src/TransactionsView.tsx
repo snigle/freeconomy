@@ -174,7 +174,7 @@ class TransactionsView extends React.Component<RouteComponentProps<IProps>, ISta
         {
           title: t.t("transactionsView.updateSolde"),
           onPress: () =>
-            this.props.history.push(`/Wallet/${this.state.Filters.walletUUID}/TransactionsView/UpdateSoldeView`),
+            this.props.history.push(`TransactionsView/UpdateSoldeView?walletUUID=${this.state.Filters.walletUUID}`),
         },
       ]} clicked={() => this.setState({ ...this.state, displayOptions: false })} />;
     }
@@ -208,12 +208,22 @@ class TransactionsView extends React.Component<RouteComponentProps<IProps>, ISta
           {options}
           {content}
           <Route
-            path="/Wallet/:WalletUUID/TransactionsView/UpdateSoldeView"
-            component={(props: RouteComponentProps<{ WalletUUID: string }>) =>
-              <UpdateSoldeView
-                WalletUUID={props.match.params.WalletUUID}
-                history={props.history} />
-            }
+            path={`/TransactionsView/UpdateSoldeView`}
+            component={(props: RouteComponentProps<{}>) => {
+              const queryParams = querystring.parse(props.location.search.replace("?", ""));
+              if (!queryParams) {
+                return null;
+              }
+              const walletUUID = _.isArray(queryParams.walletUUID) ?
+                _.first(queryParams.walletUUID) :
+                queryParams.walletUUID;
+              if (!walletUUID) {
+                return null;
+              }
+              return <UpdateSoldeView
+                WalletUUID={walletUUID}
+                history={props.history} />;
+            }}
           />
         </View>
       </SideBar>);

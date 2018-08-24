@@ -65,7 +65,6 @@ export const styles: IStyle = {
 };
 
 class AddTransactionView extends React.Component<IProps, IState> {
-  public scrollview: any | null = null;
 
   constructor(props: IProps) {
     super(props);
@@ -232,7 +231,6 @@ class AddTransactionView extends React.Component<IProps, IState> {
           }}
           keyboardType="numeric"
           onChangeText={(v: string) => this.changePrice(v)}
-          onFocus={() => Platform.OS !== "web" && this.scrollview && this.scrollview.scrollToEnd()}
           value={this.state.PriceText} />
         <View style={{ flexDirection: "row" }} >
           <View style={{ flex: 1, padding: 5 }}>
@@ -259,8 +257,8 @@ class AddTransactionView extends React.Component<IProps, IState> {
               <MyLink to="AddTransfertView" replace><Icon name="sync" /></MyLink>
           }
         />
-        <ScrollView ref={(scrollview) => this.scrollview = scrollview}
-          style={{ flex: 1 }} keyboardDismissMode="on-drag" keyboardShouldPersistTaps="always">
+        <ScrollView
+          style={{ flex: 1 }} keyboardShouldPersistTaps="always">
           {content}
         </ScrollView>
       </View>
