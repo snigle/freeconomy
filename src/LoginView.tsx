@@ -1,9 +1,9 @@
 import * as React from "react";
-import { AsyncStorage, Text, TouchableHighlight, View } from "react-native";
+import { AsyncStorage, Image, Text, TouchableHighlight, View } from "react-native";
 // @ts-ignore
 // import { Button } from "react-native-elements";
 // tslint:disable-next-line
-import { Button, ButtonIcon, Card, Icon } from "react-native-elements";
+import { Button, ButtonIcon, Card, Icon, Header } from "react-native-elements";
 import { connect } from "react-redux";
 import { RouteComponentProps } from "react-router";
 import { defaultCategories } from "./defaultCategories";
@@ -97,10 +97,28 @@ class LoginView extends React.Component<IProps, IState> {
 
   public render() {
     if (this.props.syncing) {
-      return <Loading Message={t.t("login.downloading")} />;
+      return <View style={{ flex: 1 }}>
+        <Header
+          outerContainerStyles={{ height: 60 }}
+          leftComponent={
+            <Image
+              style={{ width: 50, height: 50, position: "relative", top: 10 }}
+              source={require("../images/logoa.png")} />
+          }
+          centerComponent={{ text: "Freeconomy", style: { fontSize: 20, color: "#fff" } }}
+        /><Loading Message={t.t("login.downloading")} /></View>;
     }
     if (this.state.loading) {
-      return <Loading Message={t.t("login.logging")} />;
+      return <View style={{ flex: 1 }}>
+        <Header
+          outerContainerStyles={{ height: 60 }}
+          leftComponent={
+            <Image
+              style={{ width: 50, height: 50, position: "relative", top: 10 }}
+              source={require("../images/logoa.png")} />
+          }
+          centerComponent={{ text: "Freeconomy", style: { fontSize: 20, color: "#fff" } }}
+        /><Loading Message={t.t("login.logging")} /></View>;
     }
     return <View style={{ flex: 1 }}>
       <Card

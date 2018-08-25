@@ -8,6 +8,7 @@ import { Header, Icon } from "react-native-elements";
 import { styles } from "./AddTransactionView";
 import DatePicker from "./DatePicker";
 import { MyLink } from "./Link";
+import Loading from "./Loading";
 import * as Models from "./Models";
 import t from "./translator";
 import { ITransfertInput, IWallet } from "./Types";
@@ -125,7 +126,7 @@ class AddTransactionView extends React.Component<IProps, IState> {
   public render() {
     let content: any;
     if (this.state.Loading) {
-      content = <Text>Chargement des Comptes</Text>;
+      content = <Loading Message={t.t("common.loading")} />;
     } else {
       console.log("display", this.state);
       content = <View>

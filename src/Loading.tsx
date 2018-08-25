@@ -12,16 +12,7 @@ class Loading extends React.Component<IProps, object> {
     super(props);
   }
   public render() {
-    return <View style={{ flex: 1 }}>
-      <Header
-        outerContainerStyles={{ height: 60 }}
-        leftComponent={
-          <Image
-            style={{ width: 50, height: 50, position: "relative", top: 10 }}
-            source={require("../images/logoa.png")} />
-        }
-        centerComponent={{ text: "Freeconomy", style: { fontSize: 20, color: "#fff" } }}
-      />
+    return <View>
       <ActivityIndicator size={100} style={{ margin: 20 }} />
       <Text style={{ textAlign: "center" }}>{this.props.Message}</Text>
     </View>;

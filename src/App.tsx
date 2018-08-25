@@ -30,7 +30,6 @@ import TransactionsView from "./TransactionsView";
 import t from "./translator";
 import WalletsView from "./WalletsView";
 
-
 // @ts-ignore
 import { AppBar, connectTheme, Icon, IconToggle } from "carbon-ui";
 

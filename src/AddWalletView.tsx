@@ -8,6 +8,7 @@ import { ScrollView, View } from "react-native";
 // @ts-ignore
 import { ColorWheel } from "react-native-color-wheel";
 import { Button, Header, Icon, Text } from "react-native-elements";
+import Loading from "./Loading";
 import * as Models from "./Models";
 import t from "./translator";
 import { IconType, IWalletInput } from "./Types";
@@ -90,7 +91,7 @@ class AddWalletView extends React.Component<IProps, IState> {
   }
 
   public render() {
-    let content: JSX.Element = <View><Text>{t.t("common.loading")}</Text></View>;
+    let content: JSX.Element = <Loading Message={t.t("common.loading")} />;
     if (!this.state.Loading) {
       content = <ScrollView style={{ flex: 1 }}>
         <TextField

@@ -11,6 +11,7 @@ import {
 import { Colors, Header, Icon } from "react-native-elements";
 import DatePicker from "./DatePicker";
 import { MyLink } from "./Link";
+import Loading from "./Loading";
 import * as Models from "./Models";
 import t from "./translator";
 import { ICategory, ITransaction, ITransactionInput } from "./Types";
@@ -187,7 +188,7 @@ class AddTransactionView extends React.Component<IProps, IState> {
   public render() {
     let content: any;
     if (this.state.Loading) {
-      content = <Text>Chargement des categories</Text>;
+      content = <Loading Message={t.t("common.loading")} />;
     } else {
       const autocomplete = _.filter(this.state.autocomplete,
         (auto) => cleanTextToSearch(auto.Beneficiary).match(cleanTextToSearch(this.state.Beneficiary)),
