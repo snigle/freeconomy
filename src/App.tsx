@@ -27,7 +27,9 @@ import ImportTransactionsView from "./ImportTransactionsView";
 import ReportPie from "./reports/ReportPie";
 import TransactionsByBeneficiary from "./reports/TransactionsByBeneficiary";
 import TransactionsView from "./TransactionsView";
+import t from "./translator";
 import WalletsView from "./WalletsView";
+
 
 // @ts-ignore
 import { AppBar, connectTheme, Icon, IconToggle } from "carbon-ui";
@@ -38,6 +40,7 @@ import { applyMiddleware, compose, createStore } from "redux";
 import { createLogger } from "redux-logger";
 import promise from "redux-promise";
 import thunk from "redux-thunk";
+import Loading from "./Loading";
 import LoginView from "./LoginView";
 import reducer from "./reducer";
 import { setLogged } from "./reducer/login";
@@ -85,7 +88,7 @@ class App extends React.Component<any, IState> {
 
   public render() {
     if (!this.state.loaded) {
-      return <Text>Loading Application</Text>;
+      return <Loading Message={t.t("common.loadingApplication")} />;
     }
     if (!this.props.logged) {
       return <View style={{ flex: 1 }}>
@@ -96,6 +99,7 @@ class App extends React.Component<any, IState> {
     AsyncStorage.setItem("logged", "ok");
     return <View style={{ flex: 1 }}>
       <Route exact path="/" component={WalletsView}></Route>
+      <Route exact path="/Test" component={() => <Loading Message="Ceci est un test" />}></Route>
       <Route exact path="/refresh" component={() => <View />}></Route>
       <Route exact path="/CategoriesView" component={CategoriesView}></Route>
       <Route exact path="/ReportPie" component={ReportPie}></Route>

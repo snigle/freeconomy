@@ -9,6 +9,7 @@ import { RouteComponentProps } from "react-router";
 import { defaultCategories } from "./defaultCategories";
 import * as defaultWallets from "./defaultWallets";
 import { getLogin } from "./GoogleSync";
+import Loading from "./Loading";
 import * as Models from "./Models";
 import * as OAuth from "./OAuth";
 import { setLogged } from "./reducer/login";
@@ -96,10 +97,10 @@ class LoginView extends React.Component<IProps, IState> {
 
   public render() {
     if (this.props.syncing) {
-      return <Text> Downloading data </Text>;
+      return <Loading Message={t.t("login.downloading")} />;
     }
     if (this.state.loading) {
-      return <Text>Loging to Google...</Text>;
+      return <Loading Message={t.t("login.logging")} />;
     }
     return <View style={{ flex: 1 }}>
       <Card

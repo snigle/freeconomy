@@ -14,6 +14,7 @@ export default {
     remove: "Supprimer",
     removeName: "Supprimer %{name} ?",
     update: "Mettre à jour",
+    loadingApplication: "Chargement de l'application",
   },
   login: {
     buttonWithGoogle: "Connexion avec Google",
@@ -21,6 +22,8 @@ export default {
     line2: "Categorisez vos transactions pour connaître vos budgets mensuels !",
     locally: "Ou utilisez l'application localement, toutes vos données seront supprimées lors de la deconnexion.",
     welcome: "Bienvenue dans Freeconomy",
+    downloading: "Téléchargement des données depuis votre compte google",
+    logging: "Connexion à votre compte google",
   },
   sideBar: {
     home: "Accueil",

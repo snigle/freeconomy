@@ -14,6 +14,7 @@ export default {
     remove: "Remove",
     removeName: "Remove %{name} ?",
     update: "Update",
+    loadingApplication: "Chargement de l'application",
   },
   login: {
     buttonWithGoogle: "Login with Google",
@@ -21,6 +22,8 @@ export default {
     line2: "Categorize your transactions to know your monthly budget!",
     locally: "Or Try the application locally, all datas will be removed at logout.",
     welcome: "Welcome in Freeconomy",
+    downloading: "Downloading data from your google account",
+    logging: "Logging to your google account",
   },
   sideBar: {
     home: "Home",
