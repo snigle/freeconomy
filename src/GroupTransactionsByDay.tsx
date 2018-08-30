@@ -117,11 +117,13 @@ export default function
     </ScrollView>;
   } else {
     // Margin bottom to fix missing element due to the appBar ...
-    content = <FlatList style={{ paddingBottom: 100 }}
+    content = <FlatList
       data={groupedTransactions.reverse()}
       keyExtractor={(item: ITransactionByDay) => item.day.toISOString()}
       inverted
       renderItem={({ item }) => displayTransaction(item, props)}
+      ListHeaderComponent={<View style={{ height: groupedTransactions.length ? 100 : 0 }} />}
+      initialScrollIndex={groupedTransactions.length > 1 ? 1 : 0}
     />;
   }
 
