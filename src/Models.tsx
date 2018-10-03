@@ -57,6 +57,7 @@ export async function CreateWallet(input: IWalletInput): Promise<IWallet[]> {
     Currency: input.Currency,
     Icon: input.Icon,
     Solde: input.Solde,
+    Archived: false,
   }]),
   ).then(SaveWallets);
 }
@@ -78,10 +79,28 @@ export async function UpdateWallet(walletUUID: string, input: IWalletInput): Pro
       Icon: input.Icon,
       LastUpdate: new Date(),
       Solde: input.Solde,
+      Archived: input.Archived,
     });
     return wallets;
   },
   ).then(SaveWallets);
+}
+
+export async function ArchiveWallet(walletUUID: string): Promise<IWallet> {
+  return GetWallet(walletUUID).then((w) => UpdateWallet(walletUUID, {
+    Currency: w.Currency,
+    Description: w.Description,
+    Icon: w.Icon,
+    Name: w.Name,
+    Solde: w.Solde,
+    Archived: !w.Archived,
+  })).then((wallets) => {
+    const result = wallets.find((w) => w.UUID === walletUUID);
+    if (!result) {
+      throw new Error("internal error");
+    }
+    return result;
+  });
 }
 
 export async function DeleteWallet(walletUUID: string): Promise<IWallet[]> {

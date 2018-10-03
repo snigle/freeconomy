@@ -46,6 +46,7 @@ class AddWalletView extends React.Component<IProps, IState> {
       Icon: { Name: "account-balance-wallet", Color: "#517fa4", Type: "material" },
       Loading: true,
       SoldeText: "",
+      Archived: false,
     };
   }
 

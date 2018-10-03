@@ -14,6 +14,7 @@ export const Money: IWalletInput = {
     Symbol: "€",
   },
   Solde: 0,
+  Archived: false,
 };
 
 export const Bank: IWalletInput = {
@@ -29,4 +30,5 @@ export const Bank: IWalletInput = {
     Symbol: "€",
   },
   Solde: 0,
+  Archived: false,
 };

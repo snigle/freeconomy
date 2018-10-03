@@ -8,6 +8,8 @@ import * as Models from "./Models";
 import { displayPrice, IWallet } from "./Types";
 import WalletListItem from "./WalletListItem";
 
+import querystring from "querystring";
+import { Route, RouteComponentProps } from "react-router";
 import MoreActions from "./MoreActions";
 import SideBar, { SideBarClass } from "./SideBar";
 import SyncBar from "./SyncBar";
@@ -18,31 +20,67 @@ interface IState {
   displayOptions: boolean;
 }
 
+interface IFilters {
+  archive: boolean;
+}
+
 interface IProps {
   history: History;
 }
 
-class Wallets extends React.Component<IProps, IState> {
+class Wallets extends React.Component<RouteComponentProps<IProps>, IState> {
   public sidebar: SideBarClass | null;
 
-  constructor(props: IProps) {
+  constructor(props: RouteComponentProps<IProps>) {
     super(props);
-    this.state = { displayOptions: false };
     this.sidebar = null;
+
+    const queryParams = querystring.parse(props.location.search.replace("?", ""));
+    this.state = {
+      displayOptions: false,
+    };
+  }
+
+  public parseQueryParams(props: RouteComponentProps<IProps>): IFilters {
+    const queryParams = querystring.parse(props.location.search.replace("?", ""));
+    return {
+      archive: "true" === (_.isArray(queryParams.archive) ? _.first(queryParams.archive) : queryParams.archive),
+    };
+  }
+
+  public fetchData() {
+    const filters = this.parseQueryParams(this.props);
+    Models.GetWallets()
+      .then((wallets) => wallets.filter((w) => filters.archive || !w.Archived))
+      .then((wallets) => this.setState({ Wallets: wallets }))
+      .catch(() => console.log("fail to load wallets, need to reset ?"));
   }
 
   public componentDidMount() {
     console.log("wallet mount");
-    Models.GetWallets().then((wallets) => this.setState({ Wallets: wallets }))
-      .catch(() => console.log("fail to load wallets, need to reset ?"));
+    this.fetchData();
+  }
+
+  public componentDidUpdate(prevProps: RouteComponentProps<IProps>) {
+    const oldFilters = this.parseQueryParams(prevProps);
+    const newFilters = this.parseQueryParams(this.props);
+    if (oldFilters.archive !== newFilters.archive) {
+      this.fetchData();
+    }
   }
 
   public render() {
+    const filters = this.parseQueryParams(this.props);
     let content: JSX.Element[] | JSX.Element;
     let options: JSX.Element = <View></View>;
     if (this.state.displayOptions) {
       options = <MoreActions actions={[
         { title: t.t("walletsView.add"), onPress: () => this.props.history.push("/AddWalletView") },
+        {
+          title: filters.archive ?
+            t.t("walletsView.hideArchive") : t.t("walletsView.viewArchive"),
+          onPress: () => this.props.history.push(`/?archive=${!filters.archive}`),
+        },
       ]} clicked={() => this.setState({ ...this.state, displayOptions: false })} />;
     }
     if (!this.state.Wallets) {
@@ -66,7 +104,11 @@ class Wallets extends React.Component<IProps, IState> {
           {
             wallets.map((wallet) =>
               <View key={wallet.UUID}>
-                <WalletListItem Wallet={wallet} history={this.props.history}></WalletListItem>
+                <WalletListItem
+                  Wallet={wallet}
+                  history={this.props.history}
+                  archive={(walletUUID) => this.archive(walletUUID)}
+                  displayArchive={filters.archive}></WalletListItem>
                 <Divider />
               </View>,
             )
@@ -106,6 +148,10 @@ class Wallets extends React.Component<IProps, IState> {
         </View>
       </View>
     </SideBar>;
+  }
+
+  private archive(walletUUID: string): Promise<any> {
+    return Models.ArchiveWallet(walletUUID).then((w) => this.fetchData());
   }
 
 }

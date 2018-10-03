@@ -25,6 +25,7 @@ export interface IWallet {
   Currency: ICurrency;
   Icon: IIcon;
   Solde: number;
+  Archived: boolean;
 }
 
 export type IconType = "material" |
@@ -51,6 +52,7 @@ export interface IWalletInput {
   Currency: ICurrency;
   Icon: IIcon;
   Solde: number;
+  Archived: boolean;
 }
 
 export const DefaultIcon = (i: IIcon): IIcon => ({
@@ -68,6 +70,7 @@ export const WalletDefault = (w: IWallet): IWallet => ({
   Currency: w.Currency || { Code: "EUR", Symbol: "€" },
   Icon: DefaultIcon(w.Icon),
   Solde: w.Solde || 0,
+  Archived: w.Archived || false,
 });
 
 export const displayPrice = (price: number, currency: ICurrency): string =>

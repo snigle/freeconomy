@@ -2,14 +2,18 @@
 import { Dialog, FlatButton, TouchableRipple as TouchableHighlight } from "carbon-ui";
 import { History } from "history";
 import * as React from "react";
-import { Alert, Button, Picker, Text, View } from "react-native";
+import { Alert, Button, Picker, Text, ToastAndroid, View } from "react-native";
 import { Divider, Icon } from "react-native-elements";
 import { MyLink } from "./Link";
 import * as Models from "./Models";
+import t from "./translator";
 import { displayPrice, IWallet } from "./Types";
+
 interface IProps {
   Wallet: IWallet;
   history: History;
+  displayArchive: boolean;
+  archive: (walletUUID: string) => Promise<any>;
 }
 interface IState {
   displayOption: boolean;
@@ -20,7 +24,9 @@ const margins = {};
 export default class extends React.Component<IProps, IState> {
   constructor(props: IProps) {
     super(props);
-    this.state = { displayOption: false };
+    this.state = {
+      displayOption: false,
+    };
   }
 
   public render() {
@@ -29,12 +35,16 @@ export default class extends React.Component<IProps, IState> {
       options = <View>
         <Button
           onPress={() => this.props.history.push(`/AddWalletView/${this.props.Wallet.UUID}`)}
-          title="Modifier" />
+          title={t.t("walletListeItem.Edit")} />
+        <Button
+          onPress={() => this.props.archive(this.props.Wallet.UUID).then(() =>
+            this.setState({ ...this.state, displayOption: false }))}
+          title={this.props.Wallet.Archived ? t.t("walletListeItem.Unarchive") : t.t("walletListeItem.Archive")} />
         <Button
           onPress={() => this.props.history.push(
             `/DeleteWalletView/${this.props.Wallet.UUID}/${this.props.Wallet.Name}
             `)}
-          title="Supprimer" />
+          title={t.t("walletListeItem.Delete")} />
       </View>;
     }
     return (
@@ -72,4 +82,5 @@ export default class extends React.Component<IProps, IState> {
       </View>
     );
   }
+
 }

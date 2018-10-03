@@ -147,6 +147,15 @@ public class NewAppWidget extends AppWidgetProvider {
             }
         }
 
+        // Filter wallets
+        List<Wallet> result = new ArrayList<>();
+        for (Wallet wallet : wallets) {
+            if (!wallet.Archived) {
+                result.add(wallet);
+            }
+        }
+        wallets = result.toArray(wallets);
+
         Log.i(TAG, "update all widgets");
 
         // There may be multiple widgets active, so update all of them
