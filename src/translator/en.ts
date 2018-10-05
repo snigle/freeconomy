@@ -39,6 +39,14 @@ export default {
     loading: "Loading wallets",
     add: "Add wallet",
     wallets: "Wallets",
+    viewArchive: "Display archives",
+    hideArchive: "Hide archives",
+  },
+  walletListItem: {
+    archive: "Archive",
+    restore: "Restore",
+    modify: "Modify",
+    delete: "Delete",
   },
   addWalletView: {
     currencyCode: "Currency Code",

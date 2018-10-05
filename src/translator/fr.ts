@@ -40,6 +40,14 @@ export default {
     loading: "Chargement de comptes",
     add: "Ajouter un Compte",
     wallets: "Comptes",
+    viewArchive: "Afficher les archives",
+    hideArchive: "Cacher les archives",
+  },
+  walletListItem: {
+    archive: "Archiver",
+    restore: "Restorer",
+    modify: "Modifier",
+    delete: "Supprimer",
   },
   addWalletView: {
     currencyCode: "Nom de la monnaie",

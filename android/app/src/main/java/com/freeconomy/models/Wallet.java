@@ -17,4 +17,5 @@ public class Wallet {
     public Currency Currency;
     public Icon Icon;
     public Double Solde;
+    public Boolean Archived;
 }

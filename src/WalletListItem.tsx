@@ -35,16 +35,16 @@ export default class extends React.Component<IProps, IState> {
       options = <View>
         <Button
           onPress={() => this.props.history.push(`/AddWalletView/${this.props.Wallet.UUID}`)}
-          title={t.t("walletListeItem.Edit")} />
+          title={t.t("walletListItem.modify")} />
         <Button
           onPress={() => this.props.archive(this.props.Wallet.UUID).then(() =>
             this.setState({ ...this.state, displayOption: false }))}
-          title={this.props.Wallet.Archived ? t.t("walletListeItem.Unarchive") : t.t("walletListeItem.Archive")} />
+          title={this.props.Wallet.Archived ? t.t("walletListItem.restore") : t.t("walletListItem.archive")} />
         <Button
           onPress={() => this.props.history.push(
             `/DeleteWalletView/${this.props.Wallet.UUID}/${this.props.Wallet.Name}
             `)}
-          title={t.t("walletListeItem.Delete")} />
+          title={t.t("walletListItem.delete")} />
       </View>;
     }
     return (

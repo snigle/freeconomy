@@ -22,6 +22,8 @@ import com.oblador.vectoricons.VectorIconsModule;
 
 import java.io.IOException;
 import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Implementation of App Widget functionality.
@@ -154,7 +156,7 @@ public class NewAppWidget extends AppWidgetProvider {
                 result.add(wallet);
             }
         }
-        wallets = result.toArray(wallets);
+        wallets = result.toArray(new Wallet[0]);
 
         Log.i(TAG, "update all widgets");
 
