@@ -129,4 +129,7 @@ export default {
     currentBalance: "Solde total courant : ",
     title: "Mettre à jour le total du compte %{name}",
   },
+  balanceReport: {
+    title: "Rapport des ressources",
+  },
 };

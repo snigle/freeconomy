@@ -2,7 +2,7 @@ import * as _ from "lodash";
 import moment from "moment";
 import * as querystring from "querystring";
 import * as React from "react";
-import { ScrollView, Text, TouchableHighlight, View, ActivityIndicator } from "react-native";
+import { ActivityIndicator, ScrollView, Text, TouchableHighlight, View } from "react-native";
 import { Header } from "react-native-elements";
 import { RouteComponentProps } from "react-router";
 import { v4 } from "uuid";
@@ -245,5 +245,5 @@ export default class extends React.Component<RouteComponentProps<any>, IState> {
         }
       </View>
     </SideBar>;
-    }
   }
+}

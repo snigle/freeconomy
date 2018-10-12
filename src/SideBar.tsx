@@ -77,6 +77,11 @@ export class SideBarClass extends React.Component<IProps, IState> {
                 "/ReportPie?" + querystring.stringify({ currencyCode: this.state.defaultCurrency.Code }),
               )} />
             <ListItem
+              title={t.t("sideBar.reports")}
+              onPress={() => this.props.history.replace(
+                "/BalanceReport?" + querystring.stringify({ currencyCode: this.state.defaultCurrency.Code }),
+              )} />
+            <ListItem
               title={t.t("sideBar.sync")}
               onPress={() => GoogleSync() && this.drawer ? this.drawer.closeDrawer() : null} />
             <ListItem

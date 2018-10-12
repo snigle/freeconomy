@@ -24,6 +24,7 @@ import DeleteCategoryView from "./DeleteCategoryView";
 import DeleteWalletView from "./DeleteWalletView";
 import GoogleSyncOAuthCallBack from "./GoogleSyncOAuthCallBack";
 import ImportTransactionsView from "./ImportTransactionsView";
+import BalanceReport from "./reports/BalanceReport";
 import ReportPie from "./reports/ReportPie";
 import TransactionsByBeneficiary from "./reports/TransactionsByBeneficiary";
 import TransactionsView from "./TransactionsView";
@@ -102,6 +103,7 @@ class App extends React.Component<any, IState> {
       <Route exact path="/refresh" component={() => <View />}></Route>
       <Route exact path="/CategoriesView" component={CategoriesView}></Route>
       <Route exact path="/ReportPie" component={ReportPie}></Route>
+      <Route exact path="/BalanceReport" component={BalanceReport}></Route>
       <Route exact path="/TransactionsByBeneficiary" component={TransactionsByBeneficiary}></Route>
       <Route
         path="/AddCategoryView"

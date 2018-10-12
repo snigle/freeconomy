@@ -128,4 +128,7 @@ export default {
     currentBalance: "Current Balance : ",
     title: "Uptdate current balance of %{name}",
   },
+  balanceReport: {
+    title: "Income/Outcome reports",
+  },
 };
