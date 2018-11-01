@@ -23,7 +23,6 @@ interface IState {
   Transfert: ITransfert[];
   displayOptions: boolean;
   TransactionsView: JSX.Element;
-  Filters: IFilters;
   Title: string;
 }
 
@@ -35,6 +34,7 @@ interface IFilters {
   begin?: moment.Moment;
   end?: moment.Moment;
   category?: string;
+  total?: number;
 }
 
 interface IProps {
@@ -45,7 +45,6 @@ class TransactionsView extends React.Component<RouteComponentProps<IProps>, ISta
   private sidebar?: SideBarClass;
   constructor(props: RouteComponentProps<IProps>) {
     super(props);
-    const queryParams = querystring.parse(props.location.search.replace("?", ""));
     this.state = {
       Title: t.t("common.title"),
       Wallets: [],
@@ -54,46 +53,71 @@ class TransactionsView extends React.Component<RouteComponentProps<IProps>, ISta
       Categories: [],
       displayOptions: false,
       TransactionsView: <View></View>,
-      Filters: {
-        walletUUID: _.isArray(queryParams.walletUUID) ? _.first(queryParams.walletUUID) : queryParams.walletUUID,
-        category: _.isArray(queryParams.category) ? _.first(queryParams.category) : queryParams.category,
-        beneficiary: _.isArray(queryParams.beneficiary) ? _.first(queryParams.beneficiary) : queryParams.beneficiary,
-        currencyCode: _.isArray(queryParams.currencyCode) ?
-          _.first(queryParams.currencyCode) : queryParams.currencyCode,
-        search: _.isArray(queryParams.search) ? _.first(queryParams.search) : queryParams.search,
-        begin: queryParams.begin ? moment(queryParams.begin) : undefined,
-        end: queryParams.end ? moment(queryParams.end) : undefined,
-      },
     };
   }
 
   public componentDidMount() {
+    this.fetchData();
+  }
+
+  public parseFilters(props: RouteComponentProps<IProps>): IFilters {
+    const queryParams = querystring.parse(props.location.search.replace("?", ""));
+
+    return {
+      walletUUID: _.isArray(queryParams.walletUUID) ? _.first(queryParams.walletUUID) : queryParams.walletUUID,
+      category: _.isArray(queryParams.category) ? _.first(queryParams.category) : queryParams.category,
+      beneficiary: _.isArray(queryParams.beneficiary) ? _.first(queryParams.beneficiary) : queryParams.beneficiary,
+      currencyCode: _.isArray(queryParams.currencyCode) ?
+        _.first(queryParams.currencyCode) : queryParams.currencyCode,
+      search: _.isArray(queryParams.search) ? _.first(queryParams.search) : queryParams.search,
+      begin: queryParams.begin ? moment(queryParams.begin) : undefined,
+      end: queryParams.end ? moment(queryParams.end) : undefined,
+      total: (() => {
+        const totalString = _.isArray(queryParams.total) ? _.first(queryParams.total) : queryParams.total;
+        return totalString ? parseInt(totalString, 10) : undefined;
+      })(),
+    };
+  }
+
+  public componentDidUpdate(oldProps: RouteComponentProps<any>) {
+    const oldFilters = this.parseFilters(oldProps);
+    const filters = this.parseFilters(this.props);
+    if (!_.isEqual(oldFilters, filters)) {
+      this.fetchData();
+    }
+  }
+
+  public fetchData() {
+    const filters = this.parseFilters(this.props);
     Models.GetCategories().then((categories) =>
       Promise.all([
         Models.GetAllTransactions().then((transactions) => transactions.filter((transaction) => {
-          if (this.state.Filters.walletUUID) {
-            if (this.state.Filters.walletUUID !== transaction.WalletUUID) {
+          if (filters.walletUUID) {
+            if (filters.walletUUID !== transaction.WalletUUID) {
               return false;
             }
           }
-          if (this.state.Filters.search) {
-            if (!transaction.Beneficiary.match(this.state.Filters.search)
-              && !transaction.Comment.match(this.state.Filters.search)) {
+          if (filters.search) {
+            if (!transaction.Beneficiary.match(filters.search)
+              && !transaction.Comment.match(filters.search)) {
               return false;
             }
           }
-          if (this.state.Filters.beneficiary && this.state.Filters.beneficiary !== transaction.Beneficiary) {
+          if (filters.beneficiary && filters.beneficiary !== transaction.Beneficiary) {
             return false;
           }
-          if (this.state.Filters.begin && moment(this.state.Filters.begin).isAfter(transaction.Date)) {
+          if (filters.begin && moment(filters.begin).isAfter(transaction.Date)) {
             return false;
           }
-          if (this.state.Filters.end && moment(this.state.Filters.end).isBefore(transaction.Date)) {
+          if (filters.end && moment(filters.end).isBefore(transaction.Date)) {
+            return false;
+          }
+          if (filters.total && filters.total !== transaction.Price) {
             return false;
           }
           const category =
             _.find(categories, (ca) => ca.UUID === transaction.CategoryUUID);
-          if (category && this.state.Filters.category && category.Name !== this.state.Filters.category) {
+          if (category && filters.category && category.Name !== filters.category) {
             return false;
           }
           return true;
@@ -101,32 +125,35 @@ class TransactionsView extends React.Component<RouteComponentProps<IProps>, ISta
         Models.GetWallets(),
         Promise.resolve(categories),
         Models.GetTransferts().then((transferts) => transferts.filter((transfert) => {
-          if (this.state.Filters.walletUUID) {
-            if (this.state.Filters.walletUUID !== transfert.From.WalletUUID &&
-              this.state.Filters.walletUUID !== transfert.To.WalletUUID) {
+          if (filters.walletUUID) {
+            if (filters.walletUUID !== transfert.From.WalletUUID &&
+              filters.walletUUID !== transfert.To.WalletUUID) {
               return false;
             }
           } else {
             return false;
           }
-          if (this.state.Filters.search) {
-            if (!transfert.Comment.match(this.state.Filters.search)) {
+          if (filters.search) {
+            if (!transfert.Comment.match(filters.search)) {
               return false;
             }
+          }
+          if (filters.total && filters.total !== transfert.To.Price && filters.total !== transfert.From.Price) {
+            return false;
           }
           return true;
         },
         )),
-        this.state.Filters.currencyCode ?
-          Models.GetCurrency(this.state.Filters.currencyCode) : Promise.resolve(undefined),
+        filters.currencyCode ?
+          Models.GetCurrency(filters.currencyCode) : Promise.resolve(undefined),
       ]))
       .then(([transactions, wallets, categories, transfert, currency]) => {
         let title = this.state.Title;
-        const wallet = wallets.find((w) => w.UUID === this.state.Filters.walletUUID);
+        const wallet = wallets.find((w) => w.UUID === filters.walletUUID);
         if (wallet && wallet.Name) {
           title = wallet.Name;
-        } else if (this.state.Filters.beneficiary) {
-          title = this.state.Filters.beneficiary;
+        } else if (filters.beneficiary) {
+          title = filters.beneficiary;
         }
         if (!currency && wallet) {
           currency = wallet.Currency;
@@ -142,7 +169,7 @@ class TransactionsView extends React.Component<RouteComponentProps<IProps>, ISta
           Wallets: wallets,
           TransactionsView: <GroupTransactionsByDay
             Transfert={transfert}
-            WalletUUID={this.state.Filters.walletUUID}
+            WalletUUID={filters.walletUUID}
             Wallets={wallets}
             Categories={categories}
             Transactions={transactions}
@@ -151,30 +178,31 @@ class TransactionsView extends React.Component<RouteComponentProps<IProps>, ISta
         });
       })
       .catch((err) => console.log("fail to load transactions, need to reset ?", err));
-
   }
 
   public render() {
     let content: any;
     let options: JSX.Element = <View></View>;
-    if (this.state.displayOptions && this.state.Filters.walletUUID) {
+    const filters = this.parseFilters(this.props);
+
+    if (this.state.displayOptions && filters.walletUUID) {
       options = <MoreActions actions={[
         {
           title: t.t("transactionsView.addTransaction"),
-          onPress: () => this.props.history.push(`/Wallet/${this.state.Filters.walletUUID}/AddTransactionView`),
+          onPress: () => this.props.history.push(`/Wallet/${filters.walletUUID}/AddTransactionView`),
         },
         {
           title: t.t("transactionsView.addTransfert"),
-          onPress: () => this.props.history.push(`/Wallet/${this.state.Filters.walletUUID}/AddTransfertView`),
+          onPress: () => this.props.history.push(`/Wallet/${filters.walletUUID}/AddTransfertView`),
         },
         {
           title: t.t("transactionsView.importFromCSV"),
-          onPress: () => this.props.history.push(`/ImportTransactionsView?walletUUID=${this.state.Filters.walletUUID}`),
+          onPress: () => this.props.history.push(`/ImportTransactionsView?walletUUID=${filters.walletUUID}`),
         },
         {
           title: t.t("transactionsView.updateSolde"),
           onPress: () =>
-            this.props.history.push(`TransactionsView/UpdateSoldeView?walletUUID=${this.state.Filters.walletUUID}`),
+            this.props.history.push(`TransactionsView/UpdateSoldeView?walletUUID=${filters.walletUUID}`),
         },
       ]} clicked={() => this.setState({ ...this.state, displayOptions: false })} />;
     }

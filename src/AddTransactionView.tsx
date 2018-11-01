@@ -190,7 +190,7 @@ class AddTransactionView extends React.Component<IProps, IState> {
     if (this.state.Loading) {
       content = <Loading Message={t.t("common.loading")} />;
     } else {
-      const autocomplete = _.filter(this.state.autocomplete,
+      const autocomplete: IAutoComplete[] = this.state.autocomplete.filter(
         (auto) => cleanTextToSearch(auto.Beneficiary).match(cleanTextToSearch(this.state.Beneficiary)),
       ).slice(0, 10);
       console.log("display", this.state);

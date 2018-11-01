@@ -52,7 +52,11 @@ function displayTransaction(transactionByDay: ITransactionByDay, props: IProps):
               Transaction={transaction.Transaction}
               Currency={props.Currency}
               history={props.history}
-              CurrentTotal={transaction.Total} />;
+              CurrentTotal={transaction.Total}
+              Wallet={!props.WalletUUID ?
+                props.Wallets.find((w) => w.UUID === (transaction.Transaction && transaction.Transaction.WalletUUID)) :
+                undefined
+              } />;
           } else if (transaction.Transfert) {
             element = <TransfertListItem
               key={transaction.Transfert.UUID}

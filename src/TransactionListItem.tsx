@@ -6,7 +6,7 @@ import { Button, Text, View } from "react-native";
 import { Icon } from "react-native-elements";
 import { MyLink } from "./Link";
 import * as Models from "./Models";
-import { displayPrice, ICategory, ICurrency, ITransaction } from "./Types";
+import { displayPrice, ICategory, ICurrency, ITransaction, IWallet } from "./Types";
 
 interface IProps {
   Transaction: ITransaction;
@@ -14,6 +14,7 @@ interface IProps {
   Currency: ICurrency;
   history: History;
   Category: ICategory;
+  Wallet?: IWallet;
 }
 
 interface IState {
@@ -53,6 +54,9 @@ export default class extends React.Component<IProps, IState> {
           </View>
           <View style={{ flex: 1 }}>
             <Text style={margins}>{this.props.Transaction.Beneficiary}</Text>
+            <Text style={{ ...margins, fontSize: 10 }}>
+              {this.props.Transaction.Comment}{this.props.Wallet ? `(${this.props.Wallet.Name})` : ""}
+            </Text>
           </View>
           <View style={{ width: 150 }}>
             <Text

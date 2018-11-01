@@ -72,12 +72,12 @@ export class SideBarClass extends React.Component<IProps, IState> {
             <ListItem title={t.t("sideBar.home")} onPress={() => this.props.history.replace("/")} />
             <ListItem title={t.t("sideBar.categories")} onPress={() => this.props.history.replace("/CategoriesView")} />
             <ListItem
-              title={t.t("sideBar.reports")}
+              title={t.t("sideBar.categoryReport")}
               onPress={() => this.props.history.replace(
                 "/ReportPie?" + querystring.stringify({ currencyCode: this.state.defaultCurrency.Code }),
               )} />
             <ListItem
-              title={t.t("sideBar.reports")}
+              title={t.t("sideBar.balanceReport")}
               onPress={() => this.props.history.replace(
                 "/BalanceReport?" + querystring.stringify({ currencyCode: this.state.defaultCurrency.Code }),
               )} />

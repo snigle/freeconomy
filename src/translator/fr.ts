@@ -28,7 +28,8 @@ export default {
   sideBar: {
     home: "Accueil",
     categories: "Catégories",
-    reports: "Rapports",
+    categoryReport: "Total par catégorie",
+    balanceReport: "Évolution du solde",
     sync: "Synchroniser",
     logout: "Déconnexion",
     logoutConfirm: "Se déconnecter ?",

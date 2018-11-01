@@ -28,7 +28,8 @@ export default {
   sideBar: {
     home: "Home",
     categories: "Categories",
-    reports: "Reports",
+    categoryReport: "Report by Category",
+    balanceReport: "Balance Report",
     sync: "Synchronize",
     logout: "Logout",
     logoutConfirm: "Are you sure to logout ?",
