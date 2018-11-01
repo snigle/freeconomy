@@ -77,7 +77,7 @@ export class SideBarClass extends React.Component<IProps, IState> {
                 "/ReportPie?" + querystring.stringify({ currencyCode: this.state.defaultCurrency.Code }),
               )} />
             <ListItem
-              title={t.t("sideBar.balanceReport")}
+              title={t.t("balanceReport.title")}
               onPress={() => this.props.history.replace(
                 "/BalanceReport?" + querystring.stringify({ currencyCode: this.state.defaultCurrency.Code }),
               )} />

@@ -101,7 +101,7 @@ android {
         applicationId "com.freeconomy"
         minSdkVersion 16
         targetSdkVersion 27
-        versionCode 13
+        versionCode 14
         versionName "0.0.4"
         ndk {
             abiFilters "armeabi-v7a", "x86"

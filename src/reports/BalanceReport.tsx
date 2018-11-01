@@ -193,8 +193,8 @@ export default class extends React.Component<RouteComponentProps<any>, IState> {
                     <View><ActivityIndicator size="large" color="#0000ff" /></View>
                     :
                     <ScrollView style={{ flex: 1 }}>
-                        <View style={{ flex: 1 }}>
-                            <VictoryChart style={{ flex: 1 }}
+                        <View style={{ height: 400 }}>
+                            <VictoryChart
                                 containerComponent={<VictoryCursorContainer
                                     cursorLabel={(d: any) => `${moment(d.x).format("YYYY-MM")}, ${Math.round(d.y)}`}
                                 />}

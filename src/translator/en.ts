@@ -29,7 +29,6 @@ export default {
     home: "Home",
     categories: "Categories",
     categoryReport: "Report by Category",
-    balanceReport: "Balance Report",
     sync: "Synchronize",
     logout: "Logout",
     logoutConfirm: "Are you sure to logout ?",
@@ -130,6 +129,6 @@ export default {
     title: "Uptdate current balance of %{name}",
   },
   balanceReport: {
-    title: "Income/Outcome reports",
+    title: "Balance Report",
   },
 };

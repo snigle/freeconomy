@@ -29,7 +29,6 @@ export default {
     home: "Accueil",
     categories: "Catégories",
     categoryReport: "Total par catégorie",
-    balanceReport: "Évolution du solde",
     sync: "Synchroniser",
     logout: "Déconnexion",
     logoutConfirm: "Se déconnecter ?",
@@ -131,6 +130,6 @@ export default {
     title: "Mettre à jour le total du compte %{name}",
   },
   balanceReport: {
-    title: "Rapport des ressources",
+    title: "Évolution du solde",
   },
 };
