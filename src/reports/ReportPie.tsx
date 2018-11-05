@@ -3,10 +3,11 @@ import moment from "moment";
 import * as querystring from "querystring";
 import * as React from "react";
 import { ActivityIndicator, ScrollView, Text, TouchableHighlight, View } from "react-native";
-import { Header } from "react-native-elements";
+import { Header, Icon } from "react-native-elements";
 import { RouteComponentProps } from "react-router";
 import { v4 } from "uuid";
 import { VictoryPie } from "victory-native";
+import { MyLink } from "../Link";
 import * as Models from "../Models";
 import MoreActions from "../MoreActions";
 import SideBar, { SideBarClass } from "../SideBar";
@@ -96,13 +97,14 @@ export default class extends React.Component<RouteComponentProps<any>, IState> {
     const filters = this.parseFilters(this.props);
     if (!_.isEqual(prevFilters, filters)) {
       this.componentDidMount();
+    } else {
+      console.log("same params :s", filters);
     }
   }
 
   public componentDidMount() {
     this.setState({ ...this.state, loading: true });
     const filters = this.parseFilters(this.props);
-    console.log("did mount", filters);
     Promise.all([
       Models.GetAllTransactions(),
       Models.GetWallets(),
@@ -113,8 +115,8 @@ export default class extends React.Component<RouteComponentProps<any>, IState> {
       const categoriesByUUID: { [key: string]: ICategory } = _.mapValues(_.groupBy(categories, "UUID"), (c) => c[0]);
       wallets = wallets.filter((w) => w.Currency.Code === filters.currencyCode);
       transactions = transactions.filter((transaction) =>
-        moment(transaction.Date).isAfter(filters.begin) &&
-        moment(transaction.Date).isBefore(filters.end) &&
+        moment(transaction.Date).isSameOrAfter(filters.begin) &&
+        moment(transaction.Date).isSameOrBefore(filters.end) &&
         wallets.find((w) => w.UUID === transaction.WalletUUID),
       );
       const transactionsByCategoryUUID = _.mapValues(
@@ -131,7 +133,6 @@ export default class extends React.Component<RouteComponentProps<any>, IState> {
       const datas: Idata[] = _.values(_.mapValues(transactionsByCategoryUUID, (total, categoryUUID) =>
         ({ x: "", y: total, label: " ", Category: categoriesByUUID[categoryUUID] || defaultCategory })),
       );
-      console.log("datas", datas);
       this.setState({
         ...this.state,
         datas: _.sortBy(_.filter(datas, (d) => d.y < 0).map((d) => ({ ...d, y: -d.y })), (d) => - d.y),
@@ -146,6 +147,7 @@ export default class extends React.Component<RouteComponentProps<any>, IState> {
     const totalMax = this.state.datas.length ? this.state.datas[0].y : 0;
     const filters = this.parseFilters(this.props);
     let options = <View></View>;
+    console.log("datas", this.state.datas);
     if (this.state.displayOptions) {
       options = <MoreActions actions={[
         {
@@ -207,30 +209,51 @@ export default class extends React.Component<RouteComponentProps<any>, IState> {
           <View><ActivityIndicator size="large" color="#0000ff" /></View>
           :
           <ScrollView style={{ flex: 1 }}>
+            {filters.begin.startOf("month").isSame(filters.end.startOf("month")) ?
+              <View style={{ flexDirection: "row", margin: 5 }}>
+                <MyLink to={`/ReportPie?` + querystring.stringify({
+                  currencyCode: filters.currencyCode,
+                  begin: moment(filters.begin).add(-1, "month").toISOString(),
+                  end: moment(filters.end).endOf("month").add(-1, "month").toISOString(),
+                })}>
+                  <Icon name="chevron-left" iconStyle={{ textDecorationLine: "none" }} />
+                </MyLink>
+                <Text style={{ flex: 1, textAlign: "center", fontSize: 16, marginTop: 5 }}>
+                  {_.startCase(filters.begin.format("MMMM YYYY"))}
+                </Text>
+                <MyLink to={`/ReportPie?` + querystring.stringify({
+                  currencyCode: filters.currencyCode,
+                  begin: moment(filters.begin).add(1, "month").toISOString(),
+                  end: moment(filters.end).endOf("month").add(1, "month").toISOString(),
+                })}>
+                  <Icon name="chevron-right" />
+                </MyLink>
+              </View> :
+              null
+            }
             <View style={{ alignSelf: "center", height: 200 }}>
               <VictoryPie height={200}
                 padding={5}
                 innerRadius={70}
-                data={this.state.datas}
-                colorScale={this.state.datas.map((v, k) => rainbow(this.state.datas.length, k + 1))} />
+                data={_.concat([], this.state.datas)}
+                colorScale={this.state.datas.map((v, k) => rainbow(this.state.datas.length, k))} />
             </View>
-            <View style={{ position: "absolute", top: 60, alignSelf: "center" }}>
+            <View style={{ position: "absolute", top: 80, alignSelf: "center" }}>
               <Text style={{ textAlign: "center", fontSize: 20, marginBottom: 10 }}>Total :</Text>
               <Text style={{ textAlign: "center", fontSize: 30 }}>{displayPrice(total, this.state.Currency)}</Text>
             </View>
             <View>
               {this.state.datas.map((d, i) =>
-                <TouchableHighlight
+                <MyLink
                   key={i}
-                  onPress={() => this.props.history.push(
+                  to={
                     `TransactionsByBeneficiary?` +
                     querystring.stringify({
                       categoryName: d.Category.Name,
                       begin: filters && filters.begin.toISOString(),
                       end: filters && filters.end.toISOString(),
                       currencyCode: filters && filters.currencyCode,
-                    }),
-                  )}><View>
+                    })}><View>
                     <ReportByCategoryItem
                       TotalMax={totalMax}
                       Category={d.Category}
@@ -238,7 +261,7 @@ export default class extends React.Component<RouteComponentProps<any>, IState> {
                       Color={rainbow(this.state.datas.length, i)}
                       Currency={this.state.Currency}
                       history={this.props.history} />
-                  </View></TouchableHighlight>,
+                  </View></MyLink>,
               )}
             </View>
           </ScrollView>
