@@ -33,7 +33,10 @@ module.exports = {
 
     rules: [
       // rules for modules (configure loaders, parser options, etc.)
-
+      {
+        test: /\.less$/,
+        loader: 'less-loader' // compiles Less to CSS
+      },
       {
         test: /\.jsx?$/,
         include: [
@@ -103,7 +106,8 @@ module.exports = {
           }
         ]
       },
-    ]},
+    ]
+  },
 
 
 
@@ -138,7 +142,7 @@ module.exports = {
     hints: "warning", // enum
     maxAssetSize: 200000, // int (in bytes),
     maxEntrypointSize: 400000, // int (in bytes)
-    assetFilter: function(assetFilename) {
+    assetFilter: function (assetFilename) {
       // Function predicate that provides asset filenames
       return assetFilename.endsWith('.css') || assetFilename.endsWith('.js');
     }
