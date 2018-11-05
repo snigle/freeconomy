@@ -98,7 +98,7 @@ export default class extends React.Component<RouteComponentProps<any>, IState> {
         let transactions = await Models.GetAllTransactions();
         transactions = transactions.filter((tr) => wallets.find((w) => w.UUID === tr.WalletUUID));
         const transferts = await Models.GetTransferts(...wallets.map((w) => w.UUID));
-
+        console.log("currency", filters.currencyCode, transactions, transferts);
         // Group data by month.
         let data: { [key: number]: IPoint } = {};
         _.forEach(transactions, (tr) => {
@@ -150,10 +150,10 @@ export default class extends React.Component<RouteComponentProps<any>, IState> {
 
         // Add a first point to draw a line if only one point of data.
         if (_.keys(data).length === 1) {
-            const key = moment().startOf("month").add(-1, "month").unix();
+            const elem: IPoint | undefined = _.first(_.values(data));
+            const key = moment.unix(elem && elem.key || 0).add(-1, "month").unix();
             data[key] = { key, income: 0, outcome: 0, balance: 0 };
         }
-        console.log("data", data);
         this.setState({
             ...this.state,
             balanceData: _.values(_.mapValues(data, (p, key) => ({ month: p.key * 1000, y: p.balance }))),
@@ -193,8 +193,8 @@ export default class extends React.Component<RouteComponentProps<any>, IState> {
                     <View><ActivityIndicator size="large" color="#0000ff" /></View>
                     :
                     <ScrollView style={{ flex: 1 }}>
-                        <View style={{ height: 400 }}>
-                            <VictoryChart
+                        <View style={{ height: Platform.OS === "web" ? 400 : undefined }}>
+                            <VictoryChart style={{}}
                                 containerComponent={<VictoryCursorContainer
                                     cursorLabel={(d: any) => `${moment(d.x).format("YYYY-MM")}, ${Math.round(d.y)}`}
                                 />}
@@ -238,31 +238,31 @@ export default class extends React.Component<RouteComponentProps<any>, IState> {
 
                                 />
                             </VictoryChart>
-                            <View>
-                                {
-                                    this.state.data.reverse().map((month) => (
-                                        <TouchableHighlight
-                                            key={month.key}
-                                            onPress={() => this.props.history.push(
-                                                `ReportPie?` +
-                                                querystring.stringify({
-                                                    currencyCode: this.state.Currency.Code,
-                                                    begin: moment.unix(month.key).toISOString(),
-                                                    end: moment.unix(month.key).add(1, "month").toISOString(),
-                                                }),
-                                            )}>
-                                            <View>
-                                                <BalanceReportItem
-                                                    Balance={month.balance}
-                                                    Currency={this.state.Currency}
-                                                    Name={moment.unix(month.key).format("YYYY-MM")}
-                                                    Total={month.income - month.outcome}
-                                                    TotalMax={totalMax}
-                                                />
-                                            </View>
-                                        </TouchableHighlight>))
-                                }
-                            </View>
+                        </View>
+                        <View>
+                            {
+                                this.state.data.reverse().map((month) => (
+                                    <TouchableHighlight
+                                        key={month.key}
+                                        onPress={() => this.props.history.push(
+                                            `ReportPie?` +
+                                            querystring.stringify({
+                                                currencyCode: this.state.Currency.Code,
+                                                begin: moment.unix(month.key).toISOString(),
+                                                end: moment.unix(month.key).add(1, "month").toISOString(),
+                                            }),
+                                        )}>
+                                        <View>
+                                            <BalanceReportItem
+                                                Balance={month.balance}
+                                                Currency={this.state.Currency}
+                                                Name={moment.unix(month.key).format("YYYY-MM")}
+                                                Total={month.income - month.outcome}
+                                                TotalMax={totalMax}
+                                            />
+                                        </View>
+                                    </TouchableHighlight>))
+                            }
                         </View>
                     </ScrollView>
                 }
