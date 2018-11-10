@@ -2,6 +2,7 @@
 import { Display1, FlatButton, Paper } from "carbon-ui";
 import { History } from "history";
 import * as _ from "lodash";
+import moment from "moment";
 import * as React from "react";
 import { FlatList, Platform, ScrollView, Text, View } from "react-native";
 import { Divider, Icon } from "react-native-elements";
@@ -40,7 +41,7 @@ function displayTransaction(transactionByDay: ITransactionByDay, props: IProps):
   return (
     <View key={transactionByDay.day.toString()}>
       <Text style={{ backgroundColor: "rgb(130, 130, 130)", color: "white" }}>
-        {transactionByDay.day.toLocaleString()}
+        {_.upperFirst(moment(transactionByDay.day).format("dddd Do MMMM YYYY"))}
       </Text>
       {
         transactionByDay.transactions.map((transaction, i) => {

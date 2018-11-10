@@ -22,8 +22,8 @@ export default (props: IProps) => {
         <Icon name={icon} type="material" color={color} reverse />
       </View>
       <View style={{ flex: 1 }}>
-        <View style={{ height: 14 }}>
-          <Text style={{ fontSize: 13 }}>{props.Name}</Text>
+        <View style={{ height: 16 }}>
+          <Text style={{ fontSize: 12 }}>{props.Name}</Text>
         </View>
         <View style={{ flexDirection: "row" }}>
           <View style={{ flex: Math.abs(props.Total), backgroundColor: color, height: 20 }} />

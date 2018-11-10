@@ -209,7 +209,7 @@ export default class extends React.Component<RouteComponentProps<any>, IState> {
           <View><ActivityIndicator size="large" color="#0000ff" /></View>
           :
           <ScrollView style={{ flex: 1 }}>
-            {filters.begin.startOf("month").isSame(filters.end.startOf("month")) ?
+            {moment(filters.begin).startOf("month").isSame(moment(filters.end).startOf("month")) ?
               <View style={{ flexDirection: "row", margin: 5 }}>
                 <MyLink to={`/ReportPie?` + querystring.stringify({
                   currencyCode: filters.currencyCode,

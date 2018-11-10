@@ -2,18 +2,19 @@ import _ from "lodash";
 import moment from "moment";
 import querystring from "querystring";
 import * as React from "react";
-import { ActivityIndicator, Platform, ScrollView, TouchableHighlight, View } from "react-native";
+import { ActivityIndicator, Platform, ScrollView, View } from "react-native";
 import { Header, Text } from "react-native-elements";
 import { RouteComponentProps } from "react-router";
 import { VictoryAxis, VictoryChart, VictoryLine } from "victory-native";
 // tslint:disable
 // @ts-ignore
 import { VictoryCursorContainer } from "victory-native";
+import { MyLink } from "../Link";
 // tslint:enable
 import * as Models from "../Models";
 import SideBar, { SideBarClass } from "../SideBar";
 import t from "../translator";
-import { displayPrice, ICurrency } from "../Types";
+import { ICurrency } from "../Types";
 import BalanceReportItem from "./BalanceReportItem";
 
 interface IFilters {
@@ -217,7 +218,6 @@ export default class extends React.Component<RouteComponentProps<any>, IState> {
                                 <VictoryAxis
                                     scale={{ x: "time" }}
                                     standalone={false}
-                                    //   style={styles.axisYears}
                                     tickValues={this.state.balanceData.map((d) => d.month)}
                                     tickFormat={
                                         (x: number) => {
@@ -242,16 +242,17 @@ export default class extends React.Component<RouteComponentProps<any>, IState> {
                         <View>
                             {
                                 this.state.data.reverse().map((month) => (
-                                    <TouchableHighlight
+                                    <MyLink
                                         key={month.key}
-                                        onPress={() => this.props.history.push(
+                                        to={
                                             `ReportPie?` +
                                             querystring.stringify({
                                                 currencyCode: this.state.Currency.Code,
                                                 begin: moment.unix(month.key).toISOString(),
-                                                end: moment.unix(month.key).add(1, "month").toISOString(),
-                                            }),
-                                        )}>
+                                                end: moment.unix(month.key)
+                                                    .add(1, "month").add(-1, "day").toISOString(),
+                                            })
+                                        }>
                                         <View>
                                             <BalanceReportItem
                                                 Balance={month.balance}
@@ -261,7 +262,7 @@ export default class extends React.Component<RouteComponentProps<any>, IState> {
                                                 TotalMax={totalMax}
                                             />
                                         </View>
-                                    </TouchableHighlight>))
+                                    </MyLink>))
                             }
                         </View>
                     </ScrollView>

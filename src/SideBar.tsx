@@ -2,13 +2,14 @@ import { History } from "history";
 import * as _ from "lodash";
 import * as querystring from "querystring";
 import * as React from "react";
-import { Button, ScrollView, TouchableHighlight, View } from "react-native";
-import DrawerLayout, { DrawerLayoutProperties } from "react-native-drawer-layout";
-import { Card, Header, ListItem, Text } from "react-native-elements";
+import { Button, ScrollView, View } from "react-native";
+import DrawerLayout from "react-native-drawer-layout";
+import { Header, ListItem, Text } from "react-native-elements";
 // @ts-ignore
 // tslint:disable-next-line:no-duplicate-imports
 import { Overlay } from "react-native-elements";
 import { connect } from "react-redux";
+import { MyLink } from "./Link";
 import * as Models from "./Models";
 import { setLogout } from "./reducer/login";
 import { GoogleSync } from "./Sync";
@@ -57,10 +58,11 @@ export class SideBarClass extends React.Component<IProps, IState> {
             this.setState({ ...this.state, defaultCurrency: w.Currency }));
         }
       },
-    );
+      );
   }
 
   public render() {
+    // return <View style={{ flex: 1 }}>{this.props.children}</View>;
     return <DrawerLayout
       drawerPosition="left"
       drawerBackgroundColor="white"
@@ -69,24 +71,24 @@ export class SideBarClass extends React.Component<IProps, IState> {
         <ScrollView>
           <Text style={{ textAlign: "center", margin: 10, fontSize: 18 }}>Freeconomy</Text>
           <View style={{ marginTop: 0 }}>
-            <ListItem title={t.t("sideBar.home")} onPress={() => this.props.history.replace("/")} />
-            <ListItem title={t.t("sideBar.categories")} onPress={() => this.props.history.replace("/CategoriesView")} />
-            <ListItem
-              title={t.t("sideBar.categoryReport")}
-              onPress={() => this.props.history.replace(
-                "/ReportPie?" + querystring.stringify({ currencyCode: this.state.defaultCurrency.Code }),
-              )} />
-            <ListItem
-              title={t.t("balanceReport.title")}
-              onPress={() => this.props.history.replace(
-                "/BalanceReport?" + querystring.stringify({ currencyCode: this.state.defaultCurrency.Code }),
-              )} />
+            <MyLink to="/" replace={true}>
+              <ListItem title={t.t("sideBar.home")} />
+            </MyLink>
+            <MyLink to="/CategoriesView" replace={true}>
+              <ListItem title={t.t("sideBar.categories")} />
+            </MyLink>
+            <MyLink to={"/ReportPie?" + querystring.stringify({ currencyCode: this.state.defaultCurrency.Code })}>
+              <ListItem title={t.t("sideBar.categoryReport")} />
+            </MyLink>
+            <MyLink to={"/BalanceReport?" + querystring.stringify({ currencyCode: this.state.defaultCurrency.Code })}>
+              <ListItem title={t.t("balanceReport.title")} />
+            </MyLink>
             <ListItem
               title={t.t("sideBar.sync")}
               onPress={() => GoogleSync() && this.drawer ? this.drawer.closeDrawer() : null} />
             <ListItem
               title={t.t("sideBar.logout")}
-              onPress={() => this.setState({ logout: true }) || (this.drawer ? this.drawer.closeDrawer() : null)} />
+              onPress={() => { this.setState({ logout: true }); if (this.drawer) { this.drawer.closeDrawer(); } }} />
           </View>
         </ScrollView>
       }
@@ -95,18 +97,19 @@ export class SideBarClass extends React.Component<IProps, IState> {
       }}
     >
       {this.props.children}
-      <Overlay isVisible={this.state.logout} containerStyle={{ padding: 0 }}>
-        <Header
-          outerContainerStyles={{ height: 60 }}
-          centerComponent={{ text: t.t("sideBar.logoutConfirm"), style: { fontSize: 20, color: "#fff" } }}
-          rightComponent={{ icon: "close", color: "#fff", onPress: () => this.setState({ logout: false }) }}
-        />
-        <Text>{t.t("sideBar.logoutConfirmText")}</Text>
-        <View style={{ flexDirection: "column" }}>
-          <Button title={t.t("common.cancel")} onPress={() => this.setState({ logout: false })} />
-          <Button title={t.t("sideBar.logout")} onPress={() => this.logout()} />
-        </View>
-      </Overlay>
+      {this.state.logout ?
+        <Overlay isVisible={this.state.logout} containerStyle={{ padding: 0 }}>
+          <Header
+            outerContainerStyles={{ height: 60 }}
+            centerComponent={{ text: t.t("sideBar.logoutConfirm"), style: { fontSize: 20, color: "#fff" } }}
+            rightComponent={{ icon: "close", color: "#fff", onPress: () => this.setState({ logout: false }) }}
+          />
+          <Text>{t.t("sideBar.logoutConfirmText")}</Text>
+          <View style={{ flexDirection: "column" }}>
+            <Button title={t.t("common.cancel")} onPress={() => this.setState({ logout: false })} />
+            <Button title={t.t("sideBar.logout")} onPress={() => this.logout()} />
+          </View>
+        </Overlay> : undefined}
     </DrawerLayout>;
   }
 }

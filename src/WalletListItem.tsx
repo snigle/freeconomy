@@ -50,8 +50,8 @@ export default class extends React.Component<IProps, IState> {
     return (
       <View>
         <TouchableHighlight
-          onLongPress={() => this.setState({ ...this.state, displayOption: true })}
           onPress={() => this.props.history.push(`/TransactionsView?walletUUID=${this.props.Wallet.UUID}`)}
+          onLongPress={() => this.setState({ ...this.state, displayOption: true })}
         >
           <View style={{ height: 60, flexDirection: "row", alignItems: "center" }}>
             <View style={{ flex: 2 }}>
