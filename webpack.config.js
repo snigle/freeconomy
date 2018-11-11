@@ -1,5 +1,6 @@
 /* eslint-disable */
 const path = require('path');
+const webpack = require('webpack')
 
 module.exports = {
   entry: path.resolve(__dirname, "index.web.js"), // string | object | array
@@ -183,6 +184,13 @@ module.exports = {
   },
 
   plugins: [
+    // `process.env.NODE_ENV === 'production'` must be `true` for production
+    // builds to eliminate development checks and reduce build size. You may
+    // wish to include additional optimizations.
+    new webpack.DefinePlugin({
+      'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || 'development'),
+      __DEV__: process.env.NODE_ENV === 'production' || true
+    })
   ],
   // list of additional plugins
 }
