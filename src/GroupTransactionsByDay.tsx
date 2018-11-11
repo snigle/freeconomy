@@ -197,7 +197,7 @@ export default function
       displayItem(item, props)
     }
     ListHeaderComponent={Platform.OS === "web" ? undefined :
-      <View style={{ height: groupedTransactions.length ? 100 : 0 }} />}
+      <View style={{ height: groupedTransactions.length ? 120 : 0 }} />}
     inverted={Platform.OS !== "web"}
     viewabilityConfig={{
       minimumViewTime: 1000,
@@ -220,10 +220,10 @@ export default function
 
   />;
 
-  return <View style={{ flex: Platform.OS === "web" ? 1 : 0 }}>
+  return <View style={Platform.OS === "web" ? { flex: 1 } : {}}>
     <Icon
       raised
-      containerStyle={{ position: "absolute", zIndex: 999, right: 20, bottom: 20 }}
+      containerStyle={{ position: "absolute", zIndex: 999, right: 20, bottom: 60 }}
       name="add"
       color="#517fa4"
       onPress={() => props.history.push(`/Wallet/${props.WalletUUID}/AddTransactionView`)} />
