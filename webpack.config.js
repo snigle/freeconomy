@@ -73,15 +73,18 @@ module.exports = {
         // flags to apply these rules, even if they are overridden (advanced option)
 
         loader: "babel-loader",
+        query: {
+          presets: ['es2015', "react-native"]
+        },
         // the loader which should be applied, it'll be resolved relative to the context
         // -loader suffix is no longer optional in webpack2 for clarity reasons
         // see webpack 1 upgrade guide
 
-        options: {
-          // plugins: ["react-native-web"],
-          presets: ["react-native"],
-          // presets: ["es2015", "react", "stage-0"]
-        },
+        // options: {
+        //   // plugins: ["react-native-web"],
+        //   presets: ["react-native"],
+        //   // presets: ["es2015", "react", "stage-0"]
+        // },
         // options for the loader
       },
 
@@ -188,9 +191,12 @@ module.exports = {
     // builds to eliminate development checks and reduce build size. You may
     // wish to include additional optimizations.
     new webpack.DefinePlugin({
-      'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || 'development'),
-      __DEV__: process.env.NODE_ENV === 'production' || true
-    })
+      // Can't drop react dev mode for the moment because react-native-elements don't run after..
+      // 'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV),
+      __DEV__: process.env.NODE_ENV !== 'production',
+      __OFFLINE__: true,
+    }),
+    // new webpack.optimize.UglifyJsPlugin()
   ],
   // list of additional plugins
 }
