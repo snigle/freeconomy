@@ -3,17 +3,23 @@ import { TouchableRipple } from "carbon-ui";
 import { History } from "history";
 import * as React from "react";
 import { Button, Text, View } from "react-native";
-import { Icon } from "react-native-elements";
+import { Divider, Icon } from "react-native-elements";
 import { MyLink } from "./Link";
 import * as Models from "./Models";
 import { displayPrice, ICategory, ICurrency, ITransaction, IWallet } from "./Types";
 
 interface IProps {
-  Transaction: ITransaction;
+  UUID: string;
+  WalletUUID: string;
   CurrentTotal: number;
   Currency: ICurrency;
   history: History;
+  Description: string;
+  Comment: string;
   Category: ICategory;
+  EditRoute: string;
+  onDelete: () => Promise<any>;
+  Price: number;
   Wallet?: IWallet;
 }
 
@@ -24,7 +30,7 @@ interface IState {
 
 const margins = { marginLeft: 15, marginRight: 15 };
 
-export default class extends React.Component<IProps, IState> {
+export default class extends React.PureComponent<IProps, IState> {
   constructor(props: IProps) {
     super(props);
     this.state = { displayOption: false, deleted: false };
@@ -32,14 +38,10 @@ export default class extends React.Component<IProps, IState> {
 
   public render() {
     const options = <View>
-      <Button onPress={() => this.delete()} title="Supprimer" />
+      <Button onPress={() => this.props.onDelete().then(() => this.setState({ deleted: true }))} title="Supprimer" />
     </View>;
     return <TouchableRipple
-      onPress={() =>
-        this.props.history.push(
-          `/Wallet/${this.props.Transaction.WalletUUID}/AddTransactionView/${this.props.Transaction.UUID}`,
-        )
-      }
+      onPress={() => this.props.history.push(this.props.EditRoute)}
       onLongPress={() => this.setState({ ...this.state, displayOption: true })}
       style={{ display: this.state.deleted ? "none" : undefined }}
     >
@@ -53,9 +55,9 @@ export default class extends React.Component<IProps, IState> {
               reverse />
           </View>
           <View style={{ flex: 1 }}>
-            <Text style={margins}>{this.props.Transaction.Beneficiary}</Text>
+            <Text style={margins}>{this.props.Description}</Text>
             <Text style={{ ...margins, fontSize: 10 }}>
-              {this.props.Transaction.Comment}{this.props.Wallet ? `(${this.props.Wallet.Name})` : ""}
+              {this.props.Comment}{this.props.Wallet ? `(${this.props.Wallet.Name})` : ""}
             </Text>
           </View>
           <View style={{ width: 150 }}>
@@ -64,9 +66,9 @@ export default class extends React.Component<IProps, IState> {
                 ...margins,
                 textAlign: "right",
                 fontSize: 18,
-                color: this.props.Transaction.Price > 0 ? "green" : "red",
+                color: this.props.Price > 0 ? "green" : "red",
               }}>
-              {displayPrice(this.props.Transaction.Price, this.props.Currency)}
+              {displayPrice(this.props.Price, this.props.Currency)}
             </Text>
             <Text
               style={{ ...margins, textAlign: "right", fontSize: 10 }}>
@@ -75,11 +77,9 @@ export default class extends React.Component<IProps, IState> {
           </View>
         </View>
         {this.state.displayOption && options}
+        <Divider />
       </View>
     </TouchableRipple>;
   }
 
-  public delete() {
-    Models.DeleteTransaction(this.props.Transaction.UUID).then(() => this.setState({ deleted: true }));
-  }
 }

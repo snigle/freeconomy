@@ -25,7 +25,7 @@ interface IState {
 
 const margins = { marginLeft: 15, marginRight: 15 };
 
-export default class extends React.Component<IProps, IState> {
+export default class extends React.PureComponent<IProps, IState> {
   constructor(props: IProps) {
     super(props);
     this.state = { displayOption: false, deleted: false };

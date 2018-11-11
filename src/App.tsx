@@ -7,7 +7,6 @@
 import * as React from "react";
 import {
   AsyncStorage,
-  Text,
   View,
 } from "react-native";
 

@@ -89,6 +89,7 @@ export default class extends React.Component<RouteComponentProps<any>, IState> {
           <Text> Voulez vous importer toutes ces transactions ? </Text>
           <Button title="Importer" onPress={() => this.import()} />
           <GroupTransactionsByDay
+            Filters={{}}
             WalletUUID={this.state.WalletUUID}
             Transfert={[]}
             Wallets={this.state.Wallets}
@@ -168,7 +169,7 @@ export default class extends React.Component<RouteComponentProps<any>, IState> {
 
   public handleFile(file: File) {
     const reader = new FileReader();
-    reader.onload = (event) => this.handleCSVContent(reader.result);
+    reader.onload = (event) => this.handleCSVContent(reader.result as string);
     reader.readAsText(file);
   }
 

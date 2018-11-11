@@ -3,8 +3,8 @@ import * as _ from "lodash";
 import moment from "moment";
 import * as querystring from "querystring";
 import * as React from "react";
-import { View } from "react-native";
-import { Header } from "react-native-elements";
+import { Platform, View } from "react-native";
+import { Header, Icon, SearchBar } from "react-native-elements";
 import { Route, RouteComponentProps } from "react-router";
 import GroupTransactionsByDay from "./GroupTransactionsByDay";
 import Loading from "./Loading";
@@ -13,7 +13,7 @@ import MoreActions from "./MoreActions";
 import SideBar, { SideBarClass } from "./SideBar";
 import SyncBar from "./SyncBar";
 import t from "./translator";
-import { ICategory, ITransaction, ITransfert, IWallet } from "./Types";
+import { ICategory, ICurrency, ITransaction, ITransfert, IWallet } from "./Types";
 import UpdateSoldeView from "./UpdateSoldeView";
 
 interface IState {
@@ -22,11 +22,11 @@ interface IState {
   Wallets: IWallet[];
   Transfert: ITransfert[];
   displayOptions: boolean;
-  TransactionsView: JSX.Element;
   Title: string;
+  Currency: ICurrency;
 }
 
-interface IFilters {
+export interface IFilters {
   walletUUID?: string;
   beneficiary?: string;
   currencyCode?: string;
@@ -37,13 +37,13 @@ interface IFilters {
   total?: number;
 }
 
-interface IProps {
+interface IProps extends RouteComponentProps {
   history: History;
 }
 
-class TransactionsView extends React.Component<RouteComponentProps<IProps>, IState> {
+class TransactionsView extends React.Component<IProps, IState> {
   private sidebar?: SideBarClass;
-  constructor(props: RouteComponentProps<IProps>) {
+  constructor(props: IProps) {
     super(props);
     this.state = {
       Title: t.t("common.title"),
@@ -52,7 +52,7 @@ class TransactionsView extends React.Component<RouteComponentProps<IProps>, ISta
       Transfert: [],
       Categories: [],
       displayOptions: false,
-      TransactionsView: <View></View>,
+      Currency: { Code: "", Symbol: "?" },
     };
   }
 
@@ -60,7 +60,7 @@ class TransactionsView extends React.Component<RouteComponentProps<IProps>, ISta
     this.fetchData();
   }
 
-  public parseFilters(props: RouteComponentProps<IProps>): IFilters {
+  public parseFilters(props: IProps): IFilters {
     const queryParams = querystring.parse(props.location.search.replace("?", ""));
 
     return {
@@ -82,68 +82,16 @@ class TransactionsView extends React.Component<RouteComponentProps<IProps>, ISta
   public componentDidUpdate(oldProps: RouteComponentProps<any>) {
     const oldFilters = this.parseFilters(oldProps);
     const filters = this.parseFilters(this.props);
-    if (!_.isEqual(oldFilters, filters)) {
-      this.fetchData();
-    }
   }
 
   public fetchData() {
     const filters = this.parseFilters(this.props);
     Models.GetCategories().then((categories) =>
       Promise.all([
-        Models.GetAllTransactions().then((transactions) => transactions.filter((transaction) => {
-          if (filters.walletUUID) {
-            if (filters.walletUUID !== transaction.WalletUUID) {
-              return false;
-            }
-          }
-          if (filters.search) {
-            if (!transaction.Beneficiary.match(filters.search)
-              && !transaction.Comment.match(filters.search)) {
-              return false;
-            }
-          }
-          if (filters.beneficiary && filters.beneficiary !== transaction.Beneficiary) {
-            return false;
-          }
-          if (filters.begin && moment(filters.begin).isAfter(transaction.Date)) {
-            return false;
-          }
-          if (filters.end && moment(filters.end).isBefore(transaction.Date)) {
-            return false;
-          }
-          if (filters.total && filters.total !== transaction.Price) {
-            return false;
-          }
-          const category =
-            _.find(categories, (ca) => ca.UUID === transaction.CategoryUUID);
-          if (category && filters.category && category.Name !== filters.category) {
-            return false;
-          }
-          return true;
-        })),
+        Models.GetAllTransactions(),
         Models.GetWallets(),
         Promise.resolve(categories),
-        Models.GetTransferts().then((transferts) => transferts.filter((transfert) => {
-          if (filters.walletUUID) {
-            if (filters.walletUUID !== transfert.From.WalletUUID &&
-              filters.walletUUID !== transfert.To.WalletUUID) {
-              return false;
-            }
-          } else {
-            return false;
-          }
-          if (filters.search) {
-            if (!transfert.Comment.match(filters.search)) {
-              return false;
-            }
-          }
-          if (filters.total && filters.total !== transfert.To.Price && filters.total !== transfert.From.Price) {
-            return false;
-          }
-          return true;
-        },
-        )),
+        Models.GetTransferts(),
         filters.currencyCode ?
           Models.GetCurrency(filters.currencyCode) : Promise.resolve(undefined),
       ]))
@@ -167,14 +115,7 @@ class TransactionsView extends React.Component<RouteComponentProps<IProps>, ISta
           Transfert: transfert,
           Categories: categories,
           Wallets: wallets,
-          TransactionsView: <GroupTransactionsByDay
-            Transfert={transfert}
-            WalletUUID={filters.walletUUID}
-            Wallets={wallets}
-            Categories={categories}
-            Transactions={transactions}
-            Currency={currency}
-            history={this.props.history} />,
+          Currency: currency,
         });
       })
       .catch((err) => console.log("fail to load transactions, need to reset ?", err));
@@ -183,6 +124,7 @@ class TransactionsView extends React.Component<RouteComponentProps<IProps>, ISta
   public render() {
     let content: any;
     let options: JSX.Element = <View></View>;
+    let search: JSX.Element = <View></View>;
     const filters = this.parseFilters(this.props);
 
     if (this.state.displayOptions && filters.walletUUID) {
@@ -207,13 +149,40 @@ class TransactionsView extends React.Component<RouteComponentProps<IProps>, ISta
       ]} clicked={() => this.setState({ ...this.state, displayOptions: false })} />;
     }
 
+    if (!_.isUndefined(filters.search)) {
+      search = <SearchBar
+        lightTheme={true}
+        containerStyle={{ marginTop: -1 }}
+        round
+        defaultValue={filters.search}
+        // @ts-ignore
+        onChangeText={(text: string) => {
+          this.props.history.replace("/TransactionsView?" + querystring.stringify(
+            {
+              ...querystring.parse(this.props.location.search.replace("?", "")),
+              currencyCode: this.state.Wallets[0].Currency.Code,
+              walletUUID: filters.walletUUID,
+              search: text,
+            },
+          ));
+        }}
+        placeholder="Type Here..." />;
+    }
+
     if (!this.state.Transactions) {
       content = <Loading Message={t.t("transactionsView.loading")} />;
     } else {
-      console.log("transactions", this.state.Transactions, this.state.Transfert);
-      content = this.state.TransactionsView;
+      // console.log("transactions", this.state.Transactions, this.state.Transfert);
+      content = <GroupTransactionsByDay
+        Filters={filters}
+        Transfert={this.state.Transfert}
+        WalletUUID={filters.walletUUID}
+        Wallets={this.state.Wallets}
+        Categories={this.state.Categories}
+        Transactions={this.state.Transactions}
+        Currency={this.state.Currency}
+        history={this.props.history} />;
     }
-
     return (
       <SideBar
         history={this.props.history}
@@ -226,14 +195,28 @@ class TransactionsView extends React.Component<RouteComponentProps<IProps>, ISta
               text: this.state.Title,
               style: { fontSize: 20, color: "#fff" },
             }}
-            rightComponent={{
-              icon: this.state.displayOptions ? "expand-less" : "more-vert",
-              color: "#fff",
-              onPress: () => this.setState({ ...this.state, displayOptions: !this.state.displayOptions }),
-            }}
+            rightComponent={<View style={{ flexDirection: "row" }}>
+              <Icon
+                name={this.state.displayOptions ? "expand-less" : "search"}
+                color="#fff"
+                onPress={() => this.props.history.push("/TransactionsView?" +
+                  (!_.isUndefined(filters.search) ?
+                    querystring.stringify(_.omit(
+                      querystring.parse(this.props.location.search.replace("?", "")), "search")) :
+                    querystring.stringify({
+                      ...querystring.parse(this.props.location.search.replace("?", "")),
+                      search: "",
+                    })))}
+                containerStyle={{ marginRight: 10 }} />
+              <Icon
+                name={this.state.displayOptions ? "expand-less" : "more-vert"}
+                color="#fff"
+                onPress={() => this.setState({ ...this.state, displayOptions: !this.state.displayOptions })} />
+            </View>}
           />
           <SyncBar history={this.props.history} refresh={() => this.componentDidMount()} />
           {options}
+          {search}
           {content}
           <Route
             path={`/TransactionsView/UpdateSoldeView`}

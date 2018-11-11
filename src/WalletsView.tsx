@@ -1,7 +1,7 @@
 import { History } from "history";
 import * as _ from "lodash";
 import * as React from "react";
-import { ScrollView, View } from "react-native";
+import { ScrollView, Text, View } from "react-native";
 import { Card, Divider, Header, Icon } from "react-native-elements";
 import Loading from "./Loading";
 import * as Models from "./Models";
@@ -9,7 +9,7 @@ import { displayPrice, IWallet } from "./Types";
 import WalletListItem from "./WalletListItem";
 
 import querystring from "querystring";
-import { Route, RouteComponentProps } from "react-router";
+import { Route, RouteComponentProps, RouteProps } from "react-router";
 import MoreActions from "./MoreActions";
 import SideBar, { SideBarClass } from "./SideBar";
 import SyncBar from "./SyncBar";
@@ -24,14 +24,14 @@ interface IFilters {
   archive: boolean;
 }
 
-interface IProps {
+interface IProps extends RouteComponentProps {
   history: History;
 }
 
-class Wallets extends React.Component<RouteComponentProps<IProps>, IState> {
+class Wallets extends React.Component<IProps, IState> {
   public sidebar: SideBarClass | null;
 
-  constructor(props: RouteComponentProps<IProps>) {
+  constructor(props: IProps) {
     super(props);
     this.sidebar = null;
 
@@ -41,7 +41,7 @@ class Wallets extends React.Component<RouteComponentProps<IProps>, IState> {
     };
   }
 
-  public parseQueryParams(props: RouteComponentProps<IProps>): IFilters {
+  public parseQueryParams(props: IProps): IFilters {
     const queryParams = querystring.parse(props.location.search.replace("?", ""));
     return {
       archive: "true" === (_.isArray(queryParams.archive) ? _.first(queryParams.archive) : queryParams.archive),
@@ -61,7 +61,7 @@ class Wallets extends React.Component<RouteComponentProps<IProps>, IState> {
     this.fetchData();
   }
 
-  public componentDidUpdate(prevProps: RouteComponentProps<IProps>) {
+  public componentDidUpdate(prevProps: IProps) {
     const oldFilters = this.parseQueryParams(prevProps);
     const newFilters = this.parseQueryParams(this.props);
     if (oldFilters.archive !== newFilters.archive) {
@@ -133,7 +133,7 @@ class Wallets extends React.Component<RouteComponentProps<IProps>, IState> {
           }}
         />
         <SyncBar history={this.props.history} refresh={() => this.componentDidMount()} />
-        <View style={{ flex: 1 }}>
+        <View >
           {options}
           <ScrollView >
             {content}

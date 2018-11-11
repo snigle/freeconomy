@@ -41,9 +41,11 @@ module.exports = {
         test: /\.jsx?$/,
         include: [
           path.resolve(__dirname, "node_modules/react-router-native"),
+          path.resolve(__dirname, "node_modules/react-router-native-web"),
           path.resolve(__dirname, "node_modules/react-native-elements"),
           path.resolve(__dirname, "node_modules/react-native-color-wheel"),
           path.resolve(__dirname, "node_modules/react-native-vector-icons"),
+          path.resolve(__dirname, "node_modules/react-native-*"),
           path.resolve(__dirname, "node_modules/victory"),
 
           // path.resolve(__dirname, "node_modules/react-native-material-ui"),
@@ -75,7 +77,7 @@ module.exports = {
         // see webpack 1 upgrade guide
 
         options: {
-          plugins: ["react-native-web"],
+          // plugins: ["react-native-web"],
           presets: ["react-native"],
           // presets: ["es2015", "react", "stage-0"]
         },
