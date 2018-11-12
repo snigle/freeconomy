@@ -217,16 +217,9 @@ export default function
     windowSize={10}
     stickySectionHeadersEnabled={Platform.OS === "web"}
     onViewableItemsChanged={(e) => console.log("onviewabledchanged", "")}
-
   />;
 
   return <View style={Platform.OS === "web" ? { flex: 1 } : {}}>
-    <Icon
-      raised
-      containerStyle={{ position: "absolute", zIndex: 999, right: 20, bottom: 60 }}
-      name="add"
-      color="#517fa4"
-      onPress={() => props.history.push(`/Wallet/${props.WalletUUID}/AddTransactionView`)} />
     {content}
   </View>;
 }

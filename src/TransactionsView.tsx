@@ -218,6 +218,13 @@ class TransactionsView extends React.Component<IProps, IState> {
           {options}
           {search}
           {content}
+          {!filters.walletUUID ? undefined :
+            <Icon
+              raised
+              containerStyle={{ position: "absolute", zIndex: 999, right: 5, bottom: 0 }}
+              name="add"
+              color="#517fa4"
+              onPress={() => this.props.history.push(`/Wallet/${filters.walletUUID}/AddTransactionView`)} />}
           <Route
             path={`/TransactionsView/UpdateSoldeView`}
             component={(props: RouteComponentProps<{}>) => {
