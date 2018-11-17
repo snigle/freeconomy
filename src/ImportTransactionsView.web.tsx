@@ -1,3 +1,5 @@
+import _ from "lodash";
+import moment from "moment";
 import * as Papa from "papaparse";
 import * as queryString from "querystring";
 import * as React from "react";
@@ -26,10 +28,12 @@ interface IState {
   Date: string;
   Price: string;
   Comment: string;
+  DateFormat: string;
 }
 
 const keys: Keys[] = ["CategoryName", "Beneficiary", "Date", "Price", "Comment"];
-const mandatory: Keys[] = ["Beneficiary", "CategoryName", "Date", "Price"];
+const mandatory: Keys[] = ["CategoryName", "Date", "Price"];
+
 type Keys = "CategoryName" | "Beneficiary" | "Date" | "Price" | "Comment";
 export default class extends React.Component<RouteComponentProps<any>, IState> {
   constructor(props: RouteComponentProps<any>) {
@@ -42,6 +46,7 @@ export default class extends React.Component<RouteComponentProps<any>, IState> {
       Beneficiary: "",
       Date: "",
       Price: "",
+      DateFormat: "YYYY/MM/DD",
       Comment: "",
       CategoriesToImport: [],
       TransactionsToImport: [],
@@ -115,6 +120,14 @@ export default class extends React.Component<RouteComponentProps<any>, IState> {
                   value={this.state[k]} />
               </View>
             ))}
+            <View style={{ flexDirection: "row" }}>
+              <Text>Date Format : </Text>
+              <TextInput
+                keyboardType="decimal-pad"
+                onChangeText={(e) => this.setState({ ...this.state, DateFormat: e })}
+                placeholder="YYYY/MM/DD"
+                value={this.state.DateFormat} />
+            </View>
             <View style={{ flexDirection: "row" }}>
               <View style={{ flex: 1 }}>
                 <Button title="Cancel" onPress={() => this.cancel()} />
@@ -222,7 +235,14 @@ export default class extends React.Component<RouteComponentProps<any>, IState> {
       return Models.GetAllTransactions(this.state.WalletUUID).then(
         (transactions) => {
           const alreadyImportedMap: { [key: string]: boolean } = {};
-          transactions.forEach((t) => alreadyImportedMap[t.Beneficiary + t.Date + t.Price] = true);
+          // Add transaction in +/- 6 days to not import transaction already created 2 days before.
+          transactions.forEach((t) => {
+            for (let i = -5; i < 6; i++) {
+              const tmp = { ...t, Date: moment(t.Date).add(i, "days").toDate() };
+              alreadyImportedMap[this.transactionHash(tmp)] = true;
+            }
+          });
+          // console.log("already imported", alreadyImportedMap);
           return alreadyImportedMap;
         },
       ).then((alreadyImportedMap) => {
@@ -231,13 +251,14 @@ export default class extends React.Component<RouteComponentProps<any>, IState> {
           WalletUUID: this.state.WalletUUID,
           CategoryUUID: categoryNameToUUID[line[parseInt(this.state.CategoryName, 10)]],
           LastUpdate: new Date(),
-          Beneficiary: line[parseInt(this.state.Beneficiary, 10)],
-          Date: new Date(line[parseInt(this.state.Date, 10)]),
-          Price: parseFloat(line[parseInt(this.state.Price, 10)]),
+          Beneficiary: this.state.Beneficiary && line[parseInt(this.state.Beneficiary, 10)],
+          Date: moment(line[parseInt(this.state.Date, 10)], this.state.DateFormat).toDate(),
+          Price: parseFloat(_.replace(line[parseInt(this.state.Price, 10)], ",", ".")),
           Comment: this.state.Comment && line[parseInt(this.state.Comment, 10)],
         }));
         console.log("transactions from csv", transactions);
-        transactions = transactions.filter((t) => !alreadyImportedMap[t.Beneficiary + t.Date + t.Price]);
+        transactions = transactions.filter((t) => !alreadyImportedMap[this.transactionHash(t)] && t.Price);
+        // console.log("to import", transactions.map((t) => this.transactionHash(t)));
         console.log("transactions to import", transactions);
         state.TransactionsToImport = transactions;
       });
@@ -253,4 +274,11 @@ export default class extends React.Component<RouteComponentProps<any>, IState> {
     ).then(() => AsyncStorage.removeItem("csv")).then(() => this.props.history.push("/"));
   }
 
+  private transactionHash(t: ITransaction) {
+    if (this.state.Beneficiary) {
+      return `${moment(t.Date).format("YYYY/MM/DD")}#${t.Price}#${t.Beneficiary}`;
+    } else {
+      return `${moment(t.Date).format("YYYY/MM/DD")}#${t.Price}`;
+    }
+  }
 }

@@ -175,11 +175,13 @@ export default function
     return true;
   });
 
+  // Take older to newer to count the subtotal.
   pricedTransaction.reverse().forEach((t) => {
     total += t.Price;
     t.Total = total;
   });
 
+  // Group by day
   const grouped = _.groupBy<IPricedTransaction>(pricedTransaction, (t) =>
     new Date(t.Date.getFullYear(), t.Date.getMonth(), t.Date.getDate()).toString(),
   );
@@ -189,7 +191,7 @@ export default function
 
   const ListSections: Array<SectionListData<IPricedTransaction>> = _.map(grouped, (day, key) => ({
     key: _.upperFirst(moment(day[0].Date).format("dddd Do MMMM YYYY")),
-    data: day,
+    data: day.reverse(), // Reverse to keep the good order for subtotal
   }));
   const content = <SectionList
     sections={ListSections.reverse()}
