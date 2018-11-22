@@ -1,5 +1,6 @@
 import { History } from "history";
 import * as _ from "lodash";
+import moment from "moment";
 import * as querystring from "querystring";
 import * as React from "react";
 import { Button, ScrollView, View } from "react-native";
@@ -74,18 +75,22 @@ export class SideBarClass extends React.Component<IProps, IState> {
             <MyLink to="/" replace={true}>
               <ListItem title={t.t("sideBar.home")} />
             </MyLink>
-            <MyLink to="/CategoriesView" replace={true}>
-              <ListItem title={t.t("sideBar.categories")} />
-            </MyLink>
             <MyLink to={"/ReportPie?" + querystring.stringify({ currencyCode: this.state.defaultCurrency.Code })}>
               <ListItem title={t.t("sideBar.categoryReport")} />
             </MyLink>
-            <MyLink to={"/BalanceReport?" + querystring.stringify({ currencyCode: this.state.defaultCurrency.Code })}>
+            <MyLink to={"/BalanceReport?" + querystring.stringify({
+              currencyCode: this.state.defaultCurrency.Code,
+              begin: moment().startOf("year").toISOString(),
+              end: moment().add(1, "year").startOf("year").toISOString(),
+            })}>
               <ListItem title={t.t("balanceReport.title")} />
             </MyLink>
             <ListItem
               title={t.t("sideBar.sync")}
               onPress={() => GoogleSync() && this.drawer ? this.drawer.closeDrawer() : null} />
+            <MyLink to="/CategoriesView" replace={true}>
+              <ListItem title={t.t("sideBar.categories")} />
+            </MyLink>
             <ListItem
               title={t.t("sideBar.logout")}
               onPress={() => { this.setState({ logout: true }); if (this.drawer) { this.drawer.closeDrawer(); } }} />

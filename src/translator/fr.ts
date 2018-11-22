@@ -131,5 +131,8 @@ export default {
   },
   balanceReport: {
     title: "Évolution du solde",
+    thisYear: "Cette année",
+    last2Years: "Les 2 dernières années",
+    all: "Toute les années",
   },
 };

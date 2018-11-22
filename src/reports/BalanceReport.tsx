@@ -3,7 +3,7 @@ import moment from "moment";
 import querystring from "querystring";
 import * as React from "react";
 import { ActivityIndicator, Platform, ScrollView, View } from "react-native";
-import { Header, Text } from "react-native-elements";
+import { Header, Icon, Text } from "react-native-elements";
 import { RouteComponentProps } from "react-router";
 import { VictoryAxis, VictoryChart, VictoryLine } from "victory-native";
 // tslint:disable
@@ -12,9 +12,10 @@ import { VictoryCursorContainer } from "victory-native";
 import { MyLink } from "../Link";
 // tslint:enable
 import * as Models from "../Models";
+import MoreActions from "../MoreActions";
 import SideBar, { SideBarClass } from "../SideBar";
 import t from "../translator";
-import { ICurrency } from "../Types";
+import { displayPrice, ICurrency, IWallet } from "../Types";
 import BalanceReportItem from "./BalanceReportItem";
 
 interface IFilters {
@@ -134,22 +135,29 @@ export default class extends React.Component<RouteComponentProps<any>, IState> {
         });
 
         // Calculate accumulated balance.
-        let accumulatedTotal = _.sum(wallets.map((w) => w.Solde));
+        let accumulatedTotal = _.sum(wallets.map((w) => w.Solde)) || 10;
         _.forEach(_.values(data).map((d) => d.key).sort(), (key) => {
             const point = data[key];
+            point.balance = accumulatedTotal;
             accumulatedTotal += point.income;
             accumulatedTotal -= point.outcome;
-            point.balance = accumulatedTotal;
         });
 
         if (filters.begin) {
             const begin = filters.begin;
-            data = _.filter(data, (point) => (
+            data = _.pickBy<IPoint>(data, (point) => (
                 point.key >= begin.unix()
+            ));
+        }
+        if (filters.end) {
+            const end = filters.end;
+            data = _.pickBy<IPoint>(data, (point) => (
+                point.key < end.unix()
             ));
         }
 
         // Add a first point to draw a line if only one point of data.
+        console.log("data", data);
         if (_.keys(data).length === 1) {
             const elem: IPoint | undefined = _.first(_.values(data));
             const key = moment.unix(elem && elem.key || 0).add(-1, "month").unix();
@@ -173,6 +181,14 @@ export default class extends React.Component<RouteComponentProps<any>, IState> {
     public render() {
         console.log("balance", this.state.balanceData);
         const totalMax: number = _.max(this.state.data.map((p) => Math.abs(p.income - p.outcome))) || 0;
+        const filters = this.parseFilters(this.props);
+        let title: string = "";
+        const total = _.sum(this.state.incomeData.map((b) => b.y)) - _.sum(this.state.outcomeData.map((b) => b.y));
+        if (moment(filters.begin).isSame(moment(filters.begin).startOf("year"))
+            && moment(filters.begin).isSame(moment(filters.end).add(-1, "year"))) {
+            const year = moment(filters.begin).year();
+            title = `${year} ( ${total > 0 ? "+" : ""}${displayPrice(total, this.state.Currency)} )`;
+        }
         return <SideBar
             history={this.props.history}
             ref={(sidebar: any) => (this.sidebar = sidebar ? sidebar.getWrappedInstance() : null)}>
@@ -190,10 +206,60 @@ export default class extends React.Component<RouteComponentProps<any>, IState> {
                         onPress: () => this.setState({ ...this.state, displayOptions: !this.state.displayOptions }),
                     }}
                 />
+                {this.state.displayOptions ?
+                    <MoreActions actions={[
+                        {
+                            title: t.t("balanceReport.thisYear"), onPress: () =>
+                                this.props.history.replace("/BalanceReport?" + querystring.stringify({
+                                    currencyCode: filters.currencyCode,
+                                    begin: moment().startOf("year").toISOString(),
+                                    end: moment().add(1, "year").startOf("year").toISOString(),
+                                })),
+                        },
+                        {
+                            title: t.t("balanceReport.last2Years"), onPress: () =>
+                                this.props.history.replace("/BalanceReport?" + querystring.stringify({
+                                    begin: moment().add(-1, "year").startOf("year").toISOString(),
+                                    end: moment().add(1, "year").startOf("year").toISOString(),
+                                    currencyCode: filters.currencyCode,
+                                })),
+                        },
+                        {
+                            title: t.t("balanceReport.all"), onPress: () =>
+                                this.props.history.replace("/BalanceReport?" + querystring.stringify({
+                                    currencyCode: filters.currencyCode,
+                                })),
+                        },
+                    ]} clicked={() => this.setState({ ...this.state, displayOptions: false })} />
+                    : undefined}
                 {this.state.loading ?
                     <View><ActivityIndicator size="large" color="#0000ff" /></View>
                     :
                     <ScrollView style={{ flex: 1 }}>
+                        {title && filters.begin ?
+                            <View style={{ flexDirection: "row", margin: 5 }}>
+                                <MyLink to={`/BalanceReport?` + querystring.stringify({
+                                    currencyCode: filters.currencyCode,
+                                    begin: moment(filters.begin).add(-1, "year").toISOString(),
+                                    end: moment(filters.end).add(-1, "year").toISOString(),
+                                })}>
+                                    <Icon name="chevron-left" iconStyle={{ textDecorationLine: "none" }} />
+                                </MyLink>
+                                <Text style={{ flex: 1, textAlign: "center", fontSize: 16, marginTop: 5 }}>
+                                    {title}
+                                </Text>
+                                <MyLink to={`/BalanceReport?` + querystring.stringify({
+                                    currencyCode: filters.currencyCode,
+                                    begin: moment(filters.begin).add(1, "year").toISOString(),
+                                    end: moment(filters.end).add(1, "year").toISOString(),
+                                })}>
+                                    <Icon name="chevron-right" />
+                                </MyLink>
+                            </View> :
+                            <View>
+                                <Text style={{ flex: 1, textAlign: "center", fontSize: 16, marginTop: 5 }}>
+                                    Total : {total > 0 ? "+" : ""}{displayPrice(total, this.state.Currency)}
+                                </Text></View>}
                         <View style={{ height: Platform.OS === "web" ? 400 : undefined }}>
                             <VictoryChart style={{}}
                                 containerComponent={<VictoryCursorContainer
@@ -225,7 +291,7 @@ export default class extends React.Component<RouteComponentProps<any>, IState> {
                                         }
                                     }
                                     orientation="bottom"
-                                    tickCount={5}
+                                    tickCount={Math.min(this.state.balanceData.length, 5)}
 
                                 />
                                 <VictoryAxis

@@ -130,5 +130,8 @@ export default {
   },
   balanceReport: {
     title: "Balance Report",
+    thisYear: "This Year",
+    last2Years: "Last 2 Years",
+    all: "All Years",
   },
 };
