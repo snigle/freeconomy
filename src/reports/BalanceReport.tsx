@@ -138,9 +138,9 @@ export default class extends React.Component<RouteComponentProps<any>, IState> {
         let accumulatedTotal = _.sum(wallets.map((w) => w.Solde)) || 10;
         _.forEach(_.values(data).map((d) => d.key).sort(), (key) => {
             const point = data[key];
-            point.balance = accumulatedTotal;
             accumulatedTotal += point.income;
             accumulatedTotal -= point.outcome;
+            point.balance = accumulatedTotal;
         });
 
         if (filters.begin) {
