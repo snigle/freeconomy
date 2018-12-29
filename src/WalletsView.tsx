@@ -10,14 +10,17 @@ import WalletListItem from "./WalletListItem";
 
 import querystring from "querystring";
 import { Route, RouteComponentProps, RouteProps } from "react-router";
+import { MyLink } from "./Link";
 import MoreActions from "./MoreActions";
+import { getRepeatOperations, IRepeatable } from "./RepeatOperation";
 import SideBar, { SideBarClass } from "./SideBar";
-import SyncBar from "./SyncBar";
+import SyncBar, { SyncBarStyle } from "./SyncBar";
 import t from "./translator";
 
 interface IState {
   Wallets?: IWallet[];
   displayOptions: boolean;
+  Repeatables: IRepeatable[];
 }
 
 interface IFilters {
@@ -38,6 +41,7 @@ class Wallets extends React.Component<IProps, IState> {
     const queryParams = querystring.parse(props.location.search.replace("?", ""));
     this.state = {
       displayOptions: false,
+      Repeatables: [],
     };
   }
 
@@ -50,9 +54,12 @@ class Wallets extends React.Component<IProps, IState> {
 
   public fetchData() {
     const filters = this.parseQueryParams(this.props);
-    Models.GetWallets()
-      .then((wallets) => wallets.filter((w) => filters.archive || !w.Archived))
-      .then((wallets) => this.setState({ Wallets: wallets }))
+    Promise.all([
+      Models.GetWallets()
+        .then((wallets) => wallets.filter((w) => filters.archive || !w.Archived)),
+      getRepeatOperations(),
+    ])
+      .then(([wallets, repeatables]) => this.setState({ Wallets: wallets, Repeatables: repeatables }))
       .catch(() => console.log("fail to load wallets, need to reset ?"));
   }
 
@@ -123,7 +130,7 @@ class Wallets extends React.Component<IProps, IState> {
       ref={(sidebar: any) => (this.sidebar = sidebar ? sidebar.getWrappedInstance() : null)}>
       <View style={{ flex: 1 }}>
         <Header
-          outerContainerStyles={{ height: 60 }}
+          containerStyle={{ height: 60 }}
           leftComponent={{ icon: "menu", color: "#fff", onPress: () => this.sidebar && this.sidebar.openDrawer() }}
           centerComponent={{ text: "Freeconomy", style: { fontSize: 20, color: "#fff" } }}
           rightComponent={{
@@ -135,6 +142,15 @@ class Wallets extends React.Component<IProps, IState> {
         <SyncBar history={this.props.history} refresh={() => this.componentDidMount()} />
         <View >
           {options}
+          {this.state.Repeatables.length ?
+            <MyLink to="/RepeatOperation">
+              <View style={{ ...SyncBarStyle.background, ...SyncBarStyle.content }}>
+                <Text style={SyncBarStyle.text}>
+                  {t.t("walletsView.repeatable", { number: this.state.Repeatables.length })}
+                </Text>
+              </View>
+            </MyLink>
+            : undefined}
           <ScrollView >
             {content}
             <View style={{ height: 100 }} />

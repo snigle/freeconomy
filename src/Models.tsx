@@ -114,7 +114,7 @@ export async function DeleteWallet(walletUUID: string): Promise<IWallet[]> {
       GetAllDeleted().then((deleted) =>
         deleted.concat(toDelete.map((t): ICollection => ({ UUID: t.UUID, LastUpdate: t.LastUpdate }))),
       ),
-  )
+    )
     .then(SaveDeleted)
     .then(() => GetTransferts())
     .then((transactions) => ([
@@ -126,7 +126,7 @@ export async function DeleteWallet(walletUUID: string): Promise<IWallet[]> {
       GetAllDeleted().then((deleted) =>
         deleted.concat(toDelete.map((t): ICollection => ({ UUID: t.UUID, LastUpdate: t.LastUpdate }))),
       ),
-  )
+    )
     .then(SaveDeleted)
     .then(() => GetWallets())
     .then((walletsBefore) => walletsBefore.filter((w) => w.UUID !== walletUUID))
@@ -172,6 +172,7 @@ export async function CreateTransaction(...inputs: ITransactionInput[]): Promise
       Comment: input.Comment,
       Price: input.Price,
       WalletUUID: input.WalletUUID,
+      Repeat: input.Repeat,
     }))),
   ).then((transactions) =>
     SaveTransactions(transactions)
@@ -191,7 +192,7 @@ export async function CreateTransaction(...inputs: ITransactionInput[]): Promise
         return promise;
       })
       .then(() => transactions),
-  ).then((result) => autoSync() || result);
+  ).then((result) => { autoSync(); return result; });
 }
 
 export async function CreateTransfert(...inputs: ITransfertInput[]): Promise<ITransfert[]> {
@@ -205,6 +206,7 @@ export async function CreateTransfert(...inputs: ITransfertInput[]): Promise<ITr
       Comment: input.Comment || "",
       From: input.From,
       To: input.To,
+      Repeat: input.Repeat,
     }))),
   ).then((transactions) =>
     SaveTransferts(transactions)
@@ -231,7 +233,7 @@ export async function CreateTransfert(...inputs: ITransfertInput[]): Promise<ITr
         return promise;
       })
       .then(() => transactions),
-  ).then((result) => autoSync() || result);
+  ).then((result) => { autoSync(); return result; });
 }
 export async function SaveTransferts(transactions: ITransfert[]): Promise<ITransfert[]> {
   return AsyncStorage.setItem("transfert", JSON.stringify(
@@ -258,6 +260,7 @@ export async function UpdateTransaction(transactionUUID: string, input: ITransac
       Price: input.Price,
       WalletUUID: input.WalletUUID,
       LastUpdate: new Date(),
+      Repeat: input.Repeat,
     });
     console.log("refresh wallet with date", input.Date.getFullYear(), new Date(old.Date).getFullYear());
     return AsyncStorage.setItem("transactions", JSON.stringify(transactions))
@@ -265,7 +268,7 @@ export async function UpdateTransaction(transactionUUID: string, input: ITransac
       .then(() => RefreshTotalWallet(old.WalletUUID, new Date(old.Date).getFullYear()))
       .then(() => transactions);
   },
-  ).then((result) => autoSync() || result);
+  ).then((result) => { autoSync(); return result; });
 }
 
 export async function UpdateTransfert(transactionUUID: string, input: ITransfertInput): Promise<ITransfert[]> {
@@ -281,6 +284,7 @@ export async function UpdateTransfert(transactionUUID: string, input: ITransfert
       To: { ...input.To },
       From: { ...input.From },
       LastUpdate: new Date(),
+      Repeat: input.Repeat,
     });
     return SaveTransferts(transactions)
       .then(() => RefreshTotalWallet(input.To.WalletUUID, input.Date.getFullYear()))
@@ -289,7 +293,7 @@ export async function UpdateTransfert(transactionUUID: string, input: ITransfert
       .then(() => RefreshTotalWallet(old.From.WalletUUID, new Date(old.Date).getFullYear()))
       .then(() => transactions);
   },
-  ).then((result) => autoSync() || result);
+  ).then((result) => { autoSync(); return result; });
 }
 
 export async function DeleteTransaction(transactionUUID: string): Promise<ITransaction[]> {
@@ -305,7 +309,7 @@ export async function DeleteTransaction(transactionUUID: string): Promise<ITrans
       .then(() => transactions)
       .then((tr: ITransaction[]) => markAsDeleted(transactionUUID).then(() => tr));
   },
-  ).then((result) => autoSync() || result);
+  ).then((result) => { autoSync(); return result; });
 }
 
 export async function DeleteTransfert(transactionUUID: string): Promise<ITransfert[]> {
@@ -322,7 +326,7 @@ export async function DeleteTransfert(transactionUUID: string): Promise<ITransfe
       .then(() => transactions)
       .then((tr: ITransfert[]) => markAsDeleted(transactionUUID).then(() => tr));
   },
-  ).then((result) => autoSync() || result);
+  ).then((result) => { autoSync(); return result; });
 }
 
 async function RefreshTotalWallet(walletUUID: string, year: number): Promise<void> {

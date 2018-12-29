@@ -42,6 +42,7 @@ export default {
     wallets: "Comptes",
     viewArchive: "Afficher les archives",
     hideArchive: "Cacher les archives",
+    repeatable: "%{number} opérations à venir, cliquer ici pour les ajouter.",
   },
   walletListItem: {
     archive: "Archiver",
@@ -134,5 +135,22 @@ export default {
     thisYear: "Cette année",
     last2Years: "Les 2 dernières années",
     all: "Toute les années",
+  },
+  repeatInput: {
+    recurrenceCheckbox: "Répéter l'opération",
+    repeat: "Répéter tous les ",
+    durations: {
+      month: " Mois",
+      day: " Jours",
+      week: " Semaines",
+      year: " Ans",
+    },
+    infinite: "à l'infini.",
+    during: "Pendant ",
+  },
+  repeatOperation: {
+    title: "Opération Récurrentes",
+    insertAll: "Enregistrer tout",
+    insertSelected: "Enregistrer la sélection",
   },
 };

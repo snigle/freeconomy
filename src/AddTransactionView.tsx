@@ -7,9 +7,9 @@ import {
   AsyncStorage, Button, Picker, Platform,
   ScrollView, Text, TextInput, TextStyle, TouchableHighlight, View,
 } from "react-native";
-// @ts-ignore
 import { Colors, Header, Icon } from "react-native-elements";
 import DatePicker from "./DatePicker";
+import RepeatInput from "./formInputs/RepeatInput";
 import { MyLink } from "./Link";
 import Loading from "./Loading";
 import * as Models from "./Models";
@@ -80,7 +80,7 @@ class AddTransactionView extends React.Component<IProps, IState> {
       Date: date,
       Categories: [],
       autocomplete: [],
-
+      Repeat: null,
       Loading: true,
     };
   }
@@ -98,6 +98,7 @@ class AddTransactionView extends React.Component<IProps, IState> {
           PriceText: "" + transaction.Price,
           Date: transaction.Date,
           WalletUUID: transaction.WalletUUID,
+          Repeat: transaction.Repeat,
         });
       });
     } else {
@@ -143,7 +144,10 @@ class AddTransactionView extends React.Component<IProps, IState> {
         ),
       ).sort((a, b) => b.Occurrencies - a.Occurrencies);
       console.log("autocomplete", autocomplete);
-      this.setState({ ...this.state, Categories: categories, autocomplete, Loading: false });
+      this.setState({
+        ...this.state,
+        Categories: categories, CategoryUUID: categories[0].UUID, autocomplete, Loading: false,
+      });
     });
   }
 
@@ -233,6 +237,12 @@ class AddTransactionView extends React.Component<IProps, IState> {
           keyboardType="numeric"
           onChangeText={(v: string) => this.changePrice(v)}
           value={this.state.PriceText} />
+
+        <RepeatInput defaultValue={this.state.Repeat}
+          setRepeat={(repeat) => {
+            console.log("set repeat", repeat);
+            this.setState({ ...this.state, Repeat: repeat });
+          }} />
         <View style={{ flexDirection: "row" }} >
           <View style={{ flex: 1, padding: 5 }}>
             <Button title={t.t("common.save")} onPress={() => this.save()} />
@@ -246,7 +256,7 @@ class AddTransactionView extends React.Component<IProps, IState> {
     return (
       <View style={{ flex: 1 }}>
         <Header
-          outerContainerStyles={{ height: 60 }}
+          containerStyle={{ height: 60 }}
           leftComponent={
             <MyLink to={`/TransactionsView?walletUUID=${this.state.WalletUUID}`}>
               <Icon name="arrow-back" />

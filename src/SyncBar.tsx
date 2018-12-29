@@ -19,7 +19,8 @@ interface IProps extends IPropsParams {
   syncHide: any;
 }
 
-const styles: { text: TextStyle, content: ViewStyle } = {
+export const SyncBarStyle: { text: TextStyle, background: ViewStyle, content: ViewStyle } = {
+  background: { padding: 3, backgroundColor: "#ffc90745" },
   text: {
     color: "#4e4e4ed1",
   },
@@ -33,24 +34,24 @@ const SyncBar = (props: IProps) => {
   let content: JSX.Element = <View />;
 
   if (props.error) {
-    content = <View style={styles.content}>
+    content = <View style={SyncBarStyle.content}>
       <TouchableHighlight onPress={() => GoogleSync()}>
-        <Text style={styles.text}>Erreur lors de la Synchronisation, cliquez ici pour ré-essayer.</Text>
+        <Text style={SyncBarStyle.text}>Erreur lors de la Synchronisation, cliquez ici pour ré-essayer.</Text>
       </TouchableHighlight>
     </View>;
   } else if (props.synced) {
-    content = <View style={styles.content}>
+    content = <View style={SyncBarStyle.content}>
       <TouchableHighlight onPress={() => props.syncHide() && props.refresh()}>
-        <Text style={styles.text}>Synchronisation terminée, cliquez ici pour rafraichir.</Text>
+        <Text style={SyncBarStyle.text}>Synchronisation terminée, cliquez ici pour rafraichir.</Text>
       </TouchableHighlight>
     </View>;
   } else if (props.syncing) {
-    content = <View style={styles.content}>
+    content = <View style={SyncBarStyle.content}>
       <View style={{ width: 40 }}>
         <ActivityIndicator size="small" color="#2689dc" />
       </View>
       <View style={{}}>
-        <Text style={styles.text}>Synchronisation en cours</Text>
+        <Text style={SyncBarStyle.text}>Synchronisation en cours</Text>
       </View>
     </View>;
   }
@@ -58,7 +59,7 @@ const SyncBar = (props: IProps) => {
   if (!props.synced && !props.syncing && !props.error) {
     return <View />;
   }
-  return <View style={{ padding: 3, backgroundColor: "#ffc90745" }}>
+  return <View style={SyncBarStyle.background}>
     {content}
   </View>;
 };

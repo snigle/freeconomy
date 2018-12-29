@@ -150,23 +150,25 @@ class TransactionsView extends React.Component<IProps, IState> {
     }
 
     if (!_.isUndefined(filters.search)) {
-      search = <SearchBar
-        lightTheme={true}
-        containerStyle={{ marginTop: -1 }}
-        round
-        defaultValue={filters.search}
-        // @ts-ignore
-        onChangeText={(text: string) => {
-          this.props.history.replace("/TransactionsView?" + querystring.stringify(
-            {
-              ...querystring.parse(this.props.location.search.replace("?", "")),
-              currencyCode: this.state.Wallets[0].Currency.Code,
-              walletUUID: filters.walletUUID,
-              search: text,
-            },
-          ));
-        }}
-        placeholder="Type Here..." />;
+      // search = <SearchBar
+      //   searchIcon={false}
+      //   lightTheme={true}
+      //   containerStyle={{ marginTop: -1 }}
+      //   round
+      //   defaultValue={filters.search}
+      //   onChangeText={(text: string) => {
+      //     this.props.history.replace("/TransactionsView?" + querystring.stringify(
+      //       {
+      //         ...querystring.parse(this.props.location.search.replace("?", "")),
+      //         currencyCode: this.state.Wallets[0].Currency.Code,
+      //         walletUUID: filters.walletUUID,
+      //         search: text,
+      //       },
+      //     ));
+      //   }}
+      //   placeholder="Type Here..." />;
+      search = <View><SearchBar />
+      </View>;
     }
 
     if (!this.state.Transactions) {
@@ -189,7 +191,7 @@ class TransactionsView extends React.Component<IProps, IState> {
         ref={(sidebar: any) => (this.sidebar = sidebar ? sidebar.getWrappedInstance() : null)}>
         <View style={{ flex: 1 }}>
           <Header
-            outerContainerStyles={{ height: 60 }}
+            containerStyle={{ height: 60 }}
             leftComponent={{ icon: "menu", color: "#fff", onPress: () => this.sidebar && this.sidebar.openDrawer() }}
             centerComponent={{
               text: this.state.Title,

@@ -46,6 +46,7 @@ module.exports = {
           path.resolve(__dirname, "node_modules/react-native-elements"),
           path.resolve(__dirname, "node_modules/react-native-color-wheel"),
           path.resolve(__dirname, "node_modules/react-native-vector-icons"),
+          path.resolve(__dirname, "node_modules/react-native-touchable-scale"),
           path.resolve(__dirname, "node_modules/react-native-*"),
           path.resolve(__dirname, "node_modules/victory"),
 

@@ -7,6 +7,7 @@ import { Button, Picker, Text, TextInput, View } from "react-native";
 import { Header, Icon } from "react-native-elements";
 import { styles } from "./AddTransactionView";
 import DatePicker from "./DatePicker";
+import RepeatInput from "./formInputs/RepeatInput";
 import { MyLink } from "./Link";
 import Loading from "./Loading";
 import * as Models from "./Models";
@@ -45,6 +46,7 @@ class AddTransactionView extends React.Component<IProps, IState> {
       PriceTo: "0",
       Taux: "1",
       Date: date,
+      Repeat: null,
 
       Wallets: [],
 
@@ -64,6 +66,7 @@ class AddTransactionView extends React.Component<IProps, IState> {
           PriceFrom: "" + transfert.From.Price,
           PriceTo: "" + transfert.To.Price,
           Date: transfert.Date,
+          Repeat: transfert.Repeat,
         });
       });
     } else {
@@ -177,6 +180,11 @@ class AddTransactionView extends React.Component<IProps, IState> {
           placeholder={t.t("addTransactionView.comment")}
           onChangeText={(v: string) => this.changeComment(v)}
           value={this.state.Comment} />
+        <RepeatInput defaultValue={this.state.Repeat}
+          setRepeat={(repeat) => {
+            console.log("set repeat", repeat);
+            this.setState({ ...this.state, Repeat: repeat });
+          }} />
         <View style={{ flexDirection: "row" }} >
           <View style={{ flex: 1, padding: 5 }}>
             <Button title={t.t("common.save")} onPress={() => this.save()} />
@@ -190,7 +198,7 @@ class AddTransactionView extends React.Component<IProps, IState> {
     return (
       <View>
         <Header
-          outerContainerStyles={{ height: 60 }}
+          containerStyle={{ height: 60 }}
           leftComponent={
             <MyLink to={`/TransactionsView?walletUUID=${this.props.WalletUUID}`}>
               <Icon name="arrow-back" />

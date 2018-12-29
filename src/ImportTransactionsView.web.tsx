@@ -165,7 +165,7 @@ export default class extends React.Component<RouteComponentProps<any>, IState> {
     return (
       <View style={{ flex: 1 }}>
         <Header
-          outerContainerStyles={{ height: 60 }}
+          containerStyle={{ height: 60 }}
           leftComponent={
             <MyLink to={`/TransactionsView?walletUUID=${this.state.WalletUUID}`}>
               <Icon name="arrow-back" />
@@ -255,6 +255,7 @@ export default class extends React.Component<RouteComponentProps<any>, IState> {
           Date: moment(line[parseInt(this.state.Date, 10)], this.state.DateFormat).toDate(),
           Price: parseFloat(_.replace(line[parseInt(this.state.Price, 10)], ",", ".")),
           Comment: this.state.Comment && line[parseInt(this.state.Comment, 10)],
+          Repeat: null,
         }));
         console.log("transactions from csv", transactions);
         transactions = transactions.filter((t) => !alreadyImportedMap[this.transactionHash(t)] && t.Price);

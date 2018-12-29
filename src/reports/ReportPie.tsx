@@ -195,7 +195,7 @@ export default class extends React.Component<RouteComponentProps<any>, IState> {
       ref={(sidebar: any) => (this.sidebar = sidebar ? sidebar.getWrappedInstance() : null)}>
       <View style={{ flex: 1 }}>
         <Header
-          outerContainerStyles={{ height: 60 }}
+          containerStyle={{ height: 60 }}
           leftComponent={{ icon: "menu", color: "#fff", onPress: () => this.sidebar && this.sidebar.openDrawer() }}
           centerComponent={{ text: t.t("reportPie.title"), style: { fontSize: 20, color: "#fff" } }}
           rightComponent={{

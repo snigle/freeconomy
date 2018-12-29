@@ -3,12 +3,9 @@ import * as _ from "lodash";
 import moment from "moment";
 import * as querystring from "querystring";
 import * as React from "react";
-import { Button, ScrollView, View } from "react-native";
+import { Button, ScrollView, TouchableHighlight, View } from "react-native";
 import DrawerLayout from "react-native-drawer-layout";
-import { Header, ListItem, Text } from "react-native-elements";
-// @ts-ignore
-// tslint:disable-next-line:no-duplicate-imports
-import { Overlay } from "react-native-elements";
+import { Header, ListItem, Overlay, Text } from "react-native-elements";
 import { connect } from "react-redux";
 import { MyLink } from "./Link";
 import * as Models from "./Models";
@@ -28,7 +25,7 @@ interface IState {
   defaultCurrency: ICurrency;
 }
 
-export class SideBarClass extends React.Component<IProps, IState> {
+export class SideBarClass extends React.PureComponent<IProps, IState> {
   public drawer: DrawerLayout | null;
   constructor(props: IProps) {
     super(props);
@@ -46,7 +43,7 @@ export class SideBarClass extends React.Component<IProps, IState> {
     Models.CleanAll().then(() => this.props.setLogout());
   }
 
-  public componentDidMount() {
+  public async componentDidMount() {
     // Get Wallet with more transactions if no currency precised
     Models.GetAllTransactions().then((transactions) =>
       _.first(_.sortBy(_.map(_.mapValues(_.groupBy(transactions, (tr) => tr.WalletUUID),
@@ -63,7 +60,6 @@ export class SideBarClass extends React.Component<IProps, IState> {
   }
 
   public render() {
-    // return <View style={{ flex: 1 }}>{this.props.children}</View>;
     return <DrawerLayout
       drawerPosition="left"
       drawerBackgroundColor="white"
@@ -85,15 +81,21 @@ export class SideBarClass extends React.Component<IProps, IState> {
             })}>
               <ListItem title={t.t("balanceReport.title")} />
             </MyLink>
-            <ListItem
-              title={t.t("sideBar.sync")}
-              onPress={() => GoogleSync() && this.drawer ? this.drawer.closeDrawer() : null} />
+            <TouchableHighlight
+              onPress={() => GoogleSync() && this.drawer ? this.drawer.closeDrawer() : null}
+            ><View>
+                <ListItem
+                  title={t.t("sideBar.sync")}
+                />
+              </View></TouchableHighlight>
             <MyLink to="/CategoriesView" replace={true}>
               <ListItem title={t.t("sideBar.categories")} />
             </MyLink>
-            <ListItem
-              title={t.t("sideBar.logout")}
-              onPress={() => { this.setState({ logout: true }); if (this.drawer) { this.drawer.closeDrawer(); } }} />
+            <TouchableHighlight
+              onPress={() => { this.setState({ logout: true }); if (this.drawer) { this.drawer.closeDrawer(); } }}
+            >
+              <View><ListItem title={t.t("sideBar.logout")} /></View>
+            </TouchableHighlight>
           </View>
         </ScrollView>
       }
@@ -105,7 +107,7 @@ export class SideBarClass extends React.Component<IProps, IState> {
       {this.state.logout ?
         <Overlay isVisible={this.state.logout} containerStyle={{ padding: 0 }}>
           <Header
-            outerContainerStyles={{ height: 60 }}
+            containerStyle={{ height: 60 }}
             centerComponent={{ text: t.t("sideBar.logoutConfirm"), style: { fontSize: 20, color: "#fff" } }}
             rightComponent={{ icon: "close", color: "#fff", onPress: () => this.setState({ logout: false }) }}
           />

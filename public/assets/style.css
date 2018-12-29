@@ -1,0 +1,8 @@
+div a{
+    text-decoration: none;
+}
+
+div a:link{
+    text-decoration: none;
+    color:inherit;
+}

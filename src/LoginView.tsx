@@ -99,7 +99,7 @@ class LoginView extends React.Component<IProps, IState> {
     if (this.props.syncing) {
       return <View style={{ flex: 1 }}>
         <Header
-          outerContainerStyles={{ height: 60 }}
+          containerStyle={{ height: 60 }}
           leftComponent={
             <Image
               style={{ width: 50, height: 50, position: "relative", top: 10 }}
@@ -111,7 +111,7 @@ class LoginView extends React.Component<IProps, IState> {
     if (this.state.loading) {
       return <View style={{ flex: 1 }}>
         <Header
-          outerContainerStyles={{ height: 60 }}
+          containerStyle={{ height: 60 }}
           leftComponent={
             <Image
               style={{ width: 50, height: 50, position: "relative", top: 10 }}
@@ -130,12 +130,13 @@ class LoginView extends React.Component<IProps, IState> {
         <Text style={{ marginBottom: 10 }}>
           {t.t("login.line2")}
         </Text>
-        <Button
+        {/* <Button
           icon={<Icon name="person" color="#ffff" /> as ButtonIcon}
           buttonStyle={{ borderRadius: 0, marginLeft: 0, marginRight: 0, marginBottom: 0 }}
-          text={t.t("login.buttonWithGoogle")}
-          onPress={() => this.login()}
-        />
+          title={t.t("login.buttonWithGoogle")}
+          TouchableComponent={TouchableHighlight}
+          onPress={() => this.login()
+            /> */}
         <TouchableHighlight onPress={() => this.loginLocally()}>
           <Text style={{ color: "#9999", textAlign: "center", marginTop: 10 }}>
             {t.t("login.locally")}

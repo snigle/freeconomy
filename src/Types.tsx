@@ -100,6 +100,14 @@ export const CategoryDefault = (w: ICategory): ICategory => ({
   Icon: DefaultIcon(w.Icon),
 });
 
+export type RepeatDurationType = "day" | "month" | "week" | "year";
+
+export interface IRepeat {
+  DurationType: RepeatDurationType;
+  MaxOccurrence: number;
+  Duration: number;
+}
+
 export interface ITransaction {
   UUID: string;
   WalletUUID: string;
@@ -111,6 +119,8 @@ export interface ITransaction {
   Date: Date;
   Price: number;
   Comment: string;
+
+  Repeat: IRepeat | null;
 }
 
 export interface ITransactionInput {
@@ -120,6 +130,7 @@ export interface ITransactionInput {
   Date: Date;
   Price: number;
   Comment: string;
+  Repeat: IRepeat | null;
 }
 
 function asDate(date?: Date): Date {
@@ -137,6 +148,7 @@ export const TransactionDefault = (w: ITransaction): ITransaction => ({
   Date: asDate(w.Date),
   Price: w.Price || 0,
   Comment: w.Comment || "",
+  Repeat: w.Repeat || null,
 });
 
 export const TransfertDefault = (w: ITransfert): ITransfert => ({
@@ -146,6 +158,7 @@ export const TransfertDefault = (w: ITransfert): ITransfert => ({
   LastUpdate: asDate(w.LastUpdate),
   Date: asDate(w.Date),
   Comment: w.Comment || "",
+  Repeat: w.Repeat || null,
 });
 
 interface ITransfertDetail {
@@ -159,6 +172,7 @@ export interface ITransfert {
   To: ITransfertDetail;
   Comment: string;
 
+  Repeat: IRepeat | null;
   Date: Date;
   LastUpdate: Date;
 }
@@ -168,6 +182,7 @@ export interface ITransfertInput {
   To: ITransfertDetail;
   Comment?: string;
   Date: Date;
+  Repeat: IRepeat | null;
 }
 
 export interface ILogin {

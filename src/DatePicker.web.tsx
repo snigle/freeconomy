@@ -1,3 +1,4 @@
+import moment from "moment";
 import * as React from "react";
 
 interface IProps {
@@ -5,10 +6,14 @@ interface IProps {
   value: Date;
 }
 
-export default function(props: IProps): JSX.Element {
+// tslint:disable-next-line:space-before-function-paren
+export default function (props: IProps): JSX.Element {
   return <input
     type="date"
-    onChange={(event) => props.callback(new Date(event.target.value))}
+    onChange={(event) => {
+      const parsedDate = moment(event.target.value);
+      props.callback(parsedDate.toDate());
+    }}
     placeholder="Choose a date"
-    value={props.value.toISOString().split("T")[0]}/>;
+    value={props.value.toISOString().split("T")[0]} />;
 }

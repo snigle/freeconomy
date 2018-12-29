@@ -13,7 +13,6 @@ import {
 import * as querystring from "querystring";
 import { match, Route, RouteComponentProps } from "react-router";
 import { withRouter } from "react-router-native";
-
 import AddCategoryView from "./AddCategoryView";
 import AddTransactionView from "./AddTransactionView";
 import AddTransfertView from "./AddTransfertView";
@@ -43,6 +42,7 @@ import Loading from "./Loading";
 import LoginView from "./LoginView";
 import reducer from "./reducer";
 import { setLogged } from "./reducer/login";
+import RepeatOperation from "./RepeatOperation";
 
 interface IProps {
   match: match<any>;
@@ -99,6 +99,7 @@ class App extends React.Component<any, IState> {
     return <View style={{ flex: 1 }}>
       <Route exact path="/" component={WalletsView}></Route>
       <Route exact path="/Test" component={() => <Loading Message="Ceci est un test" />}></Route>
+      <Route exact path="/RepeatOperation" component={RepeatOperation}></Route>
       <Route exact path="/refresh" component={() => <View />}></Route>
       <Route exact path="/CategoriesView" component={CategoriesView}></Route>
       <Route exact path="/ReportPie" component={ReportPie}></Route>

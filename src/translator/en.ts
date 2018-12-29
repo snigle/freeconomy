@@ -41,6 +41,7 @@ export default {
     wallets: "Wallets",
     viewArchive: "Display archives",
     hideArchive: "Hide archives",
+    repeatable: "%{number} operations to come, click here to add it.",
   },
   walletListItem: {
     archive: "Archive",
@@ -133,5 +134,22 @@ export default {
     thisYear: "This Year",
     last2Years: "Last 2 Years",
     all: "All Years",
+  },
+  repeatInput: {
+    recurrenceCheckbox: "Auto repeat the transaction",
+    repeat: "Repeat every ",
+    durations: {
+      month: " Month",
+      day: " Days",
+      week: " Weeks",
+      year: " Years",
+    },
+    infinite: "None stop.",
+    during: "During ",
+  },
+  repeatOperation: {
+    title: "Recurring Operations",
+    insertAll: "Save all",
+    insertSelected: "Save selected",
   },
 };

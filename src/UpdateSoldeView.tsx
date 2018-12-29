@@ -2,9 +2,8 @@
 import { TextField } from "carbon-ui";
 import { History } from "history";
 import * as React from "react";
-import { Text, View } from "react-native";
-// @ts-ignore
-import { Button, Divider, Overlay } from "react-native-elements";
+import { Button, Text, View } from "react-native";
+import { Divider, Overlay } from "react-native-elements";
 import * as Models from "./Models";
 import t from "./translator";
 import { displayPrice, IWallet } from "./Types";
@@ -74,7 +73,7 @@ class UpdateSoldeView extends React.Component<IProps, IState> {
                 </Text>
                 <TextField placeholder={t.t("updateSoldeView.newBalance")} type="number" value={this.state.soldeEdit}
                     onChangeText={(text: string) => this.changeSolde(text)} />
-                <Button onPress={() => this.updateSolde()} text={t.t("common.update")} />
+                <Button onPress={() => this.updateSolde()} title={t.t("common.update")} />
             </View>
         </Overlay>;
     }

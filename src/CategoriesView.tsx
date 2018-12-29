@@ -61,7 +61,7 @@ class CategoriesView extends React.Component<IProps, IState> {
       ref={(sidebar: any) => (this.sidebar = sidebar ? sidebar.getWrappedInstance() : null)}>
       <View style={{ flex: 1 }}>
         <Header
-          outerContainerStyles={{ height: 60 }}
+          containerStyle={{ height: 60 }}
           leftComponent={{ icon: "menu", color: "#fff", onPress: () => this.sidebar && this.sidebar.openDrawer() }}
           centerComponent={{ text: "Categories", style: { fontSize: 20, color: "#fff" } }}
           rightComponent={{

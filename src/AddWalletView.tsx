@@ -4,10 +4,10 @@ import { RaisedButton, TextField } from "carbon-ui";
 import * as colorsys from "colorsys";
 import { History } from "history";
 import * as React from "react";
-import { ScrollView, View } from "react-native";
+import { Button, ScrollView, View } from "react-native";
 // @ts-ignore
 import { ColorWheel } from "react-native-color-wheel";
-import { Button, Header, Icon, Text } from "react-native-elements";
+import { Header, Icon, Text } from "react-native-elements";
 import Loading from "./Loading";
 import * as Models from "./Models";
 import t from "./translator";
@@ -148,16 +148,14 @@ class AddWalletView extends React.Component<IProps, IState> {
           <View style={{ flex: 1 }}>
             <Button
               onPress={() => this.save(true)}
-              text={t.t("common.saveAndNew")}
-              containerStyle={{ margin: 5 }}
-              textStyle={{ flex: 1 }} />
+              title={t.t("common.saveAndNew")}
+            />
           </View>
           <View style={{ flex: 1 }}>
             <Button
               onPress={() => this.save()}
-              text={t.t("common.save")}
-              containerStyle={{ margin: 5 }}
-              textStyle={{ flex: 1 }} />
+              title={t.t("common.save")}
+            />
           </View>
         </View>
       </ScrollView>;
@@ -165,7 +163,7 @@ class AddWalletView extends React.Component<IProps, IState> {
     return (
       <View style={{ flex: 1 }}>
         <Header
-          outerContainerStyles={{ height: 60 }}
+          containerStyle={{ height: 60 }}
           leftComponent={{
             icon: "navigate-before",
             color: "#fff",
