@@ -1,9 +1,6 @@
 import * as React from "react";
 import { AsyncStorage, Image, Text, TouchableHighlight, View } from "react-native";
-// @ts-ignore
-// import { Button } from "react-native-elements";
-// tslint:disable-next-line
-import { Button, ButtonIcon, Card, Icon, Header } from "react-native-elements";
+import { Button, Card, Header, Icon } from "react-native-elements";
 import { connect } from "react-redux";
 import { RouteComponentProps } from "react-router";
 import { defaultCategories } from "./defaultCategories";
@@ -130,13 +127,13 @@ class LoginView extends React.Component<IProps, IState> {
         <Text style={{ marginBottom: 10 }}>
           {t.t("login.line2")}
         </Text>
-        {/* <Button
-          icon={<Icon name="person" color="#ffff" /> as ButtonIcon}
+        <Button
+          icon={<Icon name="person" color="#ffff" />}
           buttonStyle={{ borderRadius: 0, marginLeft: 0, marginRight: 0, marginBottom: 0 }}
           title={t.t("login.buttonWithGoogle")}
           TouchableComponent={TouchableHighlight}
-          onPress={() => this.login()
-            /> */}
+          onPress={() => this.login()}
+        />
         <TouchableHighlight onPress={() => this.loginLocally()}>
           <Text style={{ color: "#9999", textAlign: "center", marginTop: 10 }}>
             {t.t("login.locally")}

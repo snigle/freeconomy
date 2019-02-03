@@ -166,7 +166,7 @@ export default class extends React.PureComponent<RouteComponentProps<any>, IStat
 
         return <SideBar
             history={this.props.history}
-            ref={(sidebar: any) => (this.sidebar = sidebar ? sidebar.getWrappedInstance() : null)}>
+            ref={(sidebar: any) => (this.sidebar = sidebar)}>
             <View style={{ flex: 1 }}>
                 <Header
                     containerStyle={{ height: 60 }}
@@ -194,7 +194,7 @@ export default class extends React.PureComponent<RouteComponentProps<any>, IStat
                 const tr = r.Transaction;
                 Models.CreateTransaction(r.Transaction.New).
                     then(() => Models.UpdateTransaction(tr.From.UUID,
-                        { ...tr.From, Repeat: null })).
+                        _.omit({ ...tr.From, Repeat: null }, ["UUID"]))).
                     then(() => this.componentDidMount());
             } else if (r.Transfert) {
                 const tr = r.Transfert;

@@ -191,7 +191,7 @@ export default class extends React.Component<RouteComponentProps<any>, IState> {
         }
         return <SideBar
             history={this.props.history}
-            ref={(sidebar: any) => (this.sidebar = sidebar ? sidebar.getWrappedInstance() : null)}>
+            ref={(sidebar: any) => (this.sidebar = sidebar)}>
             <View style={{ flex: 1 }}>
                 <Header
                     containerStyle={{ height: 60 }}

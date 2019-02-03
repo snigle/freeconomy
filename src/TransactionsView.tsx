@@ -4,7 +4,7 @@ import moment from "moment";
 import * as querystring from "querystring";
 import * as React from "react";
 import { Platform, View } from "react-native";
-import { Header, Icon, SearchBar } from "react-native-elements";
+import { Header, Icon, Input, SearchBar } from "react-native-elements";
 import { Route, RouteComponentProps } from "react-router";
 import GroupTransactionsByDay from "./GroupTransactionsByDay";
 import Loading from "./Loading";
@@ -150,25 +150,23 @@ class TransactionsView extends React.Component<IProps, IState> {
     }
 
     if (!_.isUndefined(filters.search)) {
-      // search = <SearchBar
-      //   searchIcon={false}
-      //   lightTheme={true}
-      //   containerStyle={{ marginTop: -1 }}
-      //   round
-      //   defaultValue={filters.search}
-      //   onChangeText={(text: string) => {
-      //     this.props.history.replace("/TransactionsView?" + querystring.stringify(
-      //       {
-      //         ...querystring.parse(this.props.location.search.replace("?", "")),
-      //         currencyCode: this.state.Wallets[0].Currency.Code,
-      //         walletUUID: filters.walletUUID,
-      //         search: text,
-      //       },
-      //     ));
-      //   }}
-      //   placeholder="Type Here..." />;
-      search = <View><SearchBar />
-      </View>;
+      search = <SearchBar
+        searchIcon={false}
+        lightTheme={true}
+        containerStyle={{ marginTop: -1 }}
+        round
+        value={filters.search}
+        onChangeText={(text: string) => {
+          this.props.history.replace("/TransactionsView?" + querystring.stringify(
+            {
+              ...querystring.parse(this.props.location.search.replace("?", "")),
+              currencyCode: this.state.Wallets[0].Currency.Code,
+              walletUUID: filters.walletUUID,
+              search: text,
+            },
+          ));
+        }}
+        placeholder="Type Here..." />;
     }
 
     if (!this.state.Transactions) {
@@ -188,7 +186,7 @@ class TransactionsView extends React.Component<IProps, IState> {
     return (
       <SideBar
         history={this.props.history}
-        ref={(sidebar: any) => (this.sidebar = sidebar ? sidebar.getWrappedInstance() : null)}>
+        ref={(sidebar: any) => (this.sidebar = sidebar)}>
         <View style={{ flex: 1 }}>
           <Header
             containerStyle={{ height: 60 }}
@@ -199,7 +197,7 @@ class TransactionsView extends React.Component<IProps, IState> {
             }}
             rightComponent={<View style={{ flexDirection: "row" }}>
               <Icon
-                name={this.state.displayOptions ? "expand-less" : "search"}
+                name="search"
                 color="#fff"
                 onPress={() => this.props.history.push("/TransactionsView?" +
                   (!_.isUndefined(filters.search) ?

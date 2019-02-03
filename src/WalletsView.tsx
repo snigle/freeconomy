@@ -127,7 +127,7 @@ class Wallets extends React.Component<IProps, IState> {
 
     return <SideBar
       history={this.props.history}
-      ref={(sidebar: any) => (this.sidebar = sidebar ? sidebar.getWrappedInstance() : null)}>
+      ref={(sidebar: any) => { this.sidebar = sidebar; console.log("sidebar", sidebar); }}>
       <View style={{ flex: 1 }}>
         <Header
           containerStyle={{ height: 60 }}

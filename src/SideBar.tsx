@@ -5,7 +5,7 @@ import * as querystring from "querystring";
 import * as React from "react";
 import { Button, ScrollView, TouchableHighlight, View } from "react-native";
 import DrawerLayout from "react-native-drawer-layout";
-import { Header, ListItem, Overlay, Text } from "react-native-elements";
+import { Divider, Header, ListItem, Overlay, Text } from "react-native-elements";
 import { connect } from "react-redux";
 import { MyLink } from "./Link";
 import * as Models from "./Models";
@@ -67,13 +67,16 @@ export class SideBarClass extends React.PureComponent<IProps, IState> {
       renderNavigationView={() =>
         <ScrollView>
           <Text style={{ textAlign: "center", margin: 10, fontSize: 18 }}>Freeconomy</Text>
+          <Divider />
           <View style={{ marginTop: 0 }}>
             <MyLink to="/" replace={true}>
               <ListItem title={t.t("sideBar.home")} />
             </MyLink>
+            <Divider />
             <MyLink to={"/ReportPie?" + querystring.stringify({ currencyCode: this.state.defaultCurrency.Code })}>
               <ListItem title={t.t("sideBar.categoryReport")} />
             </MyLink>
+            <Divider />
             <MyLink to={"/BalanceReport?" + querystring.stringify({
               currencyCode: this.state.defaultCurrency.Code,
               begin: moment().startOf("year").toISOString(),
@@ -81,6 +84,7 @@ export class SideBarClass extends React.PureComponent<IProps, IState> {
             })}>
               <ListItem title={t.t("balanceReport.title")} />
             </MyLink>
+            <Divider />
             <TouchableHighlight
               onPress={() => GoogleSync() && this.drawer ? this.drawer.closeDrawer() : null}
             ><View>
@@ -88,14 +92,17 @@ export class SideBarClass extends React.PureComponent<IProps, IState> {
                   title={t.t("sideBar.sync")}
                 />
               </View></TouchableHighlight>
+            <Divider />
             <MyLink to="/CategoriesView" replace={true}>
               <ListItem title={t.t("sideBar.categories")} />
             </MyLink>
+            <Divider />
             <TouchableHighlight
               onPress={() => { this.setState({ logout: true }); if (this.drawer) { this.drawer.closeDrawer(); } }}
             >
               <View><ListItem title={t.t("sideBar.logout")} /></View>
             </TouchableHighlight>
+            <Divider />
           </View>
         </ScrollView>
       }
@@ -106,15 +113,17 @@ export class SideBarClass extends React.PureComponent<IProps, IState> {
       {this.props.children}
       {this.state.logout ?
         <Overlay isVisible={this.state.logout} containerStyle={{ padding: 0 }}>
-          <Header
-            containerStyle={{ height: 60 }}
-            centerComponent={{ text: t.t("sideBar.logoutConfirm"), style: { fontSize: 20, color: "#fff" } }}
-            rightComponent={{ icon: "close", color: "#fff", onPress: () => this.setState({ logout: false }) }}
-          />
-          <Text>{t.t("sideBar.logoutConfirmText")}</Text>
-          <View style={{ flexDirection: "column" }}>
-            <Button title={t.t("common.cancel")} onPress={() => this.setState({ logout: false })} />
-            <Button title={t.t("sideBar.logout")} onPress={() => this.logout()} />
+          <View>
+            <Header
+              containerStyle={{ height: 60 }}
+              centerComponent={{ text: t.t("sideBar.logoutConfirm"), style: { fontSize: 20, color: "#fff" } }}
+              rightComponent={{ icon: "close", color: "#fff", onPress: () => this.setState({ logout: false }) }}
+            />
+            <Text>{t.t("sideBar.logoutConfirmText")}</Text>
+            <View style={{ flexDirection: "column" }}>
+              <Button title={t.t("common.cancel")} onPress={() => this.setState({ logout: false })} />
+              <Button title={t.t("sideBar.logout")} onPress={() => this.logout()} />
+            </View>
           </View>
         </Overlay> : undefined}
     </DrawerLayout>;
@@ -124,4 +133,4 @@ export class SideBarClass extends React.PureComponent<IProps, IState> {
 export default connect((state: any, props: IPropsParams): IProps => ({
   ...state,
   ...props,
-}), { setLogout }, null, { withRef: true })(SideBarClass);
+}), { setLogout }, null, { forwardRef: true })(SideBarClass);

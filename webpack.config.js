@@ -7,6 +7,16 @@ module.exports = {
   // Here the application starts executing
   // and webpack starts bundling
 
+  mode: process.env.NODE_ENV === "production" ? "production" : "development",
+  optimization: {
+    removeAvailableModules: false,
+    removeEmptyChunks: false,
+    splitChunks: {
+      cacheGroups: {
+        default: false
+      }
+    }
+  },
   output: {
     // options related to how webpack emits results
 
@@ -49,6 +59,8 @@ module.exports = {
           path.resolve(__dirname, "node_modules/react-native-touchable-scale"),
           path.resolve(__dirname, "node_modules/react-native-*"),
           path.resolve(__dirname, "node_modules/victory"),
+          path.resolve(__dirname, "node_modules/react-native-ratings"),
+          path.resolve(__dirname, "node_modules/react-native-status-bar-height"),
 
           // path.resolve(__dirname, "node_modules/react-native-material-ui"),
           // path.resolve(__dirname, "node_modules/react-native-vector-icons"),
@@ -75,7 +87,7 @@ module.exports = {
 
         loader: "babel-loader",
         query: {
-          presets: ['es2015', "react-native"]
+          presets: ['@babel/preset-env', "module:metro-react-native-babel-preset"]
         },
         // the loader which should be applied, it'll be resolved relative to the context
         // -loader suffix is no longer optional in webpack2 for clarity reasons

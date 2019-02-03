@@ -1,22 +1,12 @@
+import i18n from "i18n-js";
 import * as moment from "moment";
-import I18n, { getLanguages } from "react-native-i18n";
+import RNLanguages from "react-native-languages";
 import en from "./en";
 import fr from "./fr";
 
-I18n.defaultLocale = "en";
-I18n.fallbacks = true;
+i18n.locale = RNLanguages.language;
+i18n.defaultLocale = "en";
+i18n.fallbacks = true;
+i18n.translations = { en, fr };
 
-I18n.translations = {
-  en,
-  fr,
-};
-
-getLanguages().then((languages) => {
-  return languages.length ? languages[0].split("-")[0] : "";
-})
-  .then((lang) => {
-    I18n.locale = lang;
-    // moment.locale([lang, "en"]);
-  });
-
-export default I18n;
+export default i18n;

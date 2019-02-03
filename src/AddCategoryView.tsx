@@ -4,7 +4,7 @@ import { RaisedButton, TextField } from "carbon-ui";
 import * as colorsys from "colorsys";
 import { History } from "history";
 import * as React from "react";
-import { Button, ScrollView, View } from "react-native";
+import { Button, Platform, ScrollView, View } from "react-native";
 // @ts-ignore
 import { ColorWheel } from "react-native-color-wheel";
 import { Header, Icon, Text } from "react-native-elements";
@@ -110,10 +110,14 @@ class AddCategoryView extends React.Component<IProps, IState> {
         <Text h4>Icon :</Text>
         <View style={{ flexDirection: "row" }}>
           <View>
-            <ColorWheel
-              initialColor={this.state.Icon.Color}
-              onColorChange={(color: any) => this.changeIconColor(colorsys.hsv2Hex(color))}
-              style={{ marginLeft: 20, padding: 40, height: 100, width: 100, overflow: "visible" }} />
+            {
+              Platform.OS === "web" ?
+                <ColorWheel
+                  initialColor={this.state.Icon.Color}
+                  onColorChange={(color: any) => this.changeIconColor(colorsys.hsv2Hex(color))}
+                  style={{ marginLeft: 20, padding: 40, height: 100, width: 100, overflow: "visible" }} />
+                : undefined
+            }
           </View>
           <ScrollView horizontal showsHorizontalScrollIndicator>
             <View style={{ flexDirection: "row", alignContent: "center", alignItems: "center" }}>
