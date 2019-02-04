@@ -1,3 +1,4 @@
+import moment from "moment";
 import * as React from "react";
 import {
   DatePickerAndroid, DatePickerAndroidDateSetAction, DatePickerAndroidOpenReturn,
@@ -10,17 +11,19 @@ interface IProps {
   value: Date;
 }
 
-const formatDate = (date: Date) => `${date.getFullYear()}-${(date.getMonth() + 1) % 12}-${date.getDate()}`;
+const formatDate = (date: Date) => moment(date).format("L");
+// `${date.getFullYear()}-${(date.getMonth() + 1) % 12}-${date.getDate()}`;
 
 async function selectDate(defaultDate: Date, f: (date: Date) => void): Promise<void> {
   return DatePickerAndroid.open({ date: defaultDate }).then((date: DatePickerAndroidOpenReturn) => {
     if (date.action !== DatePickerAndroid.dismissedAction) {
       const { action, year, month, day } = date as DatePickerAndroidDateSetAction;
+      console.log("set new date", year, month, day);
       // Selected year, month (0-11), day
       return f(new Date(
-        year || defaultDate.getFullYear(),
-        month || defaultDate.getMonth(),
-        day || defaultDate.getDay(),
+        year,
+        month,
+        day,
       ));
     }
   }).catch(({ code, message }) =>
