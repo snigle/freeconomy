@@ -199,7 +199,7 @@ export default class extends React.PureComponent<RouteComponentProps<any>, IStat
             } else if (r.Transfert) {
                 const tr = r.Transfert;
                 Models.CreateTransfert(r.Transfert.New).
-                    then(() => Models.UpdateTransfert(tr.From.UUID, { ...tr.From, Repeat: null })).
+                    then(() => Models.UpdateTransfert(tr.From.UUID, _.omit({ ...tr.From, Repeat: null }, ["UUID"]))).
                     then(() => this.componentDidMount());
             }
         });

@@ -86,24 +86,10 @@ class AddTransactionView extends React.Component<IProps, IState> {
   }
 
   public async componentDidMount() {
-    let getTransactionPromise: Promise<any>;
-    if (this.props.TransactionUUID) {
-      getTransactionPromise = Models.GetTransaction(this.props.TransactionUUID).then((transaction) => {
-        this.setState({
-          ...this.state,
-          Beneficiary: transaction.Beneficiary,
-          CategoryUUID: transaction.CategoryUUID,
-          Comment: transaction.Comment,
-          Price: transaction.Price,
-          PriceText: "" + transaction.Price,
-          Date: transaction.Date,
-          WalletUUID: transaction.WalletUUID,
-          Repeat: transaction.Repeat,
-        });
-      });
-    } else {
-      getTransactionPromise = Promise.resolve();
-    }
+    const getTransactionPromise: Promise<ITransaction | null> = this.props.TransactionUUID ?
+      Models.GetTransaction(this.props.TransactionUUID) :
+      Promise.resolve(null)
+      ;
 
     Promise.all([
       Models.GetCategories().then((categories) =>
@@ -111,7 +97,7 @@ class AddTransactionView extends React.Component<IProps, IState> {
       ),
       Models.GetAllTransactions(this.props.WalletUUID),
       getTransactionPromise,
-    ]).then(([categories, transactions]) => {
+    ]).then(([categories, transactions, transaction]) => {
       let defaultCategory = categories[0];
       if (this.state.CategoryUUID) {
         defaultCategory = categories.find((c) => c.UUID === this.state.CategoryUUID) || defaultCategory;
@@ -144,10 +130,23 @@ class AddTransactionView extends React.Component<IProps, IState> {
         ),
       ).sort((a, b) => b.Occurrencies - a.Occurrencies);
       console.log("autocomplete", autocomplete);
-      this.setState({
+      let state = {
         ...this.state,
         Categories: categories, CategoryUUID: categories[0].UUID, autocomplete, Loading: false,
-      });
+      };
+      if (transaction) {
+        state = {
+          ...state, Beneficiary: transaction.Beneficiary,
+          CategoryUUID: transaction.CategoryUUID,
+          Comment: transaction.Comment,
+          Price: transaction.Price,
+          PriceText: "" + transaction.Price,
+          Date: transaction.Date,
+          WalletUUID: transaction.WalletUUID,
+          Repeat: transaction.Repeat,
+        };
+      }
+      this.setState(state);
     });
   }
 

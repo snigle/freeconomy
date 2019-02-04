@@ -37,7 +37,7 @@ function autoSync() {
 
 export async function GetWallets(): Promise<IWallet[]> {
   return AsyncStorage.getItem("wallets").then((raw) => {
-    const result: IWallet[] | null = JSON.parse(raw);
+    const result: IWallet[] | null = raw ? JSON.parse(raw) : null;
     if (!result) {
       return [];
     }
@@ -135,8 +135,8 @@ export async function DeleteWallet(walletUUID: string): Promise<IWallet[]> {
 }
 
 export async function GetAllDeleted(): Promise<ICollection[]> {
-  return AsyncStorage.getItem("deleted").then((raw: string) => {
-    const result: ICollection[] | null = JSON.parse(raw);
+  return AsyncStorage.getItem("deleted").then((raw) => {
+    const result: ICollection[] | null = raw ? JSON.parse(raw) : null;
     return (result && result.map((d) => ({ ...d, LastUpdate: new Date(d.LastUpdate) })).filter((d) => d.UUID)) || [];
   });
 }
@@ -382,7 +382,7 @@ export async function RefreshAllTotalWallet(transactions: ITransaction[], transf
 
 export async function GetAllTransactions(...walletUUIDs: string[]): Promise<ITransaction[]> {
   return AsyncStorage.getItem("transactions").then((raw) => {
-    const result: ITransaction[] | null = JSON.parse(raw);
+    const result: ITransaction[] | null = raw ? JSON.parse(raw) : null;
     if (!result) {
       return [];
     }
@@ -406,7 +406,7 @@ export async function GetTransaction(transactionUUID: string): Promise<ITransact
 
 export async function GetTransferts(...walletUUIDs: string[]): Promise<ITransfert[]> {
   return AsyncStorage.getItem("transfert").then((raw) => {
-    const result: ITransfert[] | null = JSON.parse(raw);
+    const result: ITransfert[] | null = raw ? JSON.parse(raw) : null;
     if (!result) {
       return [];
     }
@@ -444,7 +444,7 @@ export async function GetWallet(walletUUID: string): Promise<IWallet> {
 
 export async function GetCategories(): Promise<ICategory[]> {
   return AsyncStorage.getItem("categories").then((raw) => {
-    const result: ICategory[] | null = JSON.parse(raw);
+    const result: ICategory[] | null = raw ? JSON.parse(raw) : null;
     if (!result) {
       return [];
     }
@@ -510,7 +510,7 @@ export async function SaveCategories(categories: ICategory[]): Promise<ICategory
 
 export async function GetLogin(): Promise<ILogin> {
   return AsyncStorage.getItem("login").then((raw) => {
-    const result: ILogin | null = JSON.parse(raw);
+    const result: ILogin | null = raw ? JSON.parse(raw) : null;
     if (!result) {
       throw new Error(("login not found"));
     }

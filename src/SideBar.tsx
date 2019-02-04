@@ -133,4 +133,4 @@ export class SideBarClass extends React.PureComponent<IProps, IState> {
 export default connect((state: any, props: IPropsParams): IProps => ({
   ...state,
   ...props,
-}), { setLogout }, null, { forwardRef: true })(SideBarClass);
+}), { setLogout }, undefined, { forwardRef: true })(SideBarClass);

@@ -1,5 +1,8 @@
 import * as React from "react";
-import { DatePickerAndroid, TextInput, TouchableHighlight } from "react-native";
+import {
+  DatePickerAndroid, DatePickerAndroidDateSetAction, DatePickerAndroidOpenReturn,
+  TextInput, TouchableHighlight,
+} from "react-native";
 import { Text } from "react-native-elements";
 
 interface IProps {
@@ -10,8 +13,9 @@ interface IProps {
 const formatDate = (date: Date) => `${date.getFullYear()}-${(date.getMonth() + 1) % 12}-${date.getDate()}`;
 
 async function selectDate(defaultDate: Date, f: (date: Date) => void): Promise<void> {
-  return DatePickerAndroid.open({ date: defaultDate }).then(({ action, year, month, day }) => {
-    if (action !== DatePickerAndroid.dismissedAction) {
+  return DatePickerAndroid.open({ date: defaultDate }).then((date: DatePickerAndroidOpenReturn) => {
+    if (date.action !== DatePickerAndroid.dismissedAction) {
+      const { action, year, month, day } = date as DatePickerAndroidDateSetAction;
       // Selected year, month (0-11), day
       return f(new Date(
         year || defaultDate.getFullYear(),
