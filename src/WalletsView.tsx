@@ -155,12 +155,6 @@ class Wallets extends React.Component<IProps, IState> {
             {content}
             <View style={{ height: 100 }} />
           </ScrollView>
-          <Icon
-            raised
-            containerStyle={{ position: "absolute", right: 20, bottom: 20 }}
-            name="add"
-            color="#517fa4"
-            onPress={() => this.props.history.push("/AddWalletView")} />
         </View>
       </View>
     </SideBar>;

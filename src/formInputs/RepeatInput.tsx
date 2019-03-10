@@ -42,7 +42,7 @@ export default class extends React.Component<IProps, IState> {
     }
 
     public onCheckPressed() {
-        this.props.setRepeat(this.state.Repeat);
+        this.props.setRepeat(this.state.checked ? null : this.state.Repeat);
         this.setState({ ...this.state, checked: !this.state.checked });
     }
 

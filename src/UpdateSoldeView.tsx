@@ -71,7 +71,8 @@ class UpdateSoldeView extends React.Component<IProps, IState> {
                     {t.t("updateSoldeView.currentBalance")}
                     {displayPrice(this.state.solde, this.state.Wallet.Currency)}
                 </Text>
-                <TextField placeholder={t.t("updateSoldeView.newBalance")} type="number" value={this.state.soldeEdit}
+                <TextField placeholder={t.t("updateSoldeView.newBalance")}
+                    type="decimal-pad" value={this.state.soldeEdit}
                     onChangeText={(text: string) => this.changeSolde(text)} />
                 <Button onPress={() => this.updateSolde()} title={t.t("common.update")} />
             </View>

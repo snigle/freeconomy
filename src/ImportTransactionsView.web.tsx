@@ -114,7 +114,7 @@ export default class extends React.Component<RouteComponentProps<any>, IState> {
                 <Text>{k} : </Text>
                 <TextInput
                   key={k}
-                  keyboardType="numeric"
+                  keyboardType="decimal-pad"
                   onChangeText={(e) => this.bindInput(k, e)}
                   placeholder="Column Name"
                   value={this.state[k]} />

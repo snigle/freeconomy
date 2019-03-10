@@ -214,7 +214,7 @@ export default class extends React.Component<RouteComponentProps<any>, IState> {
                 <MyLink to={`/ReportPie?` + querystring.stringify({
                   currencyCode: filters.currencyCode,
                   begin: moment(filters.begin).add(-1, "month").toISOString(),
-                  end: moment(filters.end).endOf("month").add(-1, "month").toISOString(),
+                  end: moment(filters.end).startOf("month").add(-1, "hour").toISOString(),
                 })}>
                   <Icon name="chevron-left" iconStyle={{ textDecorationLine: "none" }} />
                 </MyLink>

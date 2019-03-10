@@ -233,7 +233,7 @@ class AddTransactionView extends React.Component<IProps, IState> {
             ...styles.input,
             borderColor: this.state.Price <= 0 ? styles.borderRed : styles.borderGreen,
           }}
-          keyboardType="numeric"
+          keyboardType="decimal-pad"
           onChangeText={(v: string) => this.changePrice(v)}
           value={this.state.PriceText} />
 
