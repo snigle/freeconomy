@@ -114,7 +114,7 @@ export default class extends React.Component<RouteComponentProps<any>, IState> {
                 <Text>{k} : </Text>
                 <TextInput
                   key={k}
-                  keyboardType="decimal-pad"
+                  keyboardType="phone-pad"
                   onChangeText={(e) => this.bindInput(k, e)}
                   placeholder="Column Name"
                   value={this.state[k]} />
@@ -123,7 +123,7 @@ export default class extends React.Component<RouteComponentProps<any>, IState> {
             <View style={{ flexDirection: "row" }}>
               <Text>Date Format : </Text>
               <TextInput
-                keyboardType="decimal-pad"
+                keyboardType="phone-pad"
                 onChangeText={(e) => this.setState({ ...this.state, DateFormat: e })}
                 placeholder="YYYY/MM/DD"
                 value={this.state.DateFormat} />

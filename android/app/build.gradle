@@ -101,7 +101,7 @@ android {
         applicationId "com.freeconomy"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 26
+        versionCode 29
         versionName "0.0.4"
         ndk {
             abiFilters "armeabi-v7a", "x86"

@@ -150,7 +150,7 @@ class AddTransactionView extends React.Component<IProps, IState> {
               style={{
                 ...styles.input,
               }}
-              keyboardType="decimal-pad"
+              keyboardType="phone-pad"
               onChangeText={(v: string) => this.changePriceFrom(v)}
               value={this.state.PriceFrom} />
           </View>
@@ -170,7 +170,7 @@ class AddTransactionView extends React.Component<IProps, IState> {
               style={{
                 ...styles.input,
               }}
-              keyboardType="decimal-pad"
+              keyboardType="phone-pad"
               onChangeText={(v: string) => this.changePriceFrom(v)}
               value={this.state.PriceFrom} />
           </View>
