@@ -1496,6 +1496,13 @@ cordova-plugin-device@^2.0.3:
   resolved "https://registry.yarnpkg.com/cordova-plugin-device/-/cordova-plugin-device-2.0.3.tgz#c2b41b7efd0455dd097f89356d85bfdd5dadeb0f"
   integrity sha512-Jb3V72btxf3XHpkPQsGdyc8N6tVBYn1vsxSFj43fIz9vonJDUThYPCJJHqk6PX6N4dJw6I4FjxkpfCR4LDYMlw==
 
+cordova-plugin-googleplus@8.4.0:
+  version "8.4.0"
+  resolved "https://registry.yarnpkg.com/cordova-plugin-googleplus/-/cordova-plugin-googleplus-8.4.0.tgz#ee518fed0c7efb8ae3e7d8ffac16a1c261402aab"
+  integrity sha512-r8Zwtr2yQabzoFmhjSSC96VM94qMS7QkFjQjaJU2WSwTw8Xb6SBgwYUlJUvH0qTaasz3oOF8/B09W81OzWUTgg==
+  dependencies:
+    q "*"
+
 cordova-plugin-webpack@^1.0.2:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/cordova-plugin-webpack/-/cordova-plugin-webpack-1.0.2.tgz#f1a0d258ead07b7623aa16f5fdb9a50a7be440bb"
@@ -1926,6 +1933,11 @@ dir-glob@^2.2.2:
   integrity sha512-f9LBi5QWzIW3I6e//uxZoLBlUt9kcp66qo0sSCxL6YZKc75R1c4MFCoe/LaZiBGmgujvQdxc5Bn3QhfyvK5Hsw==
   dependencies:
     path-type "^3.0.0"
+
+direct-vuex@^0.10.4:
+  version "0.10.4"
+  resolved "https://registry.yarnpkg.com/direct-vuex/-/direct-vuex-0.10.4.tgz#905cfa24cd133b3aac9ae92ad8ff2ca0a9953466"
+  integrity sha512-xCQKdyRsbE0QDtQKAy8JqZF//Z/yGlf7ihOJi3mKwV/RHEGZ3h5CxCaJCkcBJbbFokODXl3Ci6tng2QnCrvmrQ==
 
 dns-equal@^1.0.0:
   version "1.0.0"
@@ -5290,7 +5302,7 @@ punycode@^2.1.0, punycode@^2.1.1:
   resolved "https://registry.yarnpkg.com/punycode/-/punycode-2.1.1.tgz#b58b010ac40c22c5657616c8d2c2c02c7bf479ec"
   integrity sha512-XRsRjdf+j5ml+y/6GKHPZbrF/8p2Yga0JPtdqTIY2Xe5ohJPD9saDJJLPvp9+NSBprVvevdXZybnj2cv8OEd0A==
 
-q@^1.4.1, q@^1.5.1:
+q@*, q@^1.4.1, q@^1.5.1:
   version "1.5.1"
   resolved "https://registry.yarnpkg.com/q/-/q-1.5.1.tgz#7e32f75b41381291d04611f1bf14109ac00651d7"
   integrity sha1-fjL3W0E4EpHQRhHxvxQQmsAGUdc=
@@ -6904,6 +6916,11 @@ vue@^2.6.11:
   version "2.6.11"
   resolved "https://registry.yarnpkg.com/vue/-/vue-2.6.11.tgz#76594d877d4b12234406e84e35275c6d514125c5"
   integrity sha512-VfPwgcGABbGAue9+sfrD4PuwFar7gPb1yl1UK1MwXoQPAw0BKSqWfoYCT/ThFrdEVWoI51dBuyCoiNU9bZDZxQ==
+
+vuex@^3.2.0:
+  version "3.2.0"
+  resolved "https://registry.yarnpkg.com/vuex/-/vuex-3.2.0.tgz#86da7f26c3e131ff374870580109145a640ee5a8"
+  integrity sha512-qBZGJJ1gUNWZbfZlH7ylIPwENg3R0Ckpq+qPexF065kOMOt1Ixt8WDJmtssVv7OhepWD0+Qie7pOS8f0oQy1JA==
 
 watchpack@^1.6.0:
   version "1.6.1"

@@ -12,6 +12,10 @@
     },
     "cordova-plugin-webpack": {
       "PACKAGE_NAME": "com.github.snigle.freeconomy"
+    },
+    "cordova-plugin-googleplus": {
+      "PLAY_SERVICES_VERSION": "15.0.1",
+      "PACKAGE_NAME": "com.github.snigle.freeconomy"
     }
   },
   "dependent_plugins": {}

@@ -7,6 +7,7 @@ import Vue from "vue";
 import App from "./appVue/app.vue";
 import Navbar from "./components/navbar.vue";
 import { any } from "prop-types";
+import store from "./appVue/store";
 
 
 var app = {
