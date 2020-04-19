@@ -3,8 +3,8 @@ import * as _ from "lodash";
 import moment from "moment";
 import * as querystring from "querystring";
 import * as React from "react";
-import { Platform, View } from "react-native";
-import { Header, Icon, Input, SearchBar } from "react-native-elements";
+import { View } from "react-native";
+import { Header, Icon, SearchBar } from "react-native-elements";
 import { Route, RouteComponentProps } from "react-router";
 import GroupTransactionsByDay from "./GroupTransactionsByDay";
 import Loading from "./Loading";
@@ -97,6 +97,10 @@ class TransactionsView extends React.Component<IProps, IState> {
       ]))
       .then(([transactions, wallets, categories, transfert, currency]) => {
         let title = this.state.Title;
+        // Promise.All add | undefined on every types returned.. Should be patched in next typescript release.
+        if (_.isUndefined(wallets) || _.isUndefined(transfert) || _.isUndefined(transactions) || _.isUndefined(categories)) {
+          throw "internal error, promise.all should not return undefined values"
+        }
         const wallet = wallets.find((w) => w.UUID === filters.walletUUID);
         if (wallet && wallet.Name) {
           title = wallet.Name;

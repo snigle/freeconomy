@@ -4,15 +4,17 @@
  * @flow
  */
 
-import * as React from "react";
-import {
-  AsyncStorage,
-  View,
-} from "react-native";
-
 import * as querystring from "querystring";
+import * as React from "react";
+import { AsyncStorage, View } from "react-native";
+// Redux
+import { connect, Provider } from "react-redux";
 import { match, Route, RouteComponentProps } from "react-router";
 import { withRouter } from "react-router-native";
+import { applyMiddleware, compose, createStore } from "redux";
+import { createLogger } from "redux-logger";
+import promise from "redux-promise";
+import thunk from "redux-thunk";
 import AddCategoryView from "./AddCategoryView";
 import AddTransactionView from "./AddTransactionView";
 import AddTransfertView from "./AddTransfertView";
@@ -22,6 +24,11 @@ import DeleteCategoryView from "./DeleteCategoryView";
 import DeleteWalletView from "./DeleteWalletView";
 import GoogleSyncOAuthCallBack from "./GoogleSyncOAuthCallBack";
 import ImportTransactionsView from "./ImportTransactionsView";
+import Loading from "./Loading";
+import LoginView from "./LoginView";
+import reducer from "./reducer";
+import { setLogged } from "./reducer/login";
+import RepeatOperation from "./RepeatOperation";
 import BalanceReport from "./reports/BalanceReport";
 import ReportPie from "./reports/ReportPie";
 import TransactionsByBeneficiary from "./reports/TransactionsByBeneficiary";
@@ -29,20 +36,8 @@ import TransactionsView from "./TransactionsView";
 import t from "./translator";
 import WalletsView from "./WalletsView";
 
-// @ts-ignore
-import { AppBar, connectTheme, Icon, IconToggle } from "carbon-ui";
 
-// Redux
-import { connect, Provider } from "react-redux";
-import { applyMiddleware, compose, createStore } from "redux";
-import { createLogger } from "redux-logger";
-import promise from "redux-promise";
-import thunk from "redux-thunk";
-import Loading from "./Loading";
-import LoginView from "./LoginView";
-import reducer from "./reducer";
-import { setLogged } from "./reducer/login";
-import RepeatOperation from "./RepeatOperation";
+
 
 interface IProps {
   match: match<any>;
@@ -148,7 +143,7 @@ class App extends React.Component<any, IState> {
         path="/Wallet/:WalletUUID/AddTransactionView"
         exact
         component={(props: RouteComponentProps<{ WalletUUID: string }>) =>
-          <AddTransactionView WalletUUID={props.match.params.WalletUUID} history={props.history} />}
+          <AddTransactionView WalletUUID={props.match.params.WalletUUID} history={props.history} Repeatable={false} />}
       />
       <Route
         path="/Wallet/:WalletUUID/AddTransactionView/:TransactionUUID"
@@ -156,6 +151,7 @@ class App extends React.Component<any, IState> {
           <AddTransactionView
             WalletUUID={props.match.params.WalletUUID}
             TransactionUUID={props.match.params.TransactionUUID}
+            Repeatable={querystring.parse(props.location.search.replace("?","")).repeatable !== ""}
             history={props.history} />
         }
       />

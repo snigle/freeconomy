@@ -3,11 +3,8 @@ import { TextField } from "carbon-ui";
 import { History } from "history";
 import * as _ from "lodash";
 import * as React from "react";
-import {
-  AsyncStorage, Button, Picker, Platform,
-  ScrollView, Text, TextInput, TextStyle, TouchableHighlight, View,
-} from "react-native";
-import { Colors, Header, Icon } from "react-native-elements";
+import { AsyncStorage, Button, Picker, ScrollView, Text, TextInput, TextStyle, TouchableHighlight, View } from "react-native";
+import { Header, Icon } from "react-native-elements";
 import DatePicker from "./DatePicker";
 import RepeatInput from "./formInputs/RepeatInput";
 import { MyLink } from "./Link";
@@ -27,6 +24,7 @@ interface IProps {
   WalletUUID: string;
   TransactionUUID?: string;
   history: History;
+  Repeatable:boolean;
 }
 
 interface IAutoComplete {
@@ -98,6 +96,9 @@ class AddTransactionView extends React.Component<IProps, IState> {
       Models.GetAllTransactions(this.props.WalletUUID),
       getTransactionPromise,
     ]).then(([categories, transactions, transaction]) => {
+      if (!categories) {
+        throw "internal error: catagories is null"
+      }
       let defaultCategory = categories[0];
       if (this.state.CategoryUUID) {
         defaultCategory = categories.find((c) => c.UUID === this.state.CategoryUUID) || defaultCategory;
@@ -278,7 +279,11 @@ class AddTransactionView extends React.Component<IProps, IState> {
   public save(andNew: boolean = false) {
     this.setState({ ...this.state, Loading: true });
     const savePromise: Promise<any> = this.props.TransactionUUID ?
-      Models.UpdateTransaction(this.props.TransactionUUID, this.state) :
+    // TODO: update repeatable here
+    // Finally I should juste add parameter in repeat object (next values and edit the older transaction to be easier than store a new collection)
+      this.props.Repeatable ? 
+        Models.UpdateRepeatableTransaction(this.props.TransactionUUID, this.state) :
+        Models.UpdateTransaction(this.props.TransactionUUID, this.state) :
       Models.CreateTransaction(this.state);
     Promise.all([
       AsyncStorage.setItem("redirect_path", `/TransactionsView?walletUUID=${this.state.WalletUUID}`),

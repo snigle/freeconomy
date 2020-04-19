@@ -195,3 +195,27 @@ export interface ICollection {
   UUID: string;
   LastUpdate: Date;
 }
+
+export interface IRepeatable {
+  Transaction?: {
+      New: ITransaction;
+      From: ITransaction;
+  };
+  Transfert?: {
+      New: ITransfert;
+      From: ITransfert;
+  };
+  UUID: string;
+}
+
+export const RepeatableDefault = (w: IRepeatable): IRepeatable => ({
+  UUID: w.UUID || v4(),
+  Transaction: w.Transaction ? {
+    From: TransactionDefault(w.Transaction.From),
+    New: TransactionDefault(w.Transaction.New),
+  } : undefined,
+  Transfert: w.Transfert ? {
+    From : TransfertDefault(w.Transfert.From),
+    New: TransfertDefault(w.Transfert.New),
+  } : undefined,
+});

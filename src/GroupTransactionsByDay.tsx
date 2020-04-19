@@ -3,12 +3,10 @@ import * as _ from "lodash";
 import moment from "moment";
 import * as React from "react";
 import { Platform, SectionList, SectionListData, Text, View } from "react-native";
-import { Divider, Icon } from "react-native-elements";
 import * as Models from "./Models";
 import DisplayDay from "./pureComponents/DisplayDay";
 import TransactionListItem from "./TransactionListItem";
 import { IFilters } from "./TransactionsView";
-import TransfertListItem from "./TransfertListItem";
 import { displayPrice, ICategory, ICurrency, ITransaction, ITransfert, IWallet } from "./Types";
 
 interface ITransactionByDay { day: Date; transactions: IPricedTransaction[]; }
@@ -32,6 +30,7 @@ interface IProps {
   history: History;
   Wallets: IWallet[];
   Filters: IFilters;
+  ReapeatableView?: boolean;
 }
 
 interface ISelected {
@@ -60,7 +59,8 @@ export default class extends React.PureComponent<IProps, IState> {
 
     if (transaction.Transaction) {
       return <TransactionListItem
-        EditRoute={`/Wallet/${transaction.Transaction.WalletUUID}/AddTransactionView/${transaction.Transaction.UUID}`}
+        // Repeatable = 1 permit to edit only the repeated transaction (in the future), not the current one.
+        EditRoute={`/Wallet/${transaction.Transaction.WalletUUID}/AddTransactionView/${transaction.Transaction.UUID}${props.ReapeatableView ? "?repeatable=1" : "" }`}
         Category={categories[transaction.Transaction.CategoryUUID] || defaultCategory}
         Currency={props.Currency}
         history={props.history}
@@ -87,7 +87,7 @@ export default class extends React.PureComponent<IProps, IState> {
       const income = (props.WalletUUID === transaction.Transfert.To.WalletUUID);
 
       return <TransactionListItem
-        EditRoute={`/Wallet/${transaction.Transfert.From.WalletUUID}/AddTransfertView/${transaction.UUID}`}
+        EditRoute={`/Wallet/${transaction.Transfert.From.WalletUUID}/AddTransfertView/${transaction.UUID}${props.ReapeatableView ? "?repeatable=1" : "" }`}
         Category={{
           Icon: { Color: transaction.Price > 0 ? "#00AA00" : "#EE0000", Name: "sync", Type: "material" },
           Name: "",

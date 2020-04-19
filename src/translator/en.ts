@@ -151,5 +151,6 @@ export default {
     title: "Recurring Operations",
     insertAll: "Save all",
     insertSelected: "Save selected",
+    empty: "No more operation to come",
   },
 };

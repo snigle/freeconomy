@@ -2,23 +2,7 @@ import * as _ from "lodash";
 import { AsyncStorage } from "react-native";
 import { v4 } from "uuid";
 import { GoogleSync } from "./Sync";
-import {
-  CategoryDefault,
-  ICategory,
-  ICategoryInput,
-  ICollection,
-  ICurrency,
-  ILogin,
-  ITransaction,
-  ITransactionInput,
-  ITransfert,
-  ITransfertInput,
-  IWallet,
-  IWalletInput,
-  TransactionDefault,
-  TransfertDefault,
-  WalletDefault,
-} from "./Types";
+import { CategoryDefault, ICategory, ICategoryInput, ICollection, ICurrency, ILogin, IRepeatable, ITransaction, ITransactionInput, ITransfert, ITransfertInput, IWallet, IWalletInput, RepeatableDefault, TransactionDefault, TransfertDefault, WalletDefault } from "./Types";
 
 export function CleanAll(): Promise<void> {
   return AsyncStorage.getAllKeys().then((keys) =>
@@ -43,6 +27,20 @@ export async function GetWallets(): Promise<IWallet[]> {
     }
     return result.map(WalletDefault);
   });
+}
+
+export async function GetRepeatables(): Promise<IRepeatable[]> { 
+  return AsyncStorage.getItem("repeatables").then((raw) => {
+    const result: IRepeatable[] | null = raw ? JSON.parse(raw) : null;
+    if (!result) {
+      return [];
+    }
+    return result.map(RepeatableDefault);
+  });
+}
+
+export async function SaveRepeatables(repeatables: IRepeatable[]): Promise<IRepeatable[]> {
+  return AsyncStorage.setItem("repeatables", JSON.stringify(repeatables)).then(() => repeatables);
 }
 
 export async function CreateWallet(input: IWalletInput): Promise<IWallet[]> {

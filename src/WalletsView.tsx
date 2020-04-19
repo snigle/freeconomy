@@ -1,21 +1,21 @@
 import { History } from "history";
 import * as _ from "lodash";
+import querystring from "querystring";
 import * as React from "react";
 import { ScrollView, Text, View } from "react-native";
-import { Card, Divider, Header, Icon } from "react-native-elements";
+import { Card, Divider, Header } from "react-native-elements";
+import { RouteComponentProps } from "react-router";
+import { MyLink } from "./Link";
 import Loading from "./Loading";
 import * as Models from "./Models";
-import { displayPrice, IWallet } from "./Types";
-import WalletListItem from "./WalletListItem";
-
-import querystring from "querystring";
-import { Route, RouteComponentProps, RouteProps } from "react-router";
-import { MyLink } from "./Link";
 import MoreActions from "./MoreActions";
-import { getRepeatOperations, IRepeatable } from "./RepeatOperation";
+import { getRepeatOperations } from "./RepeatOperation";
 import SideBar, { SideBarClass } from "./SideBar";
 import SyncBar, { SyncBarStyle } from "./SyncBar";
 import t from "./translator";
+import { displayPrice, IRepeatable, IWallet } from "./Types";
+import WalletListItem from "./WalletListItem";
+
 
 interface IState {
   Wallets?: IWallet[];

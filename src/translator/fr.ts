@@ -152,5 +152,6 @@ export default {
     title: "Opération Récurrentes",
     insertAll: "Enregistrer tout",
     insertSelected: "Enregistrer la sélection",
+    empty: "Il n'y a plus d'operation à venir"
   },
 };

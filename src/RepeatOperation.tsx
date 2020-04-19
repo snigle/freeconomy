@@ -4,27 +4,15 @@ import * as React from "react";
 import { Button, Text, View } from "react-native";
 import { Header, Icon } from "react-native-elements";
 import { RouteComponentProps } from "react-router";
-import { v4 } from "uuid";
 import GroupTransactionsByDay from "./GroupTransactionsByDay";
 import { MyLink } from "./Link";
 import Loading from "./Loading";
 import * as Models from "./Models";
-import SideBar, { SideBarClass } from "./SideBar";
+import SideBar from "./SideBar";
 import SyncBar from "./SyncBar";
 import t from "./translator";
-import { ICategory, ITransaction, ITransactionInput, ITransfert, ITransfertInput, IWallet } from "./Types";
+import { ICategory, IRepeatable, IWallet } from "./Types";
 
-export interface IRepeatable {
-    Transaction?: {
-        New: ITransaction;
-        From: ITransaction;
-    };
-    Transfert?: {
-        New: ITransfert;
-        From: ITransfert;
-    };
-    UUID: string;
-}
 
 export async function getRepeatOperations(): Promise<IRepeatable[]> {
     // Get all repeat transaction
@@ -35,7 +23,12 @@ export async function getRepeatOperations(): Promise<IRepeatable[]> {
         (trs) => trs.filter((tr) => tr.Repeat !== null),
     );
 
-    const results: IRepeatable[] = [];
+    // List repeatables saved in cache
+    const results: IRepeatable[] = await Models.GetRepeatables();
+
+    // Create map to not add repeatable already saved.
+    const mapUUID : { [key:string]:boolean; } = {};
+    _.forEach(results, r => (mapUUID[r.UUID] = true))
 
     const repeatTreshold = moment().add(5, "days");
     _.forEach(transactions, (tr) => {
@@ -43,7 +36,7 @@ export async function getRepeatOperations(): Promise<IRepeatable[]> {
             return;
         }
         const repeatDate = moment(tr.Date).add(tr.Repeat.Duration, tr.Repeat.DurationType);
-        if (tr.Repeat && tr.Repeat.MaxOccurrence !== 0 && repeatTreshold.isAfter(repeatDate)) {
+        if (tr.Repeat && tr.Repeat.MaxOccurrence !== 0 && repeatTreshold.isAfter(repeatDate) && !mapUUID[tr.UUID]) {
             results.push({
                 UUID: tr.UUID,
                 Transaction: {
@@ -73,7 +66,7 @@ export async function getRepeatOperations(): Promise<IRepeatable[]> {
             return;
         }
         const repeatDate = moment(tr.Date).add(tr.Repeat.Duration, tr.Repeat.DurationType);
-        if (tr.Repeat && tr.Repeat.MaxOccurrence !== 0 && repeatTreshold.isAfter(repeatDate)) {
+        if (tr.Repeat && tr.Repeat.MaxOccurrence !== 0 && repeatTreshold.isAfter(repeatDate) && !mapUUID[tr.UUID]) {
             results.push({
                 UUID: tr.UUID,
                 Transfert: {
@@ -96,9 +89,8 @@ export async function getRepeatOperations(): Promise<IRepeatable[]> {
         }
     });
 
-    console.log("repeatable", results);
-
-    return results;
+    // Store repeatables to permit to update later (update price/date/etc..)
+    return Models.SaveRepeatables(results);
 }
 
 interface IState {
@@ -150,6 +142,7 @@ export default class extends React.PureComponent<RouteComponentProps<any>, IStat
                     Transactions={_.compact(this.state.Repeatables.map((r) => r.Transaction && r.Transaction.New))}
                     Transfert={_.compact(this.state.Repeatables.map((r) => r.Transfert && r.Transfert.New))}
                     Wallets={this.state.Wallets}
+                    ReapeatableView={true}
                 ></GroupTransactionsByDay>
                 <View style={{ flexDirection: "row" }}>
                     <View style={{ flex: 1, padding: 10 }}>
