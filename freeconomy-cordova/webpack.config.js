@@ -18,7 +18,7 @@ module.exports = {
         new VueLoaderPlugin(),
     ],
     resolve: {
-        extensions: ['.ts','.js', '.jsx', '.tsx'],
+        extensions: ['.ts','.js', '.jsx', '.tsx','.css'],
         alias: {
             'vue$': 'vue/dist/vue.esm.js'
         },
@@ -41,8 +41,13 @@ module.exports = {
                 exclude: [/node_modules/],
                 use: ['style-loader', 'css-loader', 'sass-loader']
             },
+            // {
+            //     test: /\.css$/,
+            //     use: ['style-loader',
+            //     { loader: 'css-loader', options: { importLoaders: 1 } }]
+            // },
             {
-                test: /\.(gif|jpe?g|png|svg)$/,
+                test: /\.(gif|jpe?g|png|svg|woff|woff2|eot|ttf)$/,
                 use: {
                     loader: 'url-loader',
                     options: {

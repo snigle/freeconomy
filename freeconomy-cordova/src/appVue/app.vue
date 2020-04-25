@@ -12,6 +12,7 @@
           <div v-if="cordova" class="nav-link">Logged</div>
           <div v-if="cordova" class="nav-link">Cordova active</div>
         </Navbar>
+        <router-view></router-view>
         <div>Loggin OK</div>
       </div>
     </div>
@@ -27,6 +28,7 @@ import Login from "./login.vue";
 import Component from "vue-class-component";
 import * as Models from "../lib/models";
 import Vuex from "vuex";
+import Desktop from "./desktop.vue";
 
 import store from "./store";
 
@@ -37,12 +39,15 @@ const Bar = Vue.extend({ template: "<div>bar</div>" });
 
 const toto: string = "10";
 const routes: Array<RouteConfig> = [
-  { path: "/foo", component: Foo },
+  { path: "/", component: Desktop },
+  { path: "/transactions/currency/:currencyCode", name: "transactionsByCurrency", component: Desktop },
+  { path: "/transactions/wallet/:wallet", name: "transactionsByWallet", component: Desktop },
   { path: "/bar", component: Bar }
 ];
 
 const router = new VueRouter({
-  routes
+  routes,
+  linkActiveClass:"active",
 });
 
 @Component({
@@ -60,22 +65,20 @@ export default class AppVue extends Vue {
   loading = true;
 
   mounted() {
-    Promise.all(
-      [
-        new Promise((resolve, reject) => {
-          document.addEventListener(
+    Promise.all([
+      new Promise((resolve, reject) => {
+        document.addEventListener(
           "deviceready",
           () => (this.cordova = true),
           false
         );
-        }),
-        store.dispatch.initialize(),
-      ]
-    ).then(() => this.loading = false);
+      }),
+      store.dispatch.initialize()
+    ]).then(() => (this.loading = false));
   }
 
   get logged() {
-    return store.getters.isLogged;
+    return store.state.login.logged;
   }
 }
 </script>

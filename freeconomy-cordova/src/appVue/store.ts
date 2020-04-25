@@ -3,8 +3,9 @@ import Vuex from "vuex";
 
 import { createDirectStore } from "direct-vuex"
 import * as Models from "../lib/models"
-import {ILogin} from "../lib/types"
+import {ILogin, IWallet, ITransfert, ITransaction, ICategory} from "../lib/types"
 import {login} from "../lib/oauth"
+import _ from "lodash";
 
 Vue.use(Vuex);
 const { store, rootActionContext, moduleActionContext } = createDirectStore({
@@ -21,14 +22,26 @@ const { store, rootActionContext, moduleActionContext } = createDirectStore({
             synced: false,
             error: false,
         },
-        wallets: [],
-        categories: [],
-        transactions: [],
+        wallets: [] as Array<IWallet>,
+        categories: [] as Array<ICategory>,
+        transactions: [] as Array<ITransaction>,
+        transferts: [] as Array<ITransfert>,
     },
     getters: {
-        isLogged(state) { return state.login.logged },
     },
     mutations: {
+        setWallets(state, wallets : Array<IWallet>) {
+            state.wallets = wallets;
+        },
+        setTransactions(state, transactions : Array<ITransaction>) {
+            state.transactions = transactions;
+        },
+        setTransferts(state, transferts : Array<ITransfert>) {
+            state.transferts = transferts;
+        },
+        setCategories(state, categories: Array<ICategory>) {
+            state.categories = categories;
+        },
         setAutosync(state, value: boolean) {
             state.autosync = value;
         },
@@ -85,8 +98,16 @@ const { store, rootActionContext, moduleActionContext } = createDirectStore({
             return Promise.all([
                 Models.GetLogin().then(login =>state.commit("setLogged", login)).catch(err => console.log("not logged",err)),
                 Models.getAutoSync().then((value) => state.commit("setAutosync", value)),
-            ]);
+            ])
         },
+        loadData(state) {
+           return Promise.all([
+               Models.GetWallets().then(wallets => state.commit("setWallets", wallets)),
+               Models.GetAllTransactions().then(transactions => state.commit("setTransactions", transactions)),
+               Models.GetTransferts().then(transferts => state.commit("setTransferts", transferts)),
+               Models.GetCategories().then(categories => state.commit("setCategories", categories)),
+           ]) 
+        }
     }
 })
 
