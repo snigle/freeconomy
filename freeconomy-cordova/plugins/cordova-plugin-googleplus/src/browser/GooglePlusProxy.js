@@ -57,6 +57,7 @@ var GooglePlusProxy = {
 
     login: function (success, error, options) {
         var that = this;
+        
         if (!__googleSdkReady) {
             return __googleCallbacks.push(function() {
                 that.login(success, error, options);
@@ -65,7 +66,7 @@ var GooglePlusProxy = {
 
         gapi.auth2.getAuthInstance().signIn(options).then(function () {
             GooglePlusProxy.updateSigninStatus(gapi.auth2.getAuthInstance().isSignedIn.get(), success, error);
-        }, function(err) {
+        }, function(err) { 
             error(err);
         });
     },

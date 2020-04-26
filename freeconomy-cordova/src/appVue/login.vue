@@ -15,7 +15,7 @@ import { GoogleSync } from "../lib/sync";
 export default class Login extends Vue {
   login() {
     console.log("try to login");
-    store.dispatch.login().then(() => GoogleSync());
+    store.dispatch.loginAndSync();
   }
 }
 </script>

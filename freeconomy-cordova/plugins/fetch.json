@@ -18,12 +18,12 @@
   "cordova-plugin-googleplus": {
     "source": {
       "type": "registry",
-      "id": "cordova-plugin-googleplus"
+      "id": "cordova-plugin-googleplus@8.4.0"
     },
     "is_top_level": true,
     "variables": {
-      "REVERSED_CLIENT_ID": "com.googleusercontent.apps.896727015937-75cu1ksrppigdq5omedqj7ehmg5cq6gp",
-      "WEB_APPLICATION_CLIENT_ID": "com.googleusercontent.apps.136643286294-fv3o8ng5rodjv37cqpbfi63bok4i5084"
+      "REVERSED_CLIENT_ID": "com.googleusercontent.apps.136643286294-p8r126j3803914r1vp0fdehjv5g2vbfn",
+      "WEB_APPLICATION_CLIENT_ID": "136643286294-tq30lcaqafpkph4hb9muohe6ctt1291i.apps.googleusercontent.com"
     }
   }
 }

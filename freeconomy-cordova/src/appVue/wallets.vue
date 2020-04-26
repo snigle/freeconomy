@@ -7,15 +7,16 @@
   <div>
     <div class="card" v-for="currencyGroup in wallets" v-bind:key="currencyGroup.Code">
       <router-link
-        v-bind:to="{name: 'transactionsByCurrency', params : {currencyCode: currencyGroup.Currency.Code}}"
+        v-bind:to="{name: 'transactions', query : {currencyCode: currencyGroup.Currency.Code}}"
         class="card-header bg-primary text-white"
       >{{currencyGroup.Currency.Code}}</router-link>
       <div class="list-group list-group-flush">
         <router-link
           v-for="wallet in currencyGroup.Wallets"
           v-bind:key="wallet.UUID"
-          v-bind:to="{name: 'transactionsByWallet', params : {wallet: wallet.UUID}}"
+          v-bind:to="{name: 'transactions', query : {wallet: wallet.UUID}}"
           class="list-group-item list-group-item-action"
+          v-bind:class="{active: $router.query && (wallet.UUID === $router.query.wallet)}"
         >{{wallet.Name}}</router-link>
       </div>
     </div>

@@ -1,6 +1,5 @@
 cordova.define("cordova-plugin-googleplus.GooglePlusProxy", function(require, exports, module) { var __googleSdkReady = false;
 var __googleCallbacks = [];
-
 var GooglePlusProxy = {
 
     isAvailable: function (success, error) {
@@ -45,21 +44,21 @@ var GooglePlusProxy = {
         }
     },
 
-    trySilentLogin: function (success, error, options) {
+    trySilentLogin: function (success, error, [options]) {
         if (!__googleSdkReady) {
             return __googleCallbacks.push(function() {
-                this.trySilentLogin(success, error, options);
+                this.trySilentLogin(success, error, [options]);
             });
         }
 
         GooglePlusProxy.updateSigninStatus(gapi.auth2.getAuthInstance().isSignedIn.get(), success, error);
     },
 
-    login: function (success, error, options) {
+    login: function (success, error, [options]) {
         var that = this;
         if (!__googleSdkReady) {
             return __googleCallbacks.push(function() {
-                that.login(success, error, options);
+                that.login(success, error, [options]);
             });
         }
 
@@ -106,7 +105,7 @@ if (window.location.protocol === "file:") {
     window.handleClientLoad = function() {
         gapi.load('auth2', function () {
             gapi.auth2.init({
-                client_id: "136643286294-fv3o8ng5rodjv37cqpbfi63bok4i5084.apps.googleusercontent.com" // CLIENT_ID is populated by the cordova after_prepare hook
+                client_id: "136643286294-tq30lcaqafpkph4hb9muohe6ctt1291i.apps.googleusercontent.com" // CLIENT_ID is populated by the cordova after_prepare hook
             }).then(function () {
                 __googleSdkReady = true;
 

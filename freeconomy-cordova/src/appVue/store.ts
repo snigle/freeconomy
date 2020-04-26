@@ -6,6 +6,7 @@ import * as Models from "../lib/models"
 import {ILogin, IWallet, ITransfert, ITransaction, ICategory} from "../lib/types"
 import {login} from "../lib/oauth"
 import _ from "lodash";
+import { GoogleSync } from "../lib/sync";
 
 Vue.use(Vuex);
 const { store, rootActionContext, moduleActionContext } = createDirectStore({
@@ -89,10 +90,16 @@ const { store, rootActionContext, moduleActionContext } = createDirectStore({
             Models.setAutoSync(true).then(() => state.commit("setAutosync", true));
         },
         login (state) {
-            return login().then((login => Models.SaveLogin(login))).then(login =>state.commit("setLogged", login)).catch(e => state.commit("setLogginError",e));
+            return login().then((login => Models.SaveLogin(login))).then(login =>state.commit("setLogged", login)).catch(e => {state.commit("setLoginError",e); throw e});
+        },
+        loginAndSync (state) {
+            return state.dispatch("login").then(() => state.dispatch("sync"));
         },
         logout (state) {
             return Models.CleanAll().then(() => state.commit("setLogout"));
+        },
+        sync(state) {
+            return GoogleSync().catch(() => state.commit("syncError"));
         },
         initialize(state) {
             return Promise.all([

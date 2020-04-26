@@ -8,9 +8,9 @@
 .icon {
   width: @iconSize;
   height: @iconSize;
-  text-align:center;
-  color:white;
-  font-size:@iconSize * 80 / 100;
+  text-align: center;
+  color: white;
+  font-size: @iconSize * 80 / 100;
   display: flex;
   justify-content: center;
   align-content: center;
@@ -24,7 +24,9 @@
         v-bind:key="day.Day.toString()"
         class="day list-group-item"
       >{{day.Day.format("dddd Do MMMM YYYY")}}</div>
-      <div class="list-group-item" v-for="line in day.Lines" v-bind:key="line.UUID">
+      <router-link class="list-group-item list-group-item-action" v-for="line in day.Lines" v-bind:key="line.UUID"
+      v-bind:to="line.EditLink"
+      >
         <div class="container">
           <div class="row">
             <div
@@ -49,7 +51,7 @@
             </div>
           </div>
         </div>
-      </div>
+      </router-link>
     </template>
   </div>
 </template>
@@ -57,6 +59,7 @@
 <script lang="ts">
 import Vue from "vue";
 import Component from "vue-class-component";
+import {Location} from "vue-router";
 import {
   ITransaction,
   IWallet,
@@ -82,6 +85,7 @@ interface ILine {
   Date: Date;
   UUID: string;
   Category: ICategory;
+  EditLink: Location;
 }
 
 const defaultCategory: ICategory = {
@@ -114,7 +118,6 @@ export default class Transactions extends Vue {
     return (
       store.state.wallets.find(
         w =>
-          w.UUID === this.$route.params.wallet ||
           w.UUID === this.$route.query.wallet
       ) || null
     );
@@ -126,10 +129,10 @@ export default class Transactions extends Vue {
     }
 
     let firstWalletOfCurrency = _.first(store.state.wallets);
-    if (this.$route.params.currencyCode) {
+    if (this.$route.query.currencyCode) {
       firstWalletOfCurrency = _.find(
         store.state.wallets,
-        w => w.Currency.Code === this.$route.params.currencyCode
+        w => w.Currency.Code === this.$route.query.currencyCode
       );
     }
     if (!firstWalletOfCurrency) {
@@ -173,7 +176,8 @@ export default class Transactions extends Vue {
       TotalPrice: 0,
       Category:
         _.find(this.categories, c => c.UUID === t.CategoryUUID) ||
-        defaultCategory
+        defaultCategory,
+        EditLink: {name: "editTransaction", params: { "transaction": t.UUID}, query: {...this.$route.query}},
     }));
   }
 
@@ -192,6 +196,7 @@ export default class Transactions extends Vue {
         Transfert: t,
         Price: price,
         TotalPrice: 0,
+        EditLink: {name: "editTransfert", params: {"transfert": t.UUID}, query: {...this.$route.query}},
         Category: {
           Icon: {
             Color: price > 0 ? "#00AA00" : "#EE0000",

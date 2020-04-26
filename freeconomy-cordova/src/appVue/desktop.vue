@@ -1,10 +1,11 @@
 <template>
-  <div class="container-fluid">
-    <div class="row" v-if="!loading">
+  <div class="container-fluid" v-if="!loading">
+    <div class="row">
       <Wallets class="col-4" />
       <Transactions class="col-4" />
       <div class="col"></div>
     </div>
+    <router-view></router-view>
   </div>
 </template>
 <script lang="ts">
