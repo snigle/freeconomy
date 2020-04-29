@@ -1,7 +1,7 @@
 <template>
   <div>
-    <div>Login Page</div>
-    <button class="btn btn-primary" v-on:click="login">Click here to login</button>
+    <div>{{$t($t.keys.login.welcome)}}</div>
+    <button class="btn btn-primary" v-on:click="login">{{$t($t.keys.login.buttonWithGoogle)}}</button>
   </div>
 </template>
 
@@ -14,7 +14,6 @@ import { GoogleSync } from "../lib/sync";
 @Component({})
 export default class Login extends Vue {
   login() {
-    console.log("try to login");
     store.dispatch.loginAndSync();
   }
 }

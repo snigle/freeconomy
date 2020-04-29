@@ -136,7 +136,7 @@ export default class Transactions extends Vue {
       );
     }
     if (!firstWalletOfCurrency) {
-      console.log("wallet not found");
+      store.commit.showError({text: this.$t(this.$t.keys.errors.needWalletToDisplayTransactions)});
       return null;
     }
     return firstWalletOfCurrency.Currency;

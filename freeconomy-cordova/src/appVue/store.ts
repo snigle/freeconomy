@@ -1,12 +1,19 @@
 import Vue from "vue";
 import Vuex from "vuex";
 
-import { createDirectStore } from "direct-vuex"
+import { createDirectStore, StateDeclaration } from "direct-vuex"
 import * as Models from "../lib/models"
-import {ILogin, IWallet, ITransfert, ITransaction, ICategory} from "../lib/types"
-import {login} from "../lib/oauth"
+import { ILogin, IWallet, ITransfert, ITransaction, ICategory } from "../lib/types"
+import { login } from "../lib/oauth"
 import _ from "lodash";
 import { GoogleSync } from "../lib/sync";
+import { v4 } from "uuid";
+
+interface IError {
+    text: string;
+    err?: any;
+    uuid: string;
+}
 
 Vue.use(Vuex);
 const { store, rootActionContext, moduleActionContext } = createDirectStore({
@@ -17,6 +24,7 @@ const { store, rootActionContext, moduleActionContext } = createDirectStore({
             data: null as ILogin | null,
             error: null as string | null,
         },
+        errors: [] as Array<IError>,
         autosync: false,
         sync: {
             syncing: false,
@@ -31,13 +39,13 @@ const { store, rootActionContext, moduleActionContext } = createDirectStore({
     getters: {
     },
     mutations: {
-        setWallets(state, wallets : Array<IWallet>) {
+        setWallets(state, wallets: Array<IWallet>) {
             state.wallets = wallets;
         },
-        setTransactions(state, transactions : Array<ITransaction>) {
+        setTransactions(state, transactions: Array<ITransaction>) {
             state.transactions = transactions;
         },
-        setTransferts(state, transferts : Array<ITransfert>) {
+        setTransferts(state, transferts: Array<ITransfert>) {
             state.transferts = transferts;
         },
         setCategories(state, categories: Array<ICategory>) {
@@ -46,11 +54,11 @@ const { store, rootActionContext, moduleActionContext } = createDirectStore({
         setAutosync(state, value: boolean) {
             state.autosync = value;
         },
-        setLogged(state, login : ILogin) {
+        setLogged(state, login: ILogin) {
             state.login.logged = true;
             state.login.data = login;
         },
-        setLoginError(state, error : string) {
+        setLoginError(state, error: string) {
             state.login.error = error;
         },
         setLogout(state) {
@@ -83,19 +91,29 @@ const { store, rootActionContext, moduleActionContext } = createDirectStore({
                 synced: false,
                 error: true,
             };
+        },
+        showError(state: StateDeclaration, err: { err?: any, text: string }) {
+            state.errors.push({
+                uuid: v4(),
+                err: err.err,
+                text: err.text,
+            })
+        },
+        hideError(state: StateDeclaration, uuid: string) {
+            state.errors = state.errors.filter((e: IError) => e.uuid !== uuid)
         }
     },
     actions: {
         enableAutosync(state) {
             Models.setAutoSync(true).then(() => state.commit("setAutosync", true));
         },
-        login (state) {
-            return login().then((login => Models.SaveLogin(login))).then(login =>state.commit("setLogged", login)).catch(e => {state.commit("setLoginError",e); throw e});
+        login(state) {
+            return login().then((login => Models.SaveLogin(login))).then(login => state.commit("setLogged", login)).catch(e => { state.commit("setLoginError", e); throw e });
         },
-        loginAndSync (state) {
+        loginAndSync(state) {
             return state.dispatch("login").then(() => state.dispatch("sync"));
         },
-        logout (state) {
+        logout(state) {
             return Models.CleanAll().then(() => state.commit("setLogout"));
         },
         sync(state) {
@@ -103,17 +121,17 @@ const { store, rootActionContext, moduleActionContext } = createDirectStore({
         },
         initialize(state) {
             return Promise.all([
-                Models.GetLogin().then(login =>state.commit("setLogged", login)).catch(err => console.log("not logged",err)),
+                Models.GetLogin().then(login => state.commit("setLogged", login)).catch(() => {/*no error if not logged*/ }),
                 Models.getAutoSync().then((value) => state.commit("setAutosync", value)),
             ])
         },
         loadData(state) {
-           return Promise.all([
-               Models.GetWallets().then(wallets => state.commit("setWallets", wallets)),
-               Models.GetAllTransactions().then(transactions => state.commit("setTransactions", transactions)),
-               Models.GetTransferts().then(transferts => state.commit("setTransferts", transferts)),
-               Models.GetCategories().then(categories => state.commit("setCategories", categories)),
-           ]) 
+            return Promise.all([
+                Models.GetWallets().then(wallets => state.commit("setWallets", wallets)),
+                Models.GetAllTransactions().then(transactions => state.commit("setTransactions", transactions)),
+                Models.GetTransferts().then(transferts => state.commit("setTransferts", transferts)),
+                Models.GetCategories().then(categories => state.commit("setCategories", categories)),
+            ])
         }
     }
 })

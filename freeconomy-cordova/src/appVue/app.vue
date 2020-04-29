@@ -1,5 +1,5 @@
 <template>
-  <div id="appo">
+  <div id="appo" class="modal-open">
     <div v-if="!loading">
       <div v-if="!logged">
         <Navbar>
@@ -10,15 +10,15 @@
       <div v-else>
         <Navbar>
           <div v-if="cordova" class="nav-link">Logged</div>
-          <button class="nav-link" v-on:click="logout()">Logout</button>
-          <button class="nav-link" v-on:click="sync()">Sync</button>
+          <button class="nav-link" v-on:click="logout()">{{$t($t.keys.sideBar.logout)}}</button>
+          <button class="nav-link" v-on:click="sync()">{{$t($t.keys.sideBar.sync)}}</button>
           <div v-if="cordova" class="nav-link">Cordova active</div>
         </Navbar>
         <router-view></router-view>
         <div>Loggin OK</div>
       </div>
     </div>
-    <div v-else>Loading</div>
+    <div v-else>{{$t($t.keys.common.loading)}}</div>
   </div>
 </template>
 
@@ -35,11 +35,12 @@ import EditTransaction from "./editTransaction.vue";
 import Desktop from "./desktop.vue";
 
 import store from "./store";
-
+import {TranslatePlugin} from "../lib/translator"
 Vue.use(VueRouter);
+Vue.use(TranslatePlugin);
 
 const Foo = Vue.extend({ template: "<div>foo</div>" });
-const EditTransactionModal = Vue.extend({ template: "<Modal><template v-slot:header>Edit transaction</template><EditTransaction /></Modal>", components: { Modal, EditTransaction } });
+const EditTransactionModal = Vue.extend({ template: "<Modal><template v-slot:header>{{$t($t.keys.transactionsView.editTransaction)}}</template><EditTransaction /></Modal>", components: { Modal, EditTransaction } });
 
 const toto: string = "10";
 const routes: Array<RouteConfig> = [
@@ -86,9 +87,9 @@ export default class AppVue extends Vue {
   message = "test";
   cordova = false;
   loading = true;
+  error = "";
 
   mounted() {
-    console.log("mounted")
     Promise.all([
       new Promise((resolve, reject) => {
         document.addEventListener(
@@ -99,7 +100,7 @@ export default class AppVue extends Vue {
           },
           false
         );
-      }).then(() => console.log("cordova ok")),
+      }),
       store.dispatch.initialize()
     ]).then(() => (this.loading = false)).catch(() => this.loading = false);
   }
@@ -111,7 +112,7 @@ export default class AppVue extends Vue {
   logout() {
     (window as any).plugins.googleplus.disconnect(() => {
       store.dispatch.logout()
-    }, (err :any)=> console.log("logout issue", err));
+    }, (err :any)=> store.commit.showError({err, text: "fail to logout"}));
     store.dispatch.logout()
   }
 
