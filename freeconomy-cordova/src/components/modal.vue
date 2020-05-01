@@ -35,11 +35,6 @@ import $ from "jquery";
 
 @Component({})
 export default class Modali extends Vue {
-  mounted() {
-    // const modal = $("#modal") as any
-    // modal.modal("show");
-    // modal.on("hidden.bs.modal", () => this.$router.back())
-  }
   close() {
     this.$router.back();
   }

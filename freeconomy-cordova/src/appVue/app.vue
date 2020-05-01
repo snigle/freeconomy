@@ -14,7 +14,8 @@
           <button class="nav-link" v-on:click="sync()">{{$t($t.keys.sideBar.sync)}}</button>
           <div v-if="cordova" class="nav-link">Cordova active</div>
         </Navbar>
-        <router-view></router-view>
+        <!-- Key permit to rerender route with same component (eg: editTransaction component used for edit and create) -->
+        <router-view :key="$route.name"></router-view>
         <div>Loggin OK</div>
       </div>
     </div>
@@ -55,7 +56,7 @@ const routes: Array<RouteConfig> = [
         component: EditTransactionModal
       },
       {
-        path: "transaction",
+        path: "addTransaction",
         name: "addTransaction",
         component: EditTransactionModal
       },
@@ -89,7 +90,7 @@ export default class AppVue extends Vue {
   loading = true;
   error = "";
 
-  mounted() {
+  created() {
     Promise.all([
       new Promise((resolve, reject) => {
         document.addEventListener(

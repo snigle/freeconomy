@@ -152,6 +152,7 @@ const en : typeof keys = {
     },
     infinite: "None stop.",
     during: "During ",
+    repeatHelp: "Permit to auto create the same operation at next interval.",
   },
   repeatOperation: {
     title: "Recurring Operations",

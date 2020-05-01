@@ -153,6 +153,7 @@ const fr : typeof keys = {
     },
     infinite: "à l'infini.",
     during: "Pendant ",
+    repeatHelp: "Permet de créer automatiquement une opération équivalente à chaque interval.",
   },
   repeatOperation: {
     title: "Opération Récurrentes",

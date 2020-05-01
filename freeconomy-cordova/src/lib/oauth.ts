@@ -4,14 +4,11 @@ import * as Sync from "./sync";
 import { ILogin } from "./types";
  
 export async function login(): Promise<ILogin> {
-  // return new Promise((resolve, reject) => reject("toto"));
-  console.log("gplus plugin", (window as any).plugins.googleplus);
   const loginConfig = {
-    'scope': 'https://www.googleapis.com/auth/drive.appdata', // optional, space-separated list of scopes, If not included or empty, defaults to `profile` and `email`.
-    'scopes': 'https://www.googleapis.com/auth/drive.appdata', // optional, space-separated list of scopes, If not included or empty, defaults to `profile` and `email`.
+    'scope': 'https://www.googleapis.com/auth/drive.appdata', // for browser
+    'scopes': 'https://www.googleapis.com/auth/drive.appdata', // for android
     // offline:true,
-    // webClientId: "136643286294-tq30lcaqafpkph4hb9muohe6ctt1291i.apps.googleusercontent.com",
-    // 'scopes': 'profile email', // optional, space-separated list of scopes, If not included or empty, defaults to `profile` and `email`.
+    // webClientId: ""
   } 
   return new Promise<ILogin>((resolve, reject) => 
     (window as any).plugins.googleplus.trySilentLogin(

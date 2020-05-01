@@ -16,6 +16,9 @@
   align-content: center;
   flex-direction: column;
 }
+.repeat {
+  font-size:18px;
+}
 </style>
 <template>
   <div v-if="currency" class="list-group">
@@ -39,7 +42,11 @@
               >{{line.Category.Icon.Name}}</i>
             </div>
             <div class="middle col">
-              <div>{{line.Beneficiary}}</div>
+              <div>
+                {{line.Beneficiary}}
+                <span v-if="line.Repeat" class="repeat material-icons">
+                sync</span>
+                </div>
               <div>
                 <span v-if="!wallet">Todo</span>
                 {{line.Comment}}
@@ -66,7 +73,8 @@ import {
   ICurrency,
   ICategory,
   ITransfert,
-  displayPrice
+  displayPrice,
+  IRepeat
 } from "../lib/types";
 import store from "./store";
 import moment, { Moment } from "moment";
@@ -86,6 +94,7 @@ interface ILine {
   UUID: string;
   Category: ICategory;
   EditLink: Location;
+  Repeat: IRepeat | null;
 }
 
 const defaultCategory: ICategory = {

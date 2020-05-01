@@ -56,16 +56,19 @@
         />
       </div>
 
+      <RepeatInput v-model="transaction.Repeat"/>
+
       <div class="form-group">
         <div class="float-left">
-          <button v-if="$route.params.transaction" class="btn btn-danger" v-on:click="deleteTransaction()">{{$t($t.keys.common.delete)}}</button>
-          <button v-else class="btn btn-danger" v-on:click="$route.back()">{{$t($t.keys.common.cancel)}}</button>
+          <button type="button" v-if="$route.params.transaction" class="btn btn-danger" v-on:click="deleteTransaction()">{{$t($t.keys.common.delete)}}</button>
+          <button type="button" v-else class="btn btn-danger" v-on:click="$route.back()">{{$t($t.keys.common.cancel)}}</button>
         </div>
         <div class="float-right">
-          <button class="btn btn-secondary" v-on:click="save(true)">{{$t($t.keys.common.saveAndNew)}}</button>
+          <button type="button" class="btn btn-secondary" v-on:click="save(true)">{{$t($t.keys.common.saveAndNew)}}</button>
           <button type="submit" class="btn btn-primary">{{$t($t.keys.common.save)}}</button>
         </div>
       </div>
+
     </form>
   </div>
 </template>
@@ -78,9 +81,10 @@ import store from "./store";
 import _ from "lodash";
 import moment from "moment";
 import Alert from "../components/alert.vue";
+import RepeatInput from "../components/repeatInput.vue";
 
 @Component({
-  components: {Alert}
+  components: {Alert, RepeatInput}
 })
 export default class EditTransaction extends Vue {
   [x: string]: any;
@@ -111,7 +115,7 @@ export default class EditTransaction extends Vue {
     this.formErrors.date = isNaN(this.transaction.Date.getTime())
   }
 
-  mounted() {
+  created() {
     if (this.$route.query && _.isString(this.$route.query.wallet)) {
       this.transaction.WalletUUID = this.$route.query.wallet;
     }
@@ -144,7 +148,7 @@ export default class EditTransaction extends Vue {
 
     this.loading = true;
           
-    const savePromise: Promise<any> =
+    const savePromise: Promise<ITransaction[]> =
       this.$route.params && this.$route.params.transaction
         ? Models.UpdateTransaction(
             this.$route.params.transaction,
@@ -152,14 +156,15 @@ export default class EditTransaction extends Vue {
           )
         : Models.CreateTransaction(this.transaction);
     savePromise
-      .then(() => {
+      .then((transactions) => {
+        store.commit.setTransactions(transactions);
         if (!andNew) {
           setTimeout(()=>this.$router.back(),0);
         } else {
-          this.$router.replace({
+          setTimeout(() => this.$router.replace({
             name: "addTransaction",
             query: { ...this.$route.query }
-          });
+          }));
         }
       })
       .catch((err: any) => store.commit.showError({err, text: "fail to save transaction"}));
