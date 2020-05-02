@@ -61,6 +61,7 @@ const en : typeof keys = {
   transactionsView: {
     addTransaction: "Add Transaction",
     editTransaction: "Edit transaction",
+    editTransfert: "Edit transfert",
     addTransfert: "Add Transfert",
     importFromCSV: "Import from CSV",
     loading: "Loading transactions",
@@ -69,7 +70,12 @@ const en : typeof keys = {
   addTransactionView: {
     beneficiary: "Bénéficiaire",
     comment: "Commentaire",
-    beneficiaryHelp:"Name of the person/entity who takes/gives money."
+    beneficiaryHelp:"Name of the person/entity who takes/gives money.",
+    priceHelp: "Negative number is an outcome (expense) and positive is an income."
+  },
+  addTransfertView: {
+    from:"From",
+    to:"To",
   },
   categoriesView: {
     loading: "Loading categories",
@@ -160,10 +166,13 @@ const en : typeof keys = {
     insertSelected: "Save selected",
   },
   errors: {
-    invalidDate: "",
+    invalidDate: "Date is invalid",
+    invalidPrice:"Price is not a correct number",
     notFound: "Page not found",
     needCategoryToAddTransaction: "You have to add categories before adding transaction.",
     needWalletToDisplayTransactions: "You have to add a wallet to display transactions.",
+    needWalletToAddTransfert: "You need to add wallet before adding a transfert.",
+    saveError: "Issue when trying to save the element : %{err}",
   },
 };
 

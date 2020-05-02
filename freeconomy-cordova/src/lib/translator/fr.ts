@@ -62,6 +62,7 @@ const fr : typeof keys = {
   transactionsView: {
     addTransaction: "Ajouter une opération",
     editTransaction: "Modifier une opération",
+    editTransfert: "Modifier un virement",
     addTransfert: "Ajouter un virement",
     importFromCSV: "Importer depuis un CSV",
     loading: "Chargement des transactions",
@@ -70,7 +71,12 @@ const fr : typeof keys = {
   addTransactionView: {
     beneficiary: "Bénéficiaire",
     comment: "Description",
-    beneficiaryHelp:"Nom de la personne/entreprise qui donne ou récupère l'argent."
+    beneficiaryHelp:"Nom de la personne/entreprise qui donne ou récupère l'argent.",
+    priceHelp: "Un nombre négatif enregistre une dépense et un positif une recette."
+  },
+  addTransfertView: {
+    from:"Depuis",
+    to:"Vers",
   },
   categoriesView: {
     loading: "Chargement des catégories",
@@ -162,9 +168,12 @@ const fr : typeof keys = {
   },
   errors: {
     invalidDate: "Le champs date est mal écrit.",
+    invalidPrice:"Le prix n'est pas un nombre correct",
     notFound: "L'élément recherché n'existe pas.",
     needCategoryToAddTransaction: "Vous devez ajouter des catégories avant de pouvoir créer une opération.",
     needWalletToDisplayTransactions: "Vous devez ajouter un compte pour afficher les opérations.",
+    needWalletToAddTransfert:"Vous devez ajouter un compte pour pouvoir créer un virement.",
+    saveError:"Bug lors de l'enregistrement de l'élément %{err}"
   },
 } ;
 

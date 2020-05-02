@@ -60,6 +60,7 @@ const keys = {
     transactionsView: {
       addTransaction: "",
       editTransaction: "",
+      editTransfert: "",
       addTransfert: "",
       importFromCSV: "",
       loading: "",
@@ -69,6 +70,11 @@ const keys = {
       beneficiary: "",
       comment: "",
       beneficiaryHelp:"",
+      priceHelp:"",
+    },
+    addTransfertView: {
+      from:"",
+      to:"",
     },
     categoriesView: {
       loading: "",
@@ -160,9 +166,12 @@ const keys = {
     },
     errors: {
       invalidDate: "",
+      invalidPrice:"",
       notFound:"",
       needCategoryToAddTransaction:"",
       needWalletToDisplayTransactions: "",
+      needWalletToAddTransfert: "",
+      saveError: "",
     },
   };
   

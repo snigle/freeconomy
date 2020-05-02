@@ -12,6 +12,7 @@
           <div v-if="cordova" class="nav-link">Logged</div>
           <button class="nav-link" v-on:click="logout()">{{$t($t.keys.sideBar.logout)}}</button>
           <button class="nav-link" v-on:click="sync()">{{$t($t.keys.sideBar.sync)}}</button>
+          <router-link class="nav-link" v-bind:to="'addTransfert'" >Add transfert</router-link>
           <div v-if="cordova" class="nav-link">Cordova active</div>
         </Navbar>
         <!-- Key permit to rerender route with same component (eg: editTransaction component used for edit and create) -->
@@ -33,6 +34,7 @@ import Component from "vue-class-component";
 import * as Models from "../lib/models";
 import Vuex from "vuex";
 import EditTransaction from "./editTransaction.vue";
+import EditTransfert from "./editTransfert.vue";
 import Desktop from "./desktop.vue";
 
 import store from "./store";
@@ -42,6 +44,7 @@ Vue.use(TranslatePlugin);
 
 const Foo = Vue.extend({ template: "<div>foo</div>" });
 const EditTransactionModal = Vue.extend({ template: "<Modal><template v-slot:header>{{$t($t.keys.transactionsView.editTransaction)}}</template><EditTransaction /></Modal>", components: { Modal, EditTransaction } });
+const EditTransfertModal = Vue.extend({ template: "<Modal><template v-slot:header>{{$t($t.keys.transactionsView.editTransfert)}}</template><EditTransfert /></Modal>", components: { Modal, EditTransfert } });
 
 const toto: string = "10";
 const routes: Array<RouteConfig> = [
@@ -60,7 +63,12 @@ const routes: Array<RouteConfig> = [
         name: "addTransaction",
         component: EditTransactionModal
       },
-      { path: "transfert/:transfert", name: "editTransfert", component: EditTransactionModal }
+      { path: "transfert/:transfert", name: "editTransfert", component: EditTransfertModal },
+            {
+        path: "addTransfert",
+        name: "addTransfert",
+        component: EditTransfertModal
+      },
       // ]},
       // { path: "transactions/wallet/:wallet", name: "transactionsByWallet", children: [
       // { path: "transaction/:transaction", name: "editTransaction", component: Bar },

@@ -47,13 +47,27 @@
 
       <div class="form-group">
         <label for="price">{{$t($t.keys.common.price)}}</label>
+        <div class="input-group">
         <input
-          type="number"
-          step="0.01"
+          type="text"
+          inputmode="numeric"
           class="form-control"
           id="price"
-          v-model.number="transaction.Price"
+          v-bind:class="{'is-invalid':isNaN(transaction.Price)}"
+          v-bind:value="price"
+          v-on:input="setPrice($event.target.value)"
         />
+        <div class="input-group-append">
+          <div class="input-group-text">
+            <i v-if="transaction.Price <= 0" class="material-icons">trending_down</i>
+            <i v-else class="material-icons">trending_up</i>
+            </div>
+        </div>
+      </div>
+        <small
+          id="priceHelp"
+          class="form-text text-muted"
+        >{{$t($t.keys.addTransactionView.priceHelp)}}</small>
       </div>
 
       <RepeatInput v-model="transaction.Repeat"/>
@@ -84,10 +98,9 @@ import Alert from "../components/alert.vue";
 import RepeatInput from "../components/repeatInput.vue";
 
 @Component({
-  components: {Alert, RepeatInput}
+  components: {Alert, RepeatInput},
 })
 export default class EditTransaction extends Vue {
-  [x: string]: any;
   transaction: ITransactionInput = {
     WalletUUID: "",
     CategoryUUID: "",
@@ -101,7 +114,13 @@ export default class EditTransaction extends Vue {
   formErrors = { date: false };
 
   loading = false;
+  price = "-";
 
+  setPrice(n: string) {
+    this.price= n;
+    this.transaction.Price = parseFloat(n);
+  }
+  
   get categories(): Array<ICategory> {
     return store.state.categories;
   }
@@ -145,6 +164,10 @@ export default class EditTransaction extends Vue {
       this.error = this.$t(this.$t.keys.errors.invalidDate);
       return;
     }
+        if (isNaN(this.transaction.Price)) {
+      this.error = this.$t(this.$t.keys.errors.invalidPrice);
+      return;
+    }
 
     this.loading = true;
           
@@ -167,7 +190,7 @@ export default class EditTransaction extends Vue {
           }));
         }
       })
-      .catch((err: any) => store.commit.showError({err, text: "fail to save transaction"}));
+      .catch((err: any) => this.error = this.$t(this.$t.keys.errors.saveError, {err : err}));
   }
 }
 </script>
