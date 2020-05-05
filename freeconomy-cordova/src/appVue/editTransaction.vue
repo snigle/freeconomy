@@ -12,6 +12,13 @@
   .list-group-item {
     font-size: 15px;
     padding: 0.25rem 0.75rem;
+    .material-icons {
+      font-size:12px;
+      margin-right:5px;
+    }
+    .price {
+      float:right;
+    }
   }
 }
 </style>
@@ -33,7 +40,7 @@
           <button type="button"
           class="list-group-item list-group-item-action"
           v-on:click="autocompleteClick(item)"
-          v-for="item in autocomplete" v-bind:key="item.UUID">{{item.Beneficiary}}</button>
+          v-for="item in autocomplete" v-bind:key="item.UUID"><span class="material-icons">{{item.Category.Icon.Name}}</span>{{item.Beneficiary}}<span class="price">{{item.Price}}{{item.Wallet.Currency.Symbol}}</span></button>
         </div>
         <small
           id="beneficiaryHelp"
@@ -126,13 +133,20 @@
 <script lang="ts">
 import Vue from "vue";
 import Component from "vue-class-component";
-import { ITransaction, ITransactionInput, ICategory } from "../lib/types";
+import { ITransaction, ITransactionInput, ICategory, IWallet } from "../lib/types";
 import * as Models from "../lib/models";
 import store from "./store";
 import _ from "lodash";
 import moment from "moment";
 import Alert from "../components/alert.vue";
 import RepeatInput from "../components/repeatInput.vue";
+
+interface IWithCategory {
+  Category? : ICategory
+}
+interface IWithWallet {
+  Wallet? : IWallet
+}
 
 @Component({
   components: { Alert, RepeatInput }
@@ -201,7 +215,7 @@ cleanToSearch(text: string): string {
     }
   }
 
-  get autocomplete(): Array<ITransaction> {
+  get autocomplete(): Array<ITransaction & IWithCategory & IWithWallet> {
     const autocomplete : Array<ITransaction> = _(store.state.transactions)
     .filter(tr => 
       tr.WalletUUID === this.transaction.WalletUUID &&
@@ -220,6 +234,12 @@ cleanToSearch(text: string): string {
       .map(transactions => _.first(transactions) as ITransaction)
       .first() as ITransaction
     )
+    .slice(0,10)
+    .map(tr => ({
+      ...tr,
+      Category: store.state.categories.find(c => c.UUID === tr.CategoryUUID),
+      Wallet: store.state.wallets.find(w=> w.UUID === tr.WalletUUID),
+    }))
     if (autocomplete.length === 1 && this.cleanToSearch(autocomplete[0].Beneficiary) === this.cleanToSearch(this.transaction.Beneficiary)){
       return []
     }
