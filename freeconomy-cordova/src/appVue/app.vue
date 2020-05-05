@@ -13,6 +13,7 @@
           <button class="nav-link" v-on:click="logout()">{{$t($t.keys.sideBar.logout)}}</button>
           <button class="nav-link" v-on:click="sync()">{{$t($t.keys.sideBar.sync)}}</button>
           <router-link class="nav-link" v-bind:to="'addTransfert'" >Add transfert</router-link>
+          <router-link class="nav-link" v-bind:to="'addTransaction'" >Add transaction</router-link>
           <div v-if="cordova" class="nav-link">Cordova active</div>
         </Navbar>
         <!-- Key permit to rerender route with same component (eg: editTransaction component used for edit and create) -->

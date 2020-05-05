@@ -1,3 +1,20 @@
+<style lang="scss" scoped>
+#beneficiary.autocomplete {
+  border-bottom:0;
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+}
+#autocomplete {
+  :first-child {
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+  }
+  .list-group-item {
+    font-size: 15px;
+    padding: 0.25rem 0.75rem;
+  }
+}
+</style>
 <template>
   <div>
     <Alert v-if="error" v-on:close="error=null">{{error}}</Alert>
@@ -8,9 +25,16 @@
           type="text"
           v-model="transaction.Beneficiary"
           class="form-control"
+          v-bind:class="{autocomplete: autocomplete.length > 0}"
           id="beneficiary"
           aria-describedby="beneficiaryHelp"
         />
+        <div class="list-group" id="autocomplete" v-if="autocomplete.length > 0">
+          <button type="button"
+          class="list-group-item list-group-item-action"
+          v-on:click="autocompleteClick(item)"
+          v-for="item in autocomplete" v-bind:key="item.UUID">{{item.Beneficiary}}</button>
+        </div>
         <small
           id="beneficiaryHelp"
           class="form-text text-muted"
@@ -48,41 +72,54 @@
       <div class="form-group">
         <label for="price">{{$t($t.keys.common.price)}}</label>
         <div class="input-group">
-        <input
-          type="text"
-          inputmode="numeric"
-          class="form-control"
-          id="price"
-          v-bind:class="{'is-invalid':isNaN(transaction.Price)}"
-          v-bind:value="price"
-          v-on:input="setPrice($event.target.value)"
-        />
-        <div class="input-group-append">
-          <div class="input-group-text">
-            <i v-if="transaction.Price <= 0" class="material-icons">trending_down</i>
-            <i v-else class="material-icons">trending_up</i>
+          <input
+            type="text"
+            inputmode="numeric"
+            class="form-control"
+            id="price"
+            v-bind:class="{'is-invalid':isNaN(transaction.Price)}"
+            v-bind:value="price"
+            v-on:input="setPrice($event.target.value)"
+          />
+          <div class="input-group-append">
+            <div class="input-group-text">
+              <i v-if="transaction.Price <= 0" class="material-icons">trending_down</i>
+              <i v-else class="material-icons">trending_up</i>
             </div>
+          </div>
         </div>
-      </div>
         <small
           id="priceHelp"
           class="form-text text-muted"
         >{{$t($t.keys.addTransactionView.priceHelp)}}</small>
       </div>
 
-      <RepeatInput v-model="transaction.Repeat"/>
+      <RepeatInput v-model="transaction.Repeat" />
 
       <div class="form-group">
         <div class="float-left">
-          <button type="button" v-if="$route.params.transaction" class="btn btn-danger" v-on:click="deleteTransaction()">{{$t($t.keys.common.delete)}}</button>
-          <button type="button" v-else class="btn btn-danger" v-on:click="$route.back()">{{$t($t.keys.common.cancel)}}</button>
+          <button
+            type="button"
+            v-if="$route.params.transaction"
+            class="btn btn-danger"
+            v-on:click="deleteTransaction()"
+          >{{$t($t.keys.common.delete)}}</button>
+          <button
+            type="button"
+            v-else
+            class="btn btn-danger"
+            v-on:click="$route.back()"
+          >{{$t($t.keys.common.cancel)}}</button>
         </div>
         <div class="float-right">
-          <button type="button" class="btn btn-secondary" v-on:click="save(true)">{{$t($t.keys.common.saveAndNew)}}</button>
+          <button
+            type="button"
+            class="btn btn-secondary"
+            v-on:click="save(true)"
+          >{{$t($t.keys.common.saveAndNew)}}</button>
           <button type="submit" class="btn btn-primary">{{$t($t.keys.common.save)}}</button>
         </div>
       </div>
-
     </form>
   </div>
 </template>
@@ -98,7 +135,7 @@ import Alert from "../components/alert.vue";
 import RepeatInput from "../components/repeatInput.vue";
 
 @Component({
-  components: {Alert, RepeatInput},
+  components: { Alert, RepeatInput }
 })
 export default class EditTransaction extends Vue {
   transaction: ITransactionInput = {
@@ -110,17 +147,22 @@ export default class EditTransaction extends Vue {
     Comment: "",
     Repeat: null
   };
-  error:string = "";
+  error: string = "";
   formErrors = { date: false };
 
   loading = false;
   price = "-";
 
   setPrice(n: string) {
-    this.price= n;
+    this.price = n;
     this.transaction.Price = parseFloat(n);
   }
+
   
+cleanToSearch(text: string): string {
+  return text.toLowerCase().replace(/( |'|-)/g, "");
+}
+
   get categories(): Array<ICategory> {
     return store.state.categories;
   }
@@ -131,7 +173,7 @@ export default class EditTransaction extends Vue {
 
   set date(date: string) {
     this.transaction.Date = new Date(date);
-    this.formErrors.date = isNaN(this.transaction.Date.getTime())
+    this.formErrors.date = isNaN(this.transaction.Date.getTime());
   }
 
   created() {
@@ -158,19 +200,55 @@ export default class EditTransaction extends Vue {
       this.transaction.CategoryUUID = category.UUID;
     }
   }
-  
+
+  get autocomplete(): Array<ITransaction> {
+    const autocomplete : Array<ITransaction> = _(store.state.transactions)
+    .filter(tr => 
+      tr.WalletUUID === this.transaction.WalletUUID &&
+      this.cleanToSearch(tr.Beneficiary).match(this.cleanToSearch(this.transaction.Beneficiary)) !== null
+    )
+    .groupBy((tr: ITransaction) => `${this.cleanToSearch(tr.Beneficiary)}.${tr.CategoryUUID}`)
+    .values()
+    .sortBy(transactions => transactions.length)
+    .reverse()
+    .value()
+    .map((transactions:Array<ITransaction>) =>  _(transactions)
+      .groupBy((tr : ITransaction) => tr.Price)
+      .values()
+      .sortBy(transactions => transactions.length)
+      .reverse()
+      .map(transactions => _.first(transactions) as ITransaction)
+      .first() as ITransaction
+    )
+    if (autocomplete.length === 1 && this.cleanToSearch(autocomplete[0].Beneficiary) === this.cleanToSearch(this.transaction.Beneficiary)){
+      return []
+    }
+    return autocomplete
+  }
+
+  autocompleteClick(tr : ITransaction) {
+    this.transaction.Beneficiary = tr.Beneficiary
+    this.transaction.CategoryUUID = tr.CategoryUUID
+    this.transaction.Comment = tr.Comment
+    this.setPrice(`${tr.Price}`)
+  }
+
   save(andNew: boolean) {
     if (isNaN(this.transaction.Date.getTime())) {
       this.error = this.$t(this.$t.keys.errors.invalidDate);
       return;
     }
-        if (isNaN(this.transaction.Price)) {
+    if (isNaN(this.transaction.Price)) {
       this.error = this.$t(this.$t.keys.errors.invalidPrice);
+      return;
+    }
+    if (!this.transaction.WalletUUID) {
+      this.error = this.$t(this.$t.keys.errors.needWalletToAddTransfert);
       return;
     }
 
     this.loading = true;
-          
+
     const savePromise: Promise<ITransaction[]> =
       this.$route.params && this.$route.params.transaction
         ? Models.UpdateTransaction(
@@ -179,18 +257,23 @@ export default class EditTransaction extends Vue {
           )
         : Models.CreateTransaction(this.transaction);
     savePromise
-      .then((transactions) => {
+      .then(transactions => {
         store.commit.setTransactions(transactions);
         if (!andNew) {
-          setTimeout(()=>this.$router.back(),0);
+          setTimeout(() => this.$router.back(), 0);
         } else {
-          setTimeout(() => this.$router.replace({
-            name: "addTransaction",
-            query: { ...this.$route.query }
-          }));
+          setTimeout(() =>
+            this.$router.replace({
+              name: "addTransaction",
+              query: { ...this.$route.query }
+            })
+          );
         }
       })
-      .catch((err: any) => this.error = this.$t(this.$t.keys.errors.saveError, {err : err}));
+      .catch(
+        (err: any) =>
+          (this.error = this.$t(this.$t.keys.errors.saveError, { err: err }))
+      );
   }
 }
 </script>
