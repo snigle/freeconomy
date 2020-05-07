@@ -1,14 +1,15 @@
 <template>
   <div>
+    <div class="modal-backdrop fade show"></div>
     <div
       class="modal modal show"
       id="modal"
       tabindex="-1"
-      data-backdrop="static"
       role="dialog"
       v-bind:style="{display:'block'}"
+      v-on:click="backdropClick()"
     >
-      <div class="modal-dialog modal-lg" role="document">
+      <div class="modal-dialog modal-lg" role="document" v-on:click.stop.prevent="() => {}">
         <div class="modal-content">
           <div class="modal-header">
             <h5 class="modal-title">
@@ -21,10 +22,12 @@
           <div class="modal-body">
             <slot></slot>
           </div>
+          <div class="modal-footer" v-if="$slots.footer">
+            <slot name="footer"></slot>
+          </div>
         </div>
       </div>
     </div>
-    <div class="modal-backdrop fade show"></div>
   </div>
 </template>
 
@@ -35,8 +38,11 @@ import $ from "jquery";
 
 @Component({})
 export default class Modali extends Vue {
+  backdropClick() {
+    this.$emit("backdropClick");
+  }
   close() {
-    this.$router.back();
+    this.$emit("close");
   }
 }
 </script>

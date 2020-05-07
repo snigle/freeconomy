@@ -21,6 +21,8 @@ const keys = {
       category:"",
       modify: "",
       delete: "",
+      selected: "" as string | {one: string, other:string},
+      areYourSure: "Are you sure ?",
     },
     login: {
       buttonWithGoogle: "",
@@ -65,6 +67,9 @@ const keys = {
       importFromCSV: "",
       loading: "",
       updateSolde: "",
+      transfert:"",
+      transaction:"",
+      deleteSelectionConfirm: "",
     },
     addTransactionView: {
       beneficiary: "",

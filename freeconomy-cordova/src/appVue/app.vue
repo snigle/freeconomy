@@ -44,8 +44,8 @@ Vue.use(VueRouter);
 Vue.use(TranslatePlugin);
 
 const Foo = Vue.extend({ template: "<div>foo</div>" });
-const EditTransactionModal = Vue.extend({ template: "<Modal><template v-slot:header>{{$t($t.keys.transactionsView.editTransaction)}}</template><EditTransaction /></Modal>", components: { Modal, EditTransaction } });
-const EditTransfertModal = Vue.extend({ template: "<Modal><template v-slot:header>{{$t($t.keys.transactionsView.editTransfert)}}</template><EditTransfert /></Modal>", components: { Modal, EditTransfert } });
+const EditTransactionModal = Vue.extend({ template: `<Modal v-on:close="$router.back()"><template v-slot:header>{{$t($t.keys.transactionsView.editTransaction)}}</template><EditTransaction /></Modal>`, components: { Modal, EditTransaction } });
+const EditTransfertModal = Vue.extend({ template: `<Modal v-on:close="$router.back()"><template v-slot:header>{{$t($t.keys.transactionsView.editTransfert)}}</template><EditTransfert /></Modal>`, components: { Modal, EditTransfert } });
 
 const toto: string = "10";
 const routes: Array<RouteConfig> = [

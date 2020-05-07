@@ -17,56 +17,83 @@
   flex-direction: column;
 }
 .repeat {
-  font-size:18px;
+  font-size: 18px;
 }
 </style>
 <template>
-  <div v-if="currency" class="list-group">
-    <template v-for="day in transactionsByDay">
-      <div
-        v-bind:key="day.Day.toString()"
-        class="day list-group-item"
-      >{{day.Day.format("dddd Do MMMM YYYY")}}</div>
-      <router-link class="list-group-item list-group-item-action" v-for="line in day.Lines" v-bind:key="line.UUID"
-      v-bind:to="line.EditLink"
-      >
-        <div class="container">
-          <div class="row">
-            <div
-              class="icon rounded-circle"
-              v-bind:style="{backgroundColor:line.Category.Icon.Color }"
-            >
-              <i
-                v-if="line.Category.Icon.Type === 'material'"
-                class="material-icons"
-              >{{line.Category.Icon.Name}}</i>
-            </div>
-            <div class="middle col">
-              <div>
-                {{line.Beneficiary}}
-                <span v-if="line.Repeat" class="repeat material-icons">
-                sync</span>
+  <div>
+    <Modal v-if="deletionPopup" v-on:close="deletionPopup = false" v-on:backdropClick="deletionPopup = false">
+      <template v-slot:header><div>{{$t($t.keys.common.areYourSure)}}</div></template>
+      {{$t($t.keys.transactionsView.deleteSelectionConfirm)}}
+      <template v-slot:footer><div>
+        <button type="button" class="btn btn-secondary" v-on:click="deletionPopup = false">{{$t($t.keys.common.cancel)}}</button>
+        <button type="button" class="btn btn-primary" v-on:click="deleteSelection()">{{$t($t.keys.common.remove)}}</button>
+      </div>
+      </template>
+    </Modal>
+    <div class="row">
+      <div class="col">
+        <button type="button" class="btn btn-primary btn-sm float-left"><span class="material-icons">playlist_add</span> {{$t($t.keys.transactionsView.transaction)}}</button>
+        <button type="button" class="btn btn-primary btn-sm float-left"><span class="material-icons">repeat_one</span> {{$t($t.keys.transactionsView.transfert)}}</button>
+      </div>
+      <div v-if="selection.length" class="col">
+       {{selection.length}} {{$t($t.keys.common.selected, {count: selection.length})}} : {{totalSelection}} {{currency.Symbol}}
+      </div>
+      <div v-if="selection.length" class="col">
+        <button type="button" class="btn btn-danger btn-sm float-right" v-on:click="deletionPopup = true">{{$t($t.keys.common.delete)}}</button>
+      </div>
+    </div>
+    <div v-if="currency" class="list-group">
+      <template v-for="day in transactionsByDay">
+        <div
+          v-bind:key="day.Day.toString()"
+          class="day list-group-item"
+        >{{day.Day.format("dddd Do MMMM YYYY")}}</div>
+        <router-link
+          class="list-group-item list-group-item-action"
+          v-for="line in day.Lines"
+          v-bind:key="line.UUID"
+          v-bind:to="line.EditLink"
+        >
+          <div class="container">
+            <div class="row">
+              <button
+                type="button"
+                v-on:click.prevent="selectLine(line.UUID)"
+                class="icon rounded-circle btn"
+                v-bind:style="{backgroundColor: (selectedLines[line.UUID] ? '#e6dbdc' : line.Category.Icon.Color) }"
+              >
+                <div
+                  v-if="line.Category.Icon.Type === 'material'"
+                  class="material-icons"
+                >{{selectedLines[line.UUID] ? 'check' : line.Category.Icon.Name}}</div>
+              </button>
+              <div class="middle col">
+                <div>
+                  {{line.Beneficiary}}
+                  <span v-if="line.Repeat" class="repeat material-icons">sync</span>
                 </div>
-              <div>
-                <span v-if="!wallet">Todo</span>
-                {{line.Comment}}
+                <div>
+                  <span v-if="!wallet">Todo</span>
+                  {{line.Comment}}
+                </div>
+              </div>
+              <div class="price">
+                <div class="price">{{line.Price}} {{currency.Symbol}}</div>
+                <div class="total">{{line.TotalPrice}} {{currency.Symbol}}</div>
               </div>
             </div>
-            <div class="price">
-              <div class="price">{{line.Price}} {{currency.Symbol}}</div>
-              <div class="total">{{line.TotalPrice}} {{currency.Symbol}}</div>
-            </div>
           </div>
-        </div>
-      </router-link>
-    </template>
+        </router-link>
+      </template>
+    </div>
   </div>
 </template>
 
 <script lang="ts">
 import Vue from "vue";
 import Component from "vue-class-component";
-import {Location} from "vue-router";
+import { Location } from "vue-router";
 import {
   ITransaction,
   IWallet,
@@ -79,6 +106,7 @@ import {
 import store from "./store";
 import moment, { Moment } from "moment";
 import _ from "lodash";
+import Modal from "../components/modal.vue";
 
 interface ITransactionByDay {
   Day: Moment;
@@ -104,8 +132,26 @@ const defaultCategory: ICategory = {
   UUID: ""
 };
 
-@Component({})
+@Component({
+  components: {Modal}
+})
 export default class Transactions extends Vue {
+  selectedLines: { [key: string]: boolean } = {};
+  deletionPopup= false;
+
+  selectLine(uuid: string) {
+    this.selectedLines[uuid] = !this.selectedLines[uuid];
+    this.selectedLines = { ...this.selectedLines };
+  }
+
+  get selection(): Array<ILine> {
+    return this.lines.filter(l => this.selectedLines[l.UUID])
+  }
+
+  get totalSelection(): number {
+    return this.selection.reduce((total, line) => total+line.Price, 0)
+  }
+
   get wallets(): Array<IWallet> {
     if (!this.currency) {
       return [];
@@ -125,10 +171,7 @@ export default class Transactions extends Vue {
 
   get wallet(): IWallet | null {
     return (
-      store.state.wallets.find(
-        w =>
-          w.UUID === this.$route.query.wallet
-      ) || null
+      store.state.wallets.find(w => w.UUID === this.$route.query.wallet) || null
     );
   }
 
@@ -145,7 +188,9 @@ export default class Transactions extends Vue {
       );
     }
     if (!firstWalletOfCurrency) {
-      store.commit.showError({text: this.$t(this.$t.keys.errors.needWalletToDisplayTransactions)});
+      store.commit.showError({
+        text: this.$t(this.$t.keys.errors.needWalletToDisplayTransactions)
+      });
       return null;
     }
     return firstWalletOfCurrency.Currency;
@@ -186,7 +231,11 @@ export default class Transactions extends Vue {
       Category:
         _.find(this.categories, c => c.UUID === t.CategoryUUID) ||
         defaultCategory,
-        EditLink: {name: "editTransaction", params: { "transaction": t.UUID}, query: {...this.$route.query}},
+      EditLink: {
+        name: "editTransaction",
+        params: { transaction: t.UUID },
+        query: { ...this.$route.query }
+      }
     }));
   }
 
@@ -205,7 +254,11 @@ export default class Transactions extends Vue {
         Transfert: t,
         Price: price,
         TotalPrice: 0,
-        EditLink: {name: "editTransfert", params: {"transfert": t.UUID}, query: {...this.$route.query}},
+        EditLink: {
+          name: "editTransfert",
+          params: { transfert: t.UUID },
+          query: { ...this.$route.query }
+        },
         Category: {
           Icon: {
             Color: price > 0 ? "#00AA00" : "#EE0000",

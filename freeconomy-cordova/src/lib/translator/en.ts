@@ -21,6 +21,8 @@ const en : typeof keys = {
     category:"Category",
     modify: "Modify",
     delete: "Delete",
+    selected: "Selected",
+    areYourSure: "Are you sure ?",
   },
   login: {
     buttonWithGoogle: "Login with Google",
@@ -66,6 +68,9 @@ const en : typeof keys = {
     importFromCSV: "Import from CSV",
     loading: "Loading transactions",
     updateSolde: "Update current balance",
+    transfert:"transfert",
+    transaction:"transaction",
+    deleteSelectionConfirm: "Are you sure to delete all the selection ?",
   },
   addTransactionView: {
     beneficiary: "Bénéficiaire",
