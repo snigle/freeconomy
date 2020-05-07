@@ -320,7 +320,7 @@ export async function DeleteTransaction(transactionUUID: string): Promise<ITrans
       .then(() => transactions)
       .then((tr: ITransaction[]) => markAsDeleted(transactionUUID).then(() => tr));
   },
-  ).then((result) => { autoSync(); return result; });
+  )
 }
 
 export async function DeleteTransfert(transactionUUID: string): Promise<ITransfert[]> {
@@ -337,7 +337,7 @@ export async function DeleteTransfert(transactionUUID: string): Promise<ITransfe
       .then(() => transactions)
       .then((tr: ITransfert[]) => markAsDeleted(transactionUUID).then(() => tr));
   },
-  ).then((result) => { autoSync(); return result; });
+  )
 }
 
 async function RefreshTotalWallet(walletUUID: string, year: number): Promise<void> {

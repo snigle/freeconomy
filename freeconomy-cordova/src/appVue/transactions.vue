@@ -4,17 +4,17 @@
   color: white;
   padding: 2px;
 }
-@iconSize: 70px;
+@iconSize: 60px;
 .icon {
   width: @iconSize;
   height: @iconSize;
   text-align: center;
   color: white;
-  font-size: @iconSize * 80 / 100;
   display: flex;
   justify-content: center;
-  align-content: center;
-  flex-direction: column;
+  .material-icons {
+    font-size: @iconSize * 45 / 100;
+  }
 }
 .repeat {
   font-size: 18px;
@@ -61,7 +61,7 @@
                 type="button"
                 v-on:click.prevent="selectLine(line.UUID)"
                 class="icon rounded-circle btn"
-                v-bind:style="{backgroundColor: (selectedLines[line.UUID] ? '#e6dbdc' : line.Category.Icon.Color) }"
+                v-bind:style="{backgroundColor: (selectedLines[line.UUID] ? 'rgb(134, 192, 255)' : line.Category.Icon.Color) }"
               >
                 <div
                   v-if="line.Category.Icon.Type === 'material'"
@@ -103,6 +103,7 @@ import {
   displayPrice,
   IRepeat
 } from "../lib/types";
+import * as Models from "../lib/models";
 import store from "./store";
 import moment, { Moment } from "moment";
 import _ from "lodash";
@@ -306,6 +307,28 @@ export default class Transactions extends Vue {
         }))
       }))
       .value();
+  }
+
+  async deleteSelection() {
+    var transferts : Array<ITransfert> | null = null;
+    var transactions : Array<ITransaction> | null = null;
+    for (const line of this.selection) {
+      if (line.Transfert) {
+        transferts = await Models.DeleteTransfert(line.UUID)
+      }
+      if (line.Transaction) {
+        transactions = await Models.DeleteTransaction(line.UUID)
+      }
+    }
+
+    if (transferts !== null) {
+      store.commit.setTransferts(transferts);
+    }
+    if (transactions !== null) {
+      store.commit.setTransactions(transactions);
+    }
+    store.dispatch.sync()
+    this.deletionPopup = false;
   }
 }
 </script>
