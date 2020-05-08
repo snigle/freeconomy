@@ -38,6 +38,7 @@ const fr : typeof keys = {
     categories: "Catégories",
     categoryReport: "Total par catégorie",
     sync: "Synchroniser",
+    syncing: "Synchronisation",
     logout: "Déconnexion",
     logoutConfirm: "Se déconnecter ?",
     logoutConfirmText: `Êtes-vous sûr de vouloir vous déconnecter ?
@@ -178,7 +179,8 @@ const fr : typeof keys = {
     needCategoryToAddTransaction: "Vous devez ajouter des catégories avant de pouvoir créer une opération.",
     needWalletToDisplayTransactions: "Vous devez ajouter un compte pour afficher les opérations.",
     needWalletToAddTransfert:"Vous devez ajouter un compte pour pouvoir créer un virement.",
-    saveError:"Bug lors de l'enregistrement de l'élément %{err}"
+    saveError:"Bug lors de l'enregistrement de l'élément %{err}",
+    syncError: "Il y a eu un bug lors de la synchronisation.",
   },
 } ;
 

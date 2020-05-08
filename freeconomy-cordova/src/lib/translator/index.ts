@@ -18,8 +18,9 @@ moment.locale(lang);
 
 export default I18n;
 
-const $t = (scope: I18n.Scope, options?: I18n.TranslateOptions) => I18n.t(scope, options);
+export const $t = (scope: I18n.Scope, options?: I18n.TranslateOptions) => I18n.t(scope, options);
 $t.keys = keys;
+
 export const TranslatePlugin = {
   install : (Vue:any, options:any) => {
     Vue.prototype.$t = $t

@@ -4,6 +4,8 @@ import * as Driver from "./googlesync";
 import { ICollection } from "./googlesync";
 import * as Models from "./models";
 import * as OAuth from "./oauth";
+import {$t} from "./translator";
+
 import { ICategory, ILogin, ITransaction, ITransfert, IWallet } from "./types";
 
 let syncPromise: Promise<any> = Promise.resolve();
@@ -58,10 +60,15 @@ export function GoogleSync(autohide: boolean = true): Promise<any> {
           }))
           .then(() => Models.CleanDeleted());
       })
-      .then(() => syncResult.newData || !autohide ? store.commit.syncTerminate() : store.commit.syncHide());
+      .then(() => {
+        console.log("sync terminate");
+        store.commit.syncTerminate();
+        setTimeout(() => store.commit.syncHide(), 5000);
+        });
   }).catch((err) => {
     console.log("error sync", err);
     store.commit.syncError();
+    store.commit.showError({text: $t($t.keys.errors.syncError), err});
     // return store.dispatch.logout();
   });
   return syncPromise;

@@ -20,7 +20,11 @@
               >{{$t($t.keys.sideBar.categories)}}</router-link>
             </li>
             <li class="nav-item active">
-              <button class="nav-link btn  my-2 my-sm-0" v-on:click="sync()">{{$t($t.keys.sideBar.sync)}}</button>
+                <button v-if="!$store.state.sync.syncing" class="nav-link btn  my-2 my-sm-0" v-on:click="sync()">{{$t($t.keys.sideBar.sync)}}
+                  <span v-if="$store.state.sync.error" class="material-icons">sync_problem</span>
+                  <span v-if="$store.state.sync.synced" class="material-icons">check</span>
+                </button>
+                <button v-else class="nav-link btn my-2 my-sm-0" disabled>{{$t($t.keys.sideBar.syncing)}} <span class="material-icons rotate">sync</span></button>
             </li>
             <li class="nav-item active">
               <button class="nav-link btn  my-2 my-sm-0" v-on:click="logout()">{{$t($t.keys.sideBar.logout)}}</button>
@@ -58,6 +62,7 @@ import * as Models from "../lib/models";
 import Vuex from "vuex";
 import EditTransaction from "./editTransaction.vue";
 import EditTransfert from "./editTransfert.vue";
+import Categories from "./categories.vue";
 import Desktop from "./desktop.vue";
 
 import store from "./store";
@@ -76,6 +81,11 @@ const EditTransfertModal = Vue.extend({
   components: { Modal, EditTransfert }
 });
 
+const CategoriesModal = Vue.extend({
+  template: `<Modal v-on:close="$router.back()"><template v-slot:header>{{$t($t.keys.sideBar.categories)}}</template><Categories /></Modal>`,
+  components: { Modal, Categories }
+});
+
 const toto: string = "10";
 const routes: Array<RouteConfig> = [
   {
@@ -84,6 +94,11 @@ const routes: Array<RouteConfig> = [
     component: Desktop,
     children: [
       { path: "", name: "transactions" },
+      {
+        path: "categories",
+        name: "categories",
+        component: CategoriesModal,
+      },
       {
         path: "transaction/:transaction",
         name: "editTransaction",

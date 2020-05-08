@@ -1,5 +1,29 @@
 <template>
   <div>
+    <Modal
+      v-if="deletionPopup"
+      v-on:close="deletionPopup = false"
+      v-on:backdropClick="deletionPopup = false"
+    >
+      <template v-slot:header>
+        <div>{{$t($t.keys.common.areYourSure)}}</div>
+      </template>
+      {{$t($t.keys.transactionView.deleteSelectionConfirm)}}
+      <template v-slot:footer>
+        <div>
+          <button
+            type="button"
+            class="btn btn-secondary"
+            v-on:click="deletionPopup = false"
+          >{{$t($t.keys.common.cancel)}}</button>
+          <button
+            type="button"
+            class="btn btn-danger"
+            v-on:click="deleteTransfert()"
+          >{{$t($t.keys.common.remove)}}</button>
+        </div>
+      </template>
+    </Modal>
     <Alert v-if="error" v-on:close="error=null">{{error}}</Alert>
     <form v-on:submit="save(false)">
       <div class="form-row">
@@ -140,7 +164,7 @@ export default class EditTransfert extends Vue {
   };
   error: string = "";
   formErrors = { date: false };
-
+  deletionPopup = false;
   loading = false;
 
   get wallets(): Array<IWallet> {
@@ -159,11 +183,15 @@ export default class EditTransfert extends Vue {
     return moment(this.transfert.Date).format("YYYY-MM-DD");
   }
 
-  get fromPrice():number {
-    return this.transfert.From.Price
+  get fromPrice(): number {
+    return this.transfert.From.Price;
   }
-  set fromPrice(fromPrice:number) {
-    if (this.walletFrom && this.walletTo && this.walletFrom.Currency.Code === this.walletTo.Currency.Code) {
+  set fromPrice(fromPrice: number) {
+    if (
+      this.walletFrom &&
+      this.walletTo &&
+      this.walletFrom.Currency.Code === this.walletTo.Currency.Code
+    ) {
       this.transfert.To.Price = fromPrice;
     }
     this.transfert.From.Price = fromPrice;
@@ -232,6 +260,15 @@ export default class EditTransfert extends Vue {
         (err: any) =>
           (this.error = this.$t(this.$t.keys.errors.saveError, { err: err }))
       );
+  }
+
+  deleteTransfert() {
+    Models.DeleteTransfert(this.$route.params.transfert).then(transferts => {
+      store.commit.setTransferts(transferts);
+      this.deletionPopup = false;
+      setTimeout(() => this.$router.back(), 0);
+      store.dispatch.sync();
+    });
   }
 }
 </script>

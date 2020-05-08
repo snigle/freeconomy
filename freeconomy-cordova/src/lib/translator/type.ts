@@ -38,6 +38,7 @@ const keys = {
       categories: "",
       categoryReport: "",
       sync: "",
+      syncing: "",
       logout: "",
       logoutConfirm: "",
       logoutConfirmText: "",
@@ -177,6 +178,7 @@ const keys = {
       needWalletToDisplayTransactions: "",
       needWalletToAddTransfert: "",
       saveError: "",
+      syncError: "",
     },
   };
   

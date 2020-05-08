@@ -24,6 +24,15 @@
 </style>
 <template>
   <div>
+    <Modal v-if="deletionPopup" v-on:close="deletionPopup = false" v-on:backdropClick="deletionPopup = false">
+      <template v-slot:header><div>{{$t($t.keys.common.areYourSure)}}</div></template>
+      {{$t($t.keys.common.removeName,{name:transaction.Beneficiary})}}
+      <template v-slot:footer><div>
+        <button type="button" class="btn btn-secondary" v-on:click="deletionPopup = false">{{$t($t.keys.common.cancel)}}</button>
+        <button type="button" class="btn btn-danger" v-on:click="deleteTransaction()">{{$t($t.keys.common.remove)}}</button>
+      </div>
+      </template>
+    </Modal>
     <Alert v-if="error" v-on:close="error=null">{{error}}</Alert>
     <form v-on:submit="save(false)">
       <div class="form-group">
@@ -40,7 +49,7 @@
           <button type="button"
           class="list-group-item list-group-item-action"
           v-on:click="autocompleteClick(item)"
-          v-for="item in autocomplete" v-bind:key="item.UUID"><span class="material-icons">{{item.Category.Icon.Name}}</span>{{item.Beneficiary}}<span class="price">{{item.Price}}{{item.Wallet.Currency.Symbol}}</span></button>
+          v-for="item in autocomplete" v-bind:key="item.UUID"><span class="material-icons">{{item.Category.Icon.Name}}</span>{{item.Beneficiary}}<span class="price">{{item.Price}}{{item.Wallet ? item.Wallet.Currency.Symbol : ''}}</span></button>
         </div>
         <small
           id="beneficiaryHelp"
@@ -109,7 +118,7 @@
             type="button"
             v-if="$route.params.transaction"
             class="btn btn-danger"
-            v-on:click="deleteTransaction()"
+            v-on:click="deletionPopup = true"
           >{{$t($t.keys.common.delete)}}</button>
           <button
             type="button"
@@ -140,6 +149,7 @@ import _ from "lodash";
 import moment from "moment";
 import Alert from "../components/alert.vue";
 import RepeatInput from "../components/repeatInput.vue";
+import Modal from "../components/modal.vue";
 
 interface IWithCategory {
   Category? : ICategory
@@ -149,7 +159,7 @@ interface IWithWallet {
 }
 
 @Component({
-  components: { Alert, RepeatInput }
+  components: { Alert, RepeatInput, Modal }
 })
 export default class EditTransaction extends Vue {
   transaction: ITransactionInput = {
@@ -163,7 +173,7 @@ export default class EditTransaction extends Vue {
   };
   error: string = "";
   formErrors = { date: false };
-
+  deletionPopup = false;
   loading = false;
   price = "-";
 
@@ -251,6 +261,16 @@ cleanToSearch(text: string): string {
     this.transaction.CategoryUUID = tr.CategoryUUID
     this.transaction.Comment = tr.Comment
     this.setPrice(`${tr.Price}`)
+  }
+
+  deleteTransaction() {
+    Models.DeleteTransaction(this.$route.params.transaction)
+    .then(transactions => {
+      store.commit.setTransactions(transactions);
+      this.deletionPopup = false;
+      setTimeout(() => this.$router.back(), 0);
+      store.dispatch.sync();
+    })
   }
 
   save(andNew: boolean) {

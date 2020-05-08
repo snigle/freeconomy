@@ -6,3 +6,20 @@
         font-size: 18px;
     }
 }
+.material-icons{
+    font-size:inherit;
+}
+
+.rotate {
+    animation: rotation 2s infinite linear;
+}
+
+@keyframes rotation {
+    to {
+        transform: rotate(0deg);
+    }
+
+    from {
+        transform: rotate(359deg);
+    }
+}

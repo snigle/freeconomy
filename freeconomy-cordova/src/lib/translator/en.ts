@@ -38,6 +38,7 @@ const en : typeof keys = {
     categories: "Categories",
     categoryReport: "Report by Category",
     sync: "Synchronize",
+    syncing: "Synchronizing",
     logout: "Logout",
     logoutConfirm: "Are you sure to logout ?",
     logoutConfirmText: "Are you sure to logout ?" +
@@ -178,6 +179,7 @@ const en : typeof keys = {
     needWalletToDisplayTransactions: "You have to add a wallet to display transactions.",
     needWalletToAddTransfert: "You need to add wallet before adding a transfert.",
     saveError: "Issue when trying to save the element : %{err}",
+    syncError: "There were an issue during the synchronisations.",
   },
 };
 
