@@ -9,12 +9,34 @@
       </div>
       <div v-else>
         <Navbar>
-          <div v-if="cordova" class="nav-link">Logged</div>
-          <button class="nav-link" v-on:click="logout()">{{$t($t.keys.sideBar.logout)}}</button>
-          <button class="nav-link" v-on:click="sync()">{{$t($t.keys.sideBar.sync)}}</button>
-          <router-link class="nav-link" v-bind:to="'addTransfert'" >Add transfert</router-link>
-          <router-link class="nav-link" v-bind:to="'addTransaction'" >Add transaction</router-link>
-          <div v-if="cordova" class="nav-link">Cordova active</div>
+          <ul class="navbar-nav mr-auto">
+            <li class="nav-item active">
+              <router-link class="nav-link" v-bind:to="{name:'transactions'}">{{$t($t.keys.sideBar.home)}}</router-link>
+            </li>
+            <li class="nav-item active">
+              <router-link
+                class="nav-link"
+                v-bind:to="{name:'categories'}"
+              >{{$t($t.keys.sideBar.categories)}}</router-link>
+            </li>
+            <li class="nav-item active">
+              <button class="nav-link btn  my-2 my-sm-0" v-on:click="sync()">{{$t($t.keys.sideBar.sync)}}</button>
+            </li>
+            <li class="nav-item active">
+              <button class="nav-link btn  my-2 my-sm-0" v-on:click="logout()">{{$t($t.keys.sideBar.logout)}}</button>
+            </li>
+          </ul>
+          <form class="form-inline my-2 my-lg-0">
+            <input
+              class="form-control mr-sm-2"
+              type="search"
+              placeholder="Search"
+              aria-label="Search"
+              v-on:input="search($event.target.value)"
+              v-bind:value="navSearch"
+            />
+            <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+          </form>
         </Navbar>
         <!-- Key permit to rerender route with same component (eg: editTransaction component used for edit and create) -->
         <router-view :key="$route.name"></router-view>
@@ -39,18 +61,26 @@ import EditTransfert from "./editTransfert.vue";
 import Desktop from "./desktop.vue";
 
 import store from "./store";
-import {TranslatePlugin} from "../lib/translator"
+import { TranslatePlugin } from "../lib/translator";
+import _ from "lodash";
 Vue.use(VueRouter);
 Vue.use(TranslatePlugin);
 
 const Foo = Vue.extend({ template: "<div>foo</div>" });
-const EditTransactionModal = Vue.extend({ template: `<Modal v-on:close="$router.back()"><template v-slot:header>{{$t($t.keys.transactionsView.editTransaction)}}</template><EditTransaction /></Modal>`, components: { Modal, EditTransaction } });
-const EditTransfertModal = Vue.extend({ template: `<Modal v-on:close="$router.back()"><template v-slot:header>{{$t($t.keys.transactionsView.editTransfert)}}</template><EditTransfert /></Modal>`, components: { Modal, EditTransfert } });
+const EditTransactionModal = Vue.extend({
+  template: `<Modal v-on:close="$router.back()"><template v-slot:header>{{$t($t.keys.transactionsView.editTransaction)}}</template><EditTransaction /></Modal>`,
+  components: { Modal, EditTransaction }
+});
+const EditTransfertModal = Vue.extend({
+  template: `<Modal v-on:close="$router.back()"><template v-slot:header>{{$t($t.keys.transactionsView.editTransfert)}}</template><EditTransfert /></Modal>`,
+  components: { Modal, EditTransfert }
+});
 
 const toto: string = "10";
 const routes: Array<RouteConfig> = [
   {
     path: "/",
+    name:"home",
     component: Desktop,
     children: [
       { path: "", name: "transactions" },
@@ -64,24 +94,28 @@ const routes: Array<RouteConfig> = [
         name: "addTransaction",
         component: EditTransactionModal
       },
-      { path: "transfert/:transfert", name: "editTransfert", component: EditTransfertModal },
-            {
+      {
+        path: "transfert/:transfert",
+        name: "editTransfert",
+        component: EditTransfertModal
+      },
+      {
         path: "addTransfert",
         name: "addTransfert",
         component: EditTransfertModal
-      },
+      }
       // ]},
       // { path: "transactions/wallet/:wallet", name: "transactionsByWallet", children: [
       // { path: "transaction/:transaction", name: "editTransaction", component: Bar },
       // { path: "transfert/:transfert", name: "editTransfert", component: Bar },
       // ]},
     ]
-  },
+  }
 ];
 
 const router = new VueRouter({
   routes,
-  linkExactActiveClass : "active"
+  linkExactActiveClass: "active"
 });
 
 @Component({
@@ -98,8 +132,10 @@ export default class AppVue extends Vue {
   cordova = false;
   loading = true;
   error = "";
+  navSearch = "";
 
   created() {
+    this.navSearch = _.isString(this.$route.query.search) ? this.$route.query.search : "";
     Promise.all([
       new Promise((resolve, reject) => {
         document.addEventListener(
@@ -112,7 +148,9 @@ export default class AppVue extends Vue {
         );
       }),
       store.dispatch.initialize()
-    ]).then(() => (this.loading = false)).catch(() => this.loading = false);
+    ])
+      .then(() => (this.loading = false))
+      .catch(() => (this.loading = false));
   }
 
   get logged() {
@@ -120,14 +158,31 @@ export default class AppVue extends Vue {
   }
 
   logout() {
-    (window as any).plugins.googleplus.disconnect(() => {
-      store.dispatch.logout()
-    }, (err :any)=> store.commit.showError({err, text: "fail to logout"}));
-    store.dispatch.logout()
+    (window as any).plugins.googleplus.disconnect(
+      () => {
+        store.dispatch.logout();
+      },
+      (err: any) => store.commit.showError({ err, text: "fail to logout" })
+    );
+    store.dispatch.logout();
   }
 
-  sync () {
+  sync() {
     store.dispatch.sync();
+  }
+
+  updateSearchQuery() {
+    console.log("debounce", this.navSearch);
+    
+  }
+
+  search(search: string) {
+    this.navSearch = search;
+    _.debounce(() => {
+      if (this.$route.query.search !== search){
+        this.$router.replace({name: this.$route.name || "", query: {...this.$route.query, search}})
+      }
+    }, 500)();
   }
 }
 </script>

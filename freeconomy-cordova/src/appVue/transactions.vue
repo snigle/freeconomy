@@ -202,8 +202,6 @@ export default class Transactions extends Vue {
     const transactions = store.state.transactions.filter(
       t => walletUUIDs.indexOf(t.WalletUUID) !== -1
     );
-    // Filter by search if exist
-    // TODO
 
     return transactions;
   }
@@ -275,10 +273,14 @@ export default class Transactions extends Vue {
   }
 
   get lines(): Array<ILine> {
-    const lines = _.sortBy(
+    let lines = _.sortBy(
       _.concat<ILine>(this.transactionLines, this.transfertLines),
       t => t.Date
-    );
+    )
+    // TODO move this getter in the store and store the search value
+    if (_.isString(this.$route.query.search)){
+      lines = lines.filter((l) =>  JSON.stringify({...l, EditLink: undefined}).match(this.$route.query.search as string) !== null);
+    }
 
     let total = 0;
     if (this.wallet) {
