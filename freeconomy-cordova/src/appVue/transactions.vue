@@ -4,18 +4,7 @@
   color: white;
   padding: 2px;
 }
-@iconSize: 60px;
-.icon {
-  width: @iconSize;
-  height: @iconSize;
-  text-align: center;
-  color: white;
-  display: flex;
-  justify-content: center;
-  .material-icons {
-    font-size: @iconSize * 45 / 100;
-  }
-}
+
 .repeat {
   font-size: 18px;
 }
@@ -60,22 +49,20 @@
               <button
                 type="button"
                 v-on:click.prevent="selectLine(line.UUID)"
-                class="icon rounded-circle btn"
+                class="icon-lg btn"
                 v-bind:style="{backgroundColor: (selectedLines[line.UUID] ? 'rgb(134, 192, 255)' : line.Category.Icon.Color) }"
-              >
-                <div
+              ><div
                   v-if="line.Category.Icon.Type === 'material'"
                   class="material-icons"
-                >{{selectedLines[line.UUID] ? 'check' : line.Category.Icon.Name}}</div>
-              </button>
+                >{{selectedLines[line.UUID] ? 'check' : $iconMap(line.Category.Icon.Name)}}</div></button>
               <div class="middle col">
                 <div>
                   {{line.Beneficiary}}
                   <span v-if="line.Repeat" class="repeat material-icons">sync</span>
                 </div>
                 <div>
-                  <span v-if="!wallet">Todo</span>
                   {{line.Comment}}
+                  <small v-if="!wallet && walletsByUUID[line.WalletUUID]">({{walletsByUUID[line.WalletUUID].Name}})</small>
                 </div>
               </div>
               <div class="price">
@@ -124,6 +111,7 @@ interface ILine {
   Category: ICategory;
   EditLink: Location;
   Repeat: IRepeat | null;
+  Wallet?: IWallet;
 }
 
 const defaultCategory: ICategory = {
@@ -170,13 +158,19 @@ export default class Transactions extends Vue {
     return wallets;
   }
 
-  get wallet(): IWallet | null {
+  get walletsByUUID(): {[key:string]: IWallet} {
+    const wallets :  {[key:string]: IWallet} = {};
+    _.forEach(this.wallets, w => wallets[w.UUID] = w)
+    return wallets;
+  }
+
+  get wallet(): IWallet | undefined {
     return (
-      store.state.wallets.find(w => w.UUID === this.$route.query.wallet) || null
+      store.state.wallets.find(w => w.UUID === this.$route.query.wallet)
     );
   }
 
-  get currency(): ICurrency | null {
+  get currency(): ICurrency | undefined {
     if (this.wallet) {
       return this.wallet.Currency;
     }
@@ -192,7 +186,7 @@ export default class Transactions extends Vue {
       store.commit.showError({
         text: this.$t(this.$t.keys.errors.needWalletToDisplayTransactions)
       });
-      return null;
+      return undefined;
     }
     return firstWalletOfCurrency.Currency;
   }

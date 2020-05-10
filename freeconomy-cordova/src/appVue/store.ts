@@ -117,7 +117,7 @@ const { store, rootActionContext, moduleActionContext } = createDirectStore({
             return Models.CleanAll().then(() => state.commit("setLogout"));
         },
         sync(state) {
-            return GoogleSync().catch(() => state.commit("syncError"));
+            return _.throttle(GoogleSync,0,{leading: true, trailing: true})().catch(() => state.commit("syncError"));
         },
         initialize(state) {
             return Promise.all([

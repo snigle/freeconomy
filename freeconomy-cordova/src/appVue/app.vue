@@ -11,7 +11,10 @@
         <Navbar>
           <ul class="navbar-nav mr-auto">
             <li class="nav-item active">
-              <router-link class="nav-link" v-bind:to="{name:'transactions'}">{{$t($t.keys.sideBar.home)}}</router-link>
+              <router-link
+                class="nav-link"
+                v-bind:to="{name:'transactions'}"
+              >{{$t($t.keys.sideBar.home)}}</router-link>
             </li>
             <li class="nav-item active">
               <router-link
@@ -20,14 +23,28 @@
               >{{$t($t.keys.sideBar.categories)}}</router-link>
             </li>
             <li class="nav-item active">
-                <button v-if="!$store.state.sync.syncing" class="nav-link btn  my-2 my-sm-0" v-on:click="sync()">{{$t($t.keys.sideBar.sync)}}
-                  <span v-if="$store.state.sync.error" class="material-icons">sync_problem</span>
-                  <span v-if="$store.state.sync.synced" class="material-icons">check</span>
-                </button>
-                <button v-else class="nav-link btn my-2 my-sm-0" disabled>{{$t($t.keys.sideBar.syncing)}} <span class="material-icons rotate">sync</span></button>
+              <button
+                v-if="!$store.state.sync.syncing"
+                class="nav-link btn my-2 my-sm-0"
+                v-on:click="sync()"
+              >
+                {{$t($t.keys.sideBar.sync)}}
+                <span
+                  v-if="$store.state.sync.error"
+                  class="material-icons"
+                >sync_problem</span>
+                <span v-if="$store.state.sync.synced" class="material-icons">check</span>
+              </button>
+              <button v-else class="nav-link btn my-2 my-sm-0" disabled>
+                {{$t($t.keys.sideBar.syncing)}}
+                <span class="material-icons rotate">sync</span>
+              </button>
             </li>
             <li class="nav-item active">
-              <button class="nav-link btn  my-2 my-sm-0" v-on:click="logout()">{{$t($t.keys.sideBar.logout)}}</button>
+              <button
+                class="nav-link btn my-2 my-sm-0"
+                v-on:click="logout()"
+              >{{$t($t.keys.sideBar.logout)}}</button>
             </li>
           </ul>
           <form class="form-inline my-2 my-lg-0">
@@ -63,6 +80,7 @@ import Vuex from "vuex";
 import EditTransaction from "./editTransaction.vue";
 import EditTransfert from "./editTransfert.vue";
 import Categories from "./categories.vue";
+import EditCategory from "./editCategory.vue";
 import Desktop from "./desktop.vue";
 
 import store from "./store";
@@ -70,6 +88,17 @@ import { TranslatePlugin } from "../lib/translator";
 import _ from "lodash";
 Vue.use(VueRouter);
 Vue.use(TranslatePlugin);
+
+declare module "vue/types/vue" {
+  // 3. Déclarez l'augmentation pour Vue
+  interface Vue {
+    $iconMap: (name: string) => string;
+  }
+}
+
+Vue.prototype.$iconMap = (name: string) => {
+  return name.replace(/-/g, "_");
+};
 
 const Foo = Vue.extend({ template: "<div>foo</div>" });
 const EditTransactionModal = Vue.extend({
@@ -85,19 +114,33 @@ const CategoriesModal = Vue.extend({
   template: `<Modal v-on:close="$router.back()"><template v-slot:header>{{$t($t.keys.sideBar.categories)}}</template><Categories /></Modal>`,
   components: { Modal, Categories }
 });
+const EditCategoryModal = Vue.extend({
+  template: `<Modal v-on:close="$router.back()"><template v-slot:header>{{$t($t.keys.common.edit)}}</template><EditCategory /></Modal>`,
+  components: { Modal, EditCategory }
+});
 
 const toto: string = "10";
 const routes: Array<RouteConfig> = [
   {
     path: "/",
-    name:"home",
+    name: "home",
     component: Desktop,
     children: [
       { path: "", name: "transactions" },
       {
         path: "categories",
         name: "categories",
-        component: CategoriesModal,
+        component: CategoriesModal
+      },
+      {
+        path: "editCategory/:category",
+        name: "editCategory",
+        component: EditCategoryModal
+      },
+      {
+        path: "addCategory",
+        name: "addCategory",
+        component: EditCategoryModal
       },
       {
         path: "transaction/:transaction",
@@ -119,11 +162,6 @@ const routes: Array<RouteConfig> = [
         name: "addTransfert",
         component: EditTransfertModal
       }
-      // ]},
-      // { path: "transactions/wallet/:wallet", name: "transactionsByWallet", children: [
-      // { path: "transaction/:transaction", name: "editTransaction", component: Bar },
-      // { path: "transfert/:transfert", name: "editTransfert", component: Bar },
-      // ]},
     ]
   }
 ];
@@ -150,7 +188,9 @@ export default class AppVue extends Vue {
   navSearch = "";
 
   created() {
-    this.navSearch = _.isString(this.$route.query.search) ? this.$route.query.search : "";
+    this.navSearch = _.isString(this.$route.query.search)
+      ? this.$route.query.search
+      : "";
     Promise.all([
       new Promise((resolve, reject) => {
         document.addEventListener(
@@ -188,14 +228,16 @@ export default class AppVue extends Vue {
 
   updateSearchQuery() {
     console.log("debounce", this.navSearch);
-    
   }
 
   search(search: string) {
     this.navSearch = search;
     _.debounce(() => {
-      if (this.$route.query.search !== search){
-        this.$router.replace({name: this.$route.name || "", query: {...this.$route.query, search}})
+      if (this.$route.query.search !== search) {
+        this.$router.replace({
+          name: this.$route.name || "",
+          query: { ...this.$route.query, search }
+        });
       }
     }, 500)();
   }

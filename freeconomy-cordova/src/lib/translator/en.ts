@@ -23,6 +23,8 @@ const en : typeof keys = {
     delete: "Delete",
     selected: "Selected",
     areYourSure: "Are you sure ?",
+    color: "Color",
+    result: "Result",
   },
   login: {
     buttonWithGoogle: "Login with Google",

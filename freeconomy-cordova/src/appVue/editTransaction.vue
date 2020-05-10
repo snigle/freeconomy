@@ -1,6 +1,6 @@
 <style lang="scss" scoped>
 #beneficiary.autocomplete {
-  border-bottom:0;
+  border-bottom: 0;
   border-bottom-left-radius: 0;
   border-bottom-right-radius: 0;
 }
@@ -13,24 +13,39 @@
     font-size: 15px;
     padding: 0.25rem 0.75rem;
     .material-icons {
-      font-size:12px;
-      margin-right:5px;
+      font-size: 12px;
+      margin-right: 5px;
     }
     .price {
-      float:right;
+      float: right;
     }
   }
 }
 </style>
 <template>
   <div>
-    <Modal v-if="deletionPopup" v-on:close="deletionPopup = false" v-on:backdropClick="deletionPopup = false">
-      <template v-slot:header><div>{{$t($t.keys.common.areYourSure)}}</div></template>
+    <Modal
+      v-if="deletionPopup"
+      v-on:close="deletionPopup = false"
+      v-on:backdropClick="deletionPopup = false"
+    >
+      <template v-slot:header>
+        <div>{{$t($t.keys.common.areYourSure)}}</div>
+      </template>
       {{$t($t.keys.common.removeName,{name:transaction.Beneficiary})}}
-      <template v-slot:footer><div>
-        <button type="button" class="btn btn-secondary" v-on:click="deletionPopup = false">{{$t($t.keys.common.cancel)}}</button>
-        <button type="button" class="btn btn-danger" v-on:click="deleteTransaction()">{{$t($t.keys.common.remove)}}</button>
-      </div>
+      <template v-slot:footer>
+        <div>
+          <button
+            type="button"
+            class="btn btn-secondary"
+            v-on:click="deletionPopup = false"
+          >{{$t($t.keys.common.cancel)}}</button>
+          <button
+            type="button"
+            class="btn btn-danger"
+            v-on:click="deleteTransaction()"
+          >{{$t($t.keys.common.remove)}}</button>
+        </div>
       </template>
     </Modal>
     <Alert v-if="error" v-on:close="error=null">{{error}}</Alert>
@@ -46,10 +61,17 @@
           aria-describedby="beneficiaryHelp"
         />
         <div class="list-group" id="autocomplete" v-if="autocomplete.length > 0">
-          <button type="button"
-          class="list-group-item list-group-item-action"
-          v-on:click="autocompleteClick(item)"
-          v-for="item in autocomplete" v-bind:key="item.UUID"><span class="material-icons">{{item.Category.Icon.Name}}</span>{{item.Beneficiary}}<span class="price">{{item.Price}}{{item.Wallet ? item.Wallet.Currency.Symbol : ''}}</span></button>
+          <button
+            type="button"
+            class="list-group-item list-group-item-action"
+            v-on:click="autocompleteClick(item)"
+            v-for="item in autocomplete"
+            v-bind:key="item.UUID"
+          >
+            <span class="material-icons">{{item.Category ? $iconMap(item.Category.Icon.Name) : "help"}}</span>
+            {{item.Beneficiary}}
+            <span v-if="!transaction.Price" class="price">{{item.Price}}{{item.Wallet ? item.Wallet.Currency.Symbol : ''}}</span>
+          </button>
         </div>
         <small
           id="beneficiaryHelp"
@@ -142,7 +164,12 @@
 <script lang="ts">
 import Vue from "vue";
 import Component from "vue-class-component";
-import { ITransaction, ITransactionInput, ICategory, IWallet } from "../lib/types";
+import {
+  ITransaction,
+  ITransactionInput,
+  ICategory,
+  IWallet
+} from "../lib/types";
 import * as Models from "../lib/models";
 import store from "./store";
 import _ from "lodash";
@@ -152,10 +179,10 @@ import RepeatInput from "../components/repeatInput.vue";
 import Modal from "../components/modal.vue";
 
 interface IWithCategory {
-  Category? : ICategory
+  Category?: ICategory;
 }
 interface IWithWallet {
-  Wallet? : IWallet
+  Wallet?: IWallet;
 }
 
 @Component({
@@ -182,10 +209,9 @@ export default class EditTransaction extends Vue {
     this.transaction.Price = parseFloat(n);
   }
 
-  
-cleanToSearch(text: string): string {
-  return text.toLowerCase().replace(/( |'|-)/g, "");
-}
+  cleanToSearch(text: string): string {
+    return text.toLowerCase().replace(/( |'|-)/g, "");
+  }
 
   get categories(): Array<ICategory> {
     return store.state.categories;
@@ -213,64 +239,84 @@ cleanToSearch(text: string): string {
         return;
       }
       this.transaction = { ...transaction };
+      this.price = `${transaction.Price}`;
     }
 
-    if (!this.transaction.CategoryUUID) {
+    if (!this.transaction.CategoryUUID || !this.categories.find(c => c.UUID === this.transaction.CategoryUUID)) {
       const category = _.first(this.categories);
       if (!category) {
         this.error = this.$t(this.$t.keys.errors.needCategoryToAddTransaction);
         return;
       }
       this.transaction.CategoryUUID = category.UUID;
+      this.transaction = {...this.transaction};
     }
   }
 
   get autocomplete(): Array<ITransaction & IWithCategory & IWithWallet> {
-    const autocomplete : Array<ITransaction> = _(store.state.transactions)
-    .filter(tr => 
-      tr.WalletUUID === this.transaction.WalletUUID &&
-      this.cleanToSearch(tr.Beneficiary).match(this.cleanToSearch(this.transaction.Beneficiary)) !== null
-    )
-    .groupBy((tr: ITransaction) => `${this.cleanToSearch(tr.Beneficiary)}.${tr.CategoryUUID}`)
-    .values()
-    .sortBy(transactions => transactions.length)
-    .reverse()
-    .value()
-    .map((transactions:Array<ITransaction>) =>  _(transactions)
-      .groupBy((tr : ITransaction) => tr.Price)
+    const autocomplete: Array<ITransaction> = _(store.state.transactions)
+      .filter(
+        tr =>
+          tr.WalletUUID === this.transaction.WalletUUID &&
+          tr.UUID !== this.$route.params.transaction &&
+          this.cleanToSearch(tr.Beneficiary).match(
+            this.cleanToSearch(this.transaction.Beneficiary)
+          ) !== null
+      )
+      .groupBy(
+        (tr: ITransaction) =>
+          `${this.cleanToSearch(tr.Beneficiary)}.${tr.CategoryUUID}`
+      )
       .values()
       .sortBy(transactions => transactions.length)
       .reverse()
-      .map(transactions => _.first(transactions) as ITransaction)
-      .first() as ITransaction
-    )
-    .slice(0,10)
-    .map(tr => ({
-      ...tr,
-      Category: store.state.categories.find(c => c.UUID === tr.CategoryUUID),
-      Wallet: store.state.wallets.find(w=> w.UUID === tr.WalletUUID),
-    }))
-    if (autocomplete.length === 1 && this.cleanToSearch(autocomplete[0].Beneficiary) === this.cleanToSearch(this.transaction.Beneficiary)){
-      return []
+      .value()
+      .map(
+        (transactions: Array<ITransaction>) =>
+          _(transactions)
+            .groupBy((tr: ITransaction) => tr.Price)
+            .values()
+            .sortBy(transactions => transactions.length)
+            .reverse()
+            .map(transactions => _.first(transactions) as ITransaction)
+            .first() as ITransaction
+      )
+      .slice(0, 10)
+      .map(tr => ({
+        ...tr,
+        Category: store.state.categories.find(c => c.UUID === tr.CategoryUUID),
+        Wallet: store.state.wallets.find(w => w.UUID === tr.WalletUUID)
+      }));
+    if (
+      autocomplete.length === 1 &&
+      this.cleanToSearch(autocomplete[0].Beneficiary) ===
+        this.cleanToSearch(this.transaction.Beneficiary)
+    ) {
+      return [];
     }
-    return autocomplete
+    return autocomplete;
   }
 
-  autocompleteClick(tr : ITransaction) {
-    this.transaction.Beneficiary = tr.Beneficiary
-    this.transaction.CategoryUUID = tr.CategoryUUID
-    this.transaction.Comment = tr.Comment
-    this.setPrice(`${tr.Price}`)
+  autocompleteClick(tr: ITransaction) {
+    this.transaction.Beneficiary = tr.Beneficiary;
+    this.transaction.CategoryUUID = tr.CategoryUUID;
+    if (this.transaction.Comment === "") {
+      this.transaction.Comment = tr.Comment;
+    }
+    if (this.transaction.Price === 0) {
+      this.setPrice(`${tr.Price}`);
+    }
   }
 
   deleteTransaction() {
-    Models.DeleteTransaction(this.$route.params.transaction)
-    .then(transactions => {
-      store.commit.setTransactions(transactions);
-      this.deletionPopup = false;
-      setTimeout(() => this.$router.back(), 0);
-      store.dispatch.sync();
-    })
+    Models.DeleteTransaction(this.$route.params.transaction).then(
+      transactions => {
+        store.commit.setTransactions(transactions);
+        this.deletionPopup = false;
+        setTimeout(() => this.$router.back(), 0);
+        store.dispatch.sync();
+      }
+    );
   }
 
   save(andNew: boolean) {

@@ -22,7 +22,9 @@ const keys = {
       modify: "",
       delete: "",
       selected: "" as string | {one: string, other:string},
-      areYourSure: "Are you sure ?",
+      areYourSure: "",
+      color: "",
+      result: "",
     },
     login: {
       buttonWithGoogle: "",

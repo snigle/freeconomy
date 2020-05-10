@@ -9,7 +9,7 @@
       v-bind:style="{display:'block'}"
       v-on:click="backdropClick()"
     >
-      <div class="modal-dialog modal-lg" role="document" v-on:click.stop.prevent="() => {}">
+      <div class="modal-dialog modal-lg" role="document" v-on:click.stop="() => {}">
         <div class="modal-content">
           <div class="modal-header">
             <h5 class="modal-title">
