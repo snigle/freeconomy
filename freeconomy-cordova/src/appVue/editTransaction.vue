@@ -345,6 +345,7 @@ export default class EditTransaction extends Vue {
     savePromise
       .then(transactions => {
         store.commit.setTransactions(transactions);
+        store.dispatch.sync();
         if (!andNew) {
           setTimeout(() => this.$router.back(), 0);
         } else {

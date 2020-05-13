@@ -53,6 +53,7 @@ const en : typeof keys = {
     viewArchive: "Display archives",
     hideArchive: "Hide archives",
     repeatable: "%{number} operations to come, click here to add it.",
+    toCome: "to come",
   },
   walletListItem: {
     archive: "Archive",
@@ -74,6 +75,8 @@ const en : typeof keys = {
     transfert:"transfert",
     transaction:"transaction",
     deleteSelectionConfirm: "Are you sure to delete all the selection ?",
+    transfertFrom: "Transfert from %{wallet}",
+    transfertTo: "Transfert to %{wallet}",
   },
   addTransactionView: {
     beneficiary: "Bénéficiaire",

@@ -11,7 +11,7 @@ import { ICategory, ILogin, ITransaction, ITransfert, IWallet } from "./types";
 let syncPromise: Promise<any> = Promise.resolve();
 
 interface ISyncResult { newData: boolean; }
-export function GoogleSync(autohide: boolean = true): Promise<any> {
+export function GoogleSync(): Promise<any> {
   const syncResult: ISyncResult = { newData: false };
   syncPromise = syncPromise.then(() => {
     store.commit.syncStart();

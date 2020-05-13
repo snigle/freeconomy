@@ -3,11 +3,12 @@ import Vuex from "vuex";
 
 import { createDirectStore, StateDeclaration } from "direct-vuex"
 import * as Models from "../lib/models"
-import { ILogin, IWallet, ITransfert, ITransaction, ICategory } from "../lib/types"
+import { ILogin, IWallet, ITransfert, ITransaction, ICategory, IRepeatable } from "../lib/types"
 import { login } from "../lib/oauth"
 import _ from "lodash";
 import { GoogleSync } from "../lib/sync";
 import { v4 } from "uuid";
+import moment from "moment";
 
 interface IError {
     text: string;
@@ -37,6 +38,70 @@ const { store, rootActionContext, moduleActionContext } = createDirectStore({
         transferts: [] as Array<ITransfert>,
     },
     getters: {
+         getRepeatOperations(state): IRepeatable[] {
+            // Get all repeat transaction
+            const transactions = state.transactions.filter((tr) => tr.Repeat !== null);
+            const transferts = state.transferts.filter((tr) => tr.Repeat !== null);
+        
+            const results: IRepeatable[] = [];
+        
+            const repeatTreshold = moment().add(5, "days");
+            _.forEach(transactions, (tr) => {
+                if (!tr.Repeat) {
+                    return;
+                }
+                const repeatDate = moment(tr.Date).add(tr.Repeat.Duration, tr.Repeat.DurationType);
+                if (tr.Repeat && tr.Repeat.MaxOccurrence !== 0 && repeatTreshold.isAfter(repeatDate)) {
+                    results.push({
+                        Key: `${tr.UUID}-repeat`,
+                        Transaction: {
+                            From: tr,
+                            New: {
+                                Beneficiary: tr.Beneficiary,
+                                CategoryUUID: tr.CategoryUUID,
+                                Comment: tr.Comment,
+                                Date: repeatDate.toDate(),
+                                Price: tr.Price,
+                                Repeat: {
+                                    Duration: tr.Repeat.Duration,
+                                    DurationType: tr.Repeat.DurationType,
+                                    MaxOccurrence: (tr.Repeat.MaxOccurrence !== -1 ? tr.Repeat.MaxOccurrence - 1 : -1),
+                                },
+                                WalletUUID: tr.WalletUUID,
+                            },
+                        },
+                    });
+                }
+            });
+        
+            _.forEach(transferts, (tr) => {
+                if (!tr.Repeat) {
+                    return;
+                }
+                const repeatDate = moment(tr.Date).add(tr.Repeat.Duration, tr.Repeat.DurationType);
+                if (tr.Repeat && tr.Repeat.MaxOccurrence !== 0 && repeatTreshold.isAfter(repeatDate)) {
+                    results.push({
+                        Key: `${tr.UUID}-repeat`,
+                        Transfert: {
+                            From: tr,
+                            New: {
+                                Comment: tr.Comment,
+                                Date: repeatDate.toDate(),
+                                Repeat: {
+                                    Duration: tr.Repeat.Duration,
+                                    DurationType: tr.Repeat.DurationType,
+                                    MaxOccurrence: (tr.Repeat.MaxOccurrence !== -1 ? tr.Repeat.MaxOccurrence - 1 : -1),
+                                },
+                                From: { ...tr.From },
+                                To: { ...tr.To },
+                            },
+                        },
+                    });
+                }
+            });
+        
+            return results;
+        }
     },
     mutations: {
         setWallets(state, wallets: Array<IWallet>) {
@@ -117,7 +182,8 @@ const { store, rootActionContext, moduleActionContext } = createDirectStore({
             return Models.CleanAll().then(() => state.commit("setLogout"));
         },
         sync(state) {
-            return _.throttle(GoogleSync,0,{leading: true, trailing: true})().catch(() => state.commit("syncError"));
+            console.log("trying to sync");
+            return _.throttle(() => GoogleSync(),0,{leading: true, trailing: true})().catch(() => state.commit("syncError"));
         },
         initialize(state) {
             return Promise.all([

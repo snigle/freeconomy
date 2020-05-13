@@ -16,6 +16,7 @@ import {
   TransactionDefault,
   TransfertDefault,
   WalletDefault,
+  IRepeatable,
 } from "./types";
 import { GoogleSync } from "./sync";
 
@@ -203,7 +204,7 @@ export async function CreateTransaction(...inputs: ITransactionInput[]): Promise
         return promise;
       })
       .then(() => transactions),
-  ).then((result) => { autoSync(); return result; });
+  );
 }
 
 export async function CreateTransfert(...inputs: ITransfertInput[]): Promise<ITransfert[]> {
@@ -236,15 +237,14 @@ export async function CreateTransfert(...inputs: ITransfertInput[]): Promise<ITr
             promise = promise.then(() => RefreshTotalWallet(t.From.WalletUUID, year));
           }
           if (!mapWalletYear[t.To.WalletUUID][year]) {
-            promise = promise.then(() => RefreshTotalWallet(t.To.WalletUUID, year));
+              promise = promise.then(() => RefreshTotalWallet(t.To.WalletUUID, year));
           }
           mapWalletYear[t.From.WalletUUID][year] = true;
           mapWalletYear[t.To.WalletUUID][year] = true;
         });
         return promise;
       })
-      .then(() => transactions),
-  ).then((result) => { autoSync(); return result; });
+      .then(() => transactions));
 }
 export async function SaveTransferts(transactions: ITransfert[]): Promise<ITransfert[]> {
   return AsyncStorage.setItem("transfert", JSON.stringify(
@@ -278,8 +278,7 @@ export async function UpdateTransaction(transactionUUID: string, input: ITransac
       .then(() => RefreshTotalWallet(input.WalletUUID, input.Date.getFullYear()))
       .then(() => RefreshTotalWallet(old.WalletUUID, new Date(old.Date).getFullYear()))
       .then(() => transactions);
-  },
-  ).then((result) => { autoSync(); return result; });
+  });
 }
 
 export async function UpdateTransfert(transactionUUID: string, input: ITransfertInput): Promise<ITransfert[]> {
@@ -303,8 +302,7 @@ export async function UpdateTransfert(transactionUUID: string, input: ITransfert
       .then(() => RefreshTotalWallet(old.To.WalletUUID, new Date(old.Date).getFullYear()))
       .then(() => RefreshTotalWallet(old.From.WalletUUID, new Date(old.Date).getFullYear()))
       .then(() => transactions);
-  },
-  ).then((result) => { autoSync(); return result; });
+  });
 }
 
 export async function DeleteTransaction(transactionUUID: string): Promise<ITransaction[]> {
@@ -517,6 +515,24 @@ export async function DeleteCategory(categoryUUID: string): Promise<ICategory[]>
 
 export async function SaveCategories(categories: ICategory[]): Promise<ICategory[]> {
   return AsyncStorage.setItem("categories", JSON.stringify(_.sortBy(categories, "Name"))).then(() => categories);
+}
+
+export async function InsertRepeatTransaction(repeat: IRepeatable): Promise<ITransaction[]>{
+  if (!repeat.Transaction) {
+    throw "missing transaction in repeatable";
+  }
+    await CreateTransaction(repeat.Transaction.New)
+    return UpdateTransaction(repeat.Transaction.From.UUID,
+            _.omit({ ...repeat.Transaction?.From, Repeat: null }, ["UUID"]));
+}
+
+export async function InsertRepeatTransfert(repeat: IRepeatable): Promise<ITransfert[]>{
+  if (!repeat.Transfert) {
+    throw "missing transfert in repeatable";
+  }
+
+  await CreateTransfert(repeat.Transfert.New)
+  return UpdateTransfert(repeat.Transfert.From.UUID, _.omit({ ...repeat.Transfert.From, Repeat: null }, ["UUID"]));
 }
 
 export async function GetLogin(): Promise<ILogin> {

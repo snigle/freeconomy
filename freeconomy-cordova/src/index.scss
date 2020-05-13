@@ -55,3 +55,7 @@
     // Three columns to start
     @include row-cols(8);
 }
+
+.actions {
+    margin-bottom:1px;
+}

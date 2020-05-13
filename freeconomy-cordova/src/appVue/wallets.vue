@@ -5,6 +5,21 @@
 </style>
 <template>
   <div>
+    <div class="row actions">
+      <div class="col">
+        <router-link type="button" class="btn btn-primary btn-sm float-left" v-bind:to="{name:'addWallet'}">
+          <span class="material-icons">playlist_add</span>
+          {{$t($t.keys.walletsView.wallets)}}
+        </router-link>
+      </div>
+      <div
+        v-if="selection.length"
+        class="col middle"
+      >{{selection.length}} {{$t($t.keys.common.selected, {count: selection.length})}}</div>
+      <div v-if="selection.length" class="col">
+      </div>
+    </div>
+
     <div class="card" v-for="currencyGroup in wallets" v-bind:key="currencyGroup.Code">
       <router-link
         v-bind:to="{name: 'transactions', query : {currencyCode: currencyGroup.Currency.Code}}"
@@ -36,6 +51,12 @@ export interface IWalletsByCurrency {
 
 @Component({})
 export default class Wallets extends Vue {
+    selectedLines: { [key: string]: boolean } = {};
+
+  get selection(): Array<IWallet> {
+    return store.state.wallets.filter(l => this.selectedLines[l.UUID]);
+  }
+
   get wallets(): Array<IWalletsByCurrency> {
     return _(store.state.wallets)
       .groupBy(w => w.Currency.Code)

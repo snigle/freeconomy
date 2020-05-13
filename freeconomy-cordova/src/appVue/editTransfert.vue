@@ -239,12 +239,14 @@ export default class EditTransfert extends Vue {
     this.loading = true;
 
     const savePromise: Promise<ITransfert[]> =
-      this.$route.params && this.$route.params.transaction
-        ? Models.UpdateTransfert(this.$route.params.transaction, this.transfert)
+      this.$route.params && this.$route.params.transfert
+        ? Models.UpdateTransfert(this.$route.params.transfert, this.transfert)
         : Models.CreateTransfert(this.transfert);
     savePromise
       .then(transferts => {
         store.commit.setTransferts(transferts);
+        store.dispatch.sync();
+
         if (!andNew) {
           setTimeout(() => this.$router.back(), 0);
         } else {

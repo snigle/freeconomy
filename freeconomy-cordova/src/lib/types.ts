@@ -109,6 +109,18 @@ export interface IRepeat {
   Duration: number;
 }
 
+export interface IRepeatable {
+  Transaction?: {
+      New: ITransactionInput;
+      From: ITransaction;
+  };
+  Transfert?: {
+      New: ITransfertInput;
+      From: ITransfert;
+  };
+  Key: string;
+}
+
 export interface ITransaction {
   UUID: string;
   WalletUUID: string;

@@ -52,6 +52,7 @@ const keys = {
       viewArchive: "",
       hideArchive: "",
       repeatable: "",
+      toCome: "",
     },
     walletListItem: {
       archive: "",
@@ -73,6 +74,8 @@ const keys = {
       transfert:"",
       transaction:"",
       deleteSelectionConfirm: "",
+      transfertFrom: "",
+      transfertTo: "",
     },
     addTransactionView: {
       beneficiary: "",

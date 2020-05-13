@@ -53,7 +53,8 @@ const fr : typeof keys = {
     wallets: "Comptes",
     viewArchive: "Afficher les archives",
     hideArchive: "Cacher les archives",
-    repeatable: "%{number} opérations à venir, cliquer ici pour les ajouter.",
+    repeatable: "%{number} opérations à venir",
+    toCome: "A venir",
   },
   walletListItem: {
     archive: "Archiver",
@@ -75,6 +76,8 @@ const fr : typeof keys = {
     transfert: "Virement",
     transaction: "Opération",
     deleteSelectionConfirm: "Êtes-vous sûr de vouloir supprimer la sélection ?",
+    transfertFrom: "Virement depuis %{wallet}",
+    transfertTo: "Virement vers %{wallet}",
   },
   addTransactionView: {
     beneficiary: "Bénéficiaire",
