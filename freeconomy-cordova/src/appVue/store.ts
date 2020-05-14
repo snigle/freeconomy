@@ -16,6 +16,8 @@ interface IError {
     uuid: string;
 }
 
+export type IWalletWithTotalToCome = IWallet & { TotalToCome: number, OperationsToCome: number }
+
 Vue.use(Vuex);
 const { store, rootActionContext, moduleActionContext } = createDirectStore({
     namespaced: true as true,
@@ -38,13 +40,33 @@ const { store, rootActionContext, moduleActionContext } = createDirectStore({
         transferts: [] as Array<ITransfert>,
     },
     getters: {
-         getRepeatOperations(state): IRepeatable[] {
+        walletsWithPriceToCome(state, getters): Array<IWalletWithTotalToCome> {
+            return state.wallets.map(w => {
+                const totalToCome = (getters.getRepeatOperations as IRepeatable[]).filter((r : IRepeatable) => 
+                    r.Transaction?.New.WalletUUID === w.UUID || 
+                    r.Transfert?.New.From.WalletUUID === w.UUID || 
+                    r.Transfert?.New.To.WalletUUID === w.UUID
+                    ).reduce((price, r) => {
+                        if (!_.isUndefined(r.Transaction)){
+                            price.TotalToCome+=r.Transaction.New.Price
+                        } else if (!_.isUndefined(r.Transfert) && r.Transfert.New.From.WalletUUID === w.UUID){
+                            price.TotalToCome-= r.Transfert.New.From.Price
+                        } else if (!_.isUndefined(r.Transfert) && r.Transfert.New.To.WalletUUID === w.UUID){
+                            price.TotalToCome+= r.Transfert.New.To.Price
+                        }
+                        price.OperationsToCome++;
+                        return price
+                    },{TotalToCome: 0, OperationsToCome: 0})
+                return {...w, ...totalToCome}
+            });
+        },
+        getRepeatOperations(state): IRepeatable[] {
             // Get all repeat transaction
             const transactions = state.transactions.filter((tr) => tr.Repeat !== null);
             const transferts = state.transferts.filter((tr) => tr.Repeat !== null);
-        
+
             const results: IRepeatable[] = [];
-        
+
             const repeatTreshold = moment().add(5, "days");
             _.forEach(transactions, (tr) => {
                 if (!tr.Repeat) {
@@ -52,6 +74,7 @@ const { store, rootActionContext, moduleActionContext } = createDirectStore({
                 }
                 const repeatDate = moment(tr.Date).add(tr.Repeat.Duration, tr.Repeat.DurationType);
                 if (tr.Repeat && tr.Repeat.MaxOccurrence !== 0 && repeatTreshold.isAfter(repeatDate)) {
+                    const nextMaxOccurence = tr.Repeat.MaxOccurrence == -1 ? -1 : tr.Repeat.MaxOccurrence-1;
                     results.push({
                         Key: `${tr.UUID}-repeat`,
                         Transaction: {
@@ -62,24 +85,25 @@ const { store, rootActionContext, moduleActionContext } = createDirectStore({
                                 Comment: tr.Comment,
                                 Date: repeatDate.toDate(),
                                 Price: tr.Price,
-                                Repeat: {
+                                Repeat:  nextMaxOccurence !== 0 ? {
                                     Duration: tr.Repeat.Duration,
                                     DurationType: tr.Repeat.DurationType,
-                                    MaxOccurrence: (tr.Repeat.MaxOccurrence !== -1 ? tr.Repeat.MaxOccurrence - 1 : -1),
-                                },
+                                    MaxOccurrence: nextMaxOccurence,
+                                } : null,
                                 WalletUUID: tr.WalletUUID,
                             },
                         },
                     });
                 }
             });
-        
+
             _.forEach(transferts, (tr) => {
                 if (!tr.Repeat) {
                     return;
                 }
                 const repeatDate = moment(tr.Date).add(tr.Repeat.Duration, tr.Repeat.DurationType);
                 if (tr.Repeat && tr.Repeat.MaxOccurrence !== 0 && repeatTreshold.isAfter(repeatDate)) {
+                    const nextMaxOccurence = tr.Repeat.MaxOccurrence == -1 ? -1 : tr.Repeat.MaxOccurrence-1;
                     results.push({
                         Key: `${tr.UUID}-repeat`,
                         Transfert: {
@@ -87,11 +111,11 @@ const { store, rootActionContext, moduleActionContext } = createDirectStore({
                             New: {
                                 Comment: tr.Comment,
                                 Date: repeatDate.toDate(),
-                                Repeat: {
+                                Repeat: nextMaxOccurence !== 0 ? {
                                     Duration: tr.Repeat.Duration,
                                     DurationType: tr.Repeat.DurationType,
-                                    MaxOccurrence: (tr.Repeat.MaxOccurrence !== -1 ? tr.Repeat.MaxOccurrence - 1 : -1),
-                                },
+                                    MaxOccurrence: nextMaxOccurence,
+                                } : null,
                                 From: { ...tr.From },
                                 To: { ...tr.To },
                             },
@@ -99,7 +123,7 @@ const { store, rootActionContext, moduleActionContext } = createDirectStore({
                     });
                 }
             });
-        
+
             return results;
         }
     },
@@ -183,7 +207,7 @@ const { store, rootActionContext, moduleActionContext } = createDirectStore({
         },
         sync(state) {
             console.log("trying to sync");
-            return _.throttle(() => GoogleSync(),0,{leading: true, trailing: true})().catch(() => state.commit("syncError"));
+            return _.throttle(() => GoogleSync(), 0, { leading: true, trailing: true })().catch(() => state.commit("syncError"));
         },
         initialize(state) {
             return Promise.all([

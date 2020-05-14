@@ -32,7 +32,7 @@
           v-bind:to="{name: 'transactions', query : {wallet: wallet.UUID}}"
           class="list-group-item list-group-item-action"
           v-bind:class="{active: $router.query && (wallet.UUID === $router.query.wallet)}"
-        >{{wallet.Name}}</router-link>
+        >{{wallet.Name}}<span class="badge badge-pill badge-info" v-if="wallet.OperationsToCome">{{wallet.OperationsToCome}}</span></router-link>
       </div>
     </div>
   </div>
@@ -41,12 +41,12 @@
 import Vue from "vue";
 import Component from "vue-class-component";
 import { IWallet, ICurrency } from "../lib/types";
-import store from "./store";
+import store,{IWalletWithTotalToCome} from "./store";
 import _ from "lodash";
 
 export interface IWalletsByCurrency {
   Currency: ICurrency;
-  Wallets: Array<IWallet>;
+  Wallets: Array<IWalletWithTotalToCome>;
 }
 
 @Component({})
@@ -58,9 +58,9 @@ export default class Wallets extends Vue {
   }
 
   get wallets(): Array<IWalletsByCurrency> {
-    return _(store.state.wallets)
+    return _(store.getters.walletsWithPriceToCome)
       .groupBy(w => w.Currency.Code)
-      .map((wallets: Array<IWallet>, Currency: string) => ({
+      .map((wallets: Array<IWalletWithTotalToCome>, Currency: string) => ({
         Currency: (_.first(wallets) as IWallet).Currency,
         Wallets: wallets
       }))

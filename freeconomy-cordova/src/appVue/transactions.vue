@@ -287,6 +287,7 @@ export default class Transactions extends Vue {
   }
 
   transactionToLine(t: ITransaction, repeatable?: boolean): ILine {
+    console.log("update line", t.UUID, t.Beneficiary, t);
     return {
       ...t,
       Transaction: t,
@@ -441,8 +442,8 @@ export default class Transactions extends Vue {
     let lines = _.sortBy(
       _.concat<ILine>(this.transactionLines, this.transfertLines),
       t => t.Date
-    );
-    // TODO move this getter in the store and store the search value
+    ).map(l => ({...l})); // Recreate objects to avoid modifying source.
+
     if (_.isString(this.$route.query.search)) {
       lines = lines.filter(
         l =>

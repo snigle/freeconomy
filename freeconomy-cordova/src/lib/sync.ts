@@ -53,10 +53,7 @@ export function GoogleSync(): Promise<any> {
             ),
           ]))
           .then(([wallets, transactions, transfert, categories]) => Models.RefreshAllTotalWallet(transactions, transfert).then( () => {
-            store.commit.setCategories(categories);
-            store.commit.setWallets(wallets);
-            store.commit.setTransactions(transactions);
-            store.commit.setTransferts(transfert);
+            store.dispatch.loadData();
           }))
           .then(() => Models.CleanDeleted());
       })
