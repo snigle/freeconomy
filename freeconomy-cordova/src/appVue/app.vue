@@ -81,6 +81,7 @@ import EditTransaction from "./editTransaction.vue";
 import EditTransfert from "./editTransfert.vue";
 import Categories from "./categories.vue";
 import EditCategory from "./editCategory.vue";
+import EditWallet from "./editWallet.vue";
 import Desktop from "./desktop.vue";
 
 import store from "./store";
@@ -119,6 +120,11 @@ const EditCategoryModal = Vue.extend({
   components: { Modal, EditCategory }
 });
 
+const EditWalletModal = Vue.extend({
+  template: `<Modal v-on:close="$router.back()"><template v-slot:header>{{$t($t.keys.common.edit)}}</template><EditWallet /></Modal>`,
+  components: { Modal, EditWallet }
+});
+
 const toto: string = "10";
 const routes: Array<RouteConfig> = [
   {
@@ -136,6 +142,16 @@ const routes: Array<RouteConfig> = [
         path: "editCategory/:category",
         name: "editCategory",
         component: EditCategoryModal
+      },
+        {
+        path: "editWallet/:wallet",
+        name: "editWallet",
+        component: EditWalletModal
+      },
+      {
+        path: "addWallet",
+        name: "addWallet",
+        component: EditWalletModal
       },
       {
         path: "addCategory",

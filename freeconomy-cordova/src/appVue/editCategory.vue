@@ -13,7 +13,7 @@
       <template v-slot:header>
         <div>{{$t($t.keys.common.areYourSure)}}</div>
       </template>
-      {{$t($t.keys.common.removeName,{name:category.Name})}}
+      {{$t($t.keys.deleteCategoryView.areYouSure,{name:category.Name})}}
       <template v-slot:footer>
         <div>
           <button
@@ -74,7 +74,7 @@
             type="button"
             v-else
             class="btn btn-danger"
-            v-on:click="$route.back()"
+            v-on:click="$router.back()"
           >{{$t($t.keys.common.cancel)}}</button>
         </div>
         <div class="float-right">
@@ -145,7 +145,7 @@ export default class EditCategory extends Vue {
     Icon: {
       Name: this.icons[0].name,
       Type: this.icons[0].type,
-      Color: "rgb(81, 127, 164)"
+      Color: "#517FA4"
     }
   };
 
@@ -174,7 +174,6 @@ export default class EditCategory extends Vue {
 
   async save(andNew: boolean) {
     let categories: Array<ICategory>;
-    console.log("params ? ", this.$route.params.category, this.$route.params)
     if (this.$route.params.category) {
       categories = await Models.UpdateCategory(
         this.$route.params.category,

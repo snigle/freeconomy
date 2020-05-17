@@ -1,6 +1,6 @@
 import keys from "./type";
 
-const fr : typeof keys = {
+const fr = {
   common: {
     title: "Freeconomy",
     cancel: "Annuler",
@@ -21,10 +21,11 @@ const fr : typeof keys = {
     category:"Catégorie",
     modify: "Modifier",
     delete: "Supprimer",
-    selected: {one: "Sélectionné", other: "Sélectionnés" },
+    selected: {one: "Sélectionné", other: "Sélectionnés" } as string | {one:string, other:string},
     areYourSure: "Êtes-vous sûr ?",
     color: "Couleur",
     result: "Résultat",
+    eg: "ex: ",
   },
   login: {
     buttonWithGoogle: "Connexion avec Google",

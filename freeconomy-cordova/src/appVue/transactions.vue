@@ -287,7 +287,6 @@ export default class Transactions extends Vue {
   }
 
   transactionToLine(t: ITransaction, repeatable?: boolean): ILine {
-    console.log("update line", t.UUID, t.Beneficiary, t);
     return {
       ...t,
       Transaction: t,
@@ -362,50 +361,46 @@ export default class Transactions extends Vue {
     let price = 0;
     let totalPrice = 0;
     let description = "";
-    if (this.wallet) {
-      if (this.wallet.UUID === t.From.WalletUUID) {
-        price = -t.From.Price;
-        totalPrice = price;
-        const otherWallet = store.state.wallets.find(
-          w => w.UUID === t.To.WalletUUID
-        );
-        description = this.$t(this.$t.keys.transactionsView.transfertTo, {
-          wallet: otherWallet?.Name
-        });
-      } else {
-        price = t.To.Price;
-        let otherWallet = store.state.wallets.find(
-          w => w.UUID === t.From.WalletUUID
-        );
-        description = this.$t(this.$t.keys.transactionsView.transfertFrom, {
-          wallet: otherWallet?.Name
-        });
-      }
-    } else {
-      const walletFrom = store.state.wallets.find(
-        w => w.UUID === t.From.WalletUUID
-      );
-      const walletTo = store.state.wallets.find(
+    const walletFrom = store.state.wallets.find(
+      w => w.UUID === t.From.WalletUUID
+    );
+    const walletTo = store.state.wallets.find(w => w.UUID === t.To.WalletUUID);
+
+    if (this.wallet && this.wallet.UUID === t.From.WalletUUID) {
+      price = -t.From.Price;
+      totalPrice = price;
+      const otherWallet = store.state.wallets.find(
         w => w.UUID === t.To.WalletUUID
       );
-      if (walletFrom?.Currency.Code === walletTo?.Currency.Code) {
-        totalPrice = 0;
-        price = t.From.Price;
-      } else if (walletFrom?.Currency.Code === this.currency?.Code) {
-        price = -t.From.Price;
-        totalPrice = price;
-      } else {
-        price = -t.From.Price;
-        totalPrice = price;
-      }
-      description = [
-        this.$t(this.$t.keys.transactionsView.transfert),
-        this.$t(this.$t.keys.addTransfertView.from),
-        walletFrom?.Name,
-        this.$t(this.$t.keys.addTransfertView.to).toLowerCase(),
-        walletTo?.Name
-      ].join(" ");
+      description = this.$t(this.$t.keys.transactionsView.transfertTo, {
+        wallet: otherWallet?.Name
+      });
+    } else if (this.wallet && this.wallet.UUID === t.To.WalletUUID) {
+      price = t.To.Price;
+      totalPrice = price;
+      let otherWallet = store.state.wallets.find(
+        w => w.UUID === t.From.WalletUUID
+      );
+      description = this.$t(this.$t.keys.transactionsView.transfertFrom, {
+        wallet: otherWallet?.Name
+      });
+    } else if (walletFrom?.Currency.Code === walletTo?.Currency.Code) {
+      totalPrice = 0;
+      price = t.From.Price;
+    } else if (walletFrom?.Currency.Code === this.currency?.Code) {
+      price = -t.From.Price;
+      totalPrice = price;
+    } else {
+      price = -t.From.Price;
+      totalPrice = price;
     }
+    description = [
+      this.$t(this.$t.keys.transactionsView.transfert),
+      this.$t(this.$t.keys.addTransfertView.from),
+      walletFrom?.Name,
+      this.$t(this.$t.keys.addTransfertView.to).toLowerCase(),
+      walletTo?.Name
+    ].join(" ");
 
     return {
       ...t,
@@ -442,7 +437,7 @@ export default class Transactions extends Vue {
     let lines = _.sortBy(
       _.concat<ILine>(this.transactionLines, this.transfertLines),
       t => t.Date
-    ).map(l => ({...l})); // Recreate objects to avoid modifying source.
+    ).map(l => ({ ...l })); // Recreate objects to avoid modifying source.
 
     if (_.isString(this.$route.query.search)) {
       lines = lines.filter(

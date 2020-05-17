@@ -25,6 +25,7 @@ const en : typeof keys = {
     areYourSure: "Are you sure ?",
     color: "Color",
     result: "Result",
+    eg: "eg: ",
   },
   login: {
     buttonWithGoogle: "Login with Google",
