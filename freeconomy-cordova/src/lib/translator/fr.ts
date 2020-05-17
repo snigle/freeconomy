@@ -1,4 +1,4 @@
-import keys from "./type";
+import {custom} from "./type";
 
 const fr = {
   common: {
@@ -21,7 +21,7 @@ const fr = {
     category:"Catégorie",
     modify: "Modifier",
     delete: "Supprimer",
-    selected: {one: "Sélectionné", other: "Sélectionnés" } as string | {one:string, other:string},
+    selected:  {one: "Sélectionné", other: "Sélectionnés", custom:true } as custom,
     areYourSure: "Êtes-vous sûr ?",
     color: "Couleur",
     result: "Résultat",

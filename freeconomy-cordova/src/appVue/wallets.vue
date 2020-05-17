@@ -1,10 +1,16 @@
 <style lang="less" scoped>
-.card {
-  margin-bottom: 10px;
-  a.card-header {
-    text-decoration: none;
-    color: inherit;
-  }
+.icon-lg {
+  border-radius: 30%;
+}
+.price {
+  text-align:right;
+}
+.list-group {
+  margin-bottom:20px;
+}
+.align-right{
+  text-align:right;
+  float:right;
 }
 </style>
 <template>
@@ -20,50 +26,73 @@
           {{$t($t.keys.walletsView.wallets)}}
         </router-link>
       </div>
-      <div
-        v-if="selection.length"
-        class="col middle"
-      >{{selection.length}} {{$t($t.keys.common.selected, {count: selection.length})}}</div>
-      <div v-if="selection.length" class="col"></div>
     </div>
 
-    <div class="card" v-for="currencyGroup in wallets" v-bind:key="currencyGroup.Code">
+    <div class="list-group" v-for="currencyGroup in wallets" v-bind:key="currencyGroup.Code">
       <router-link
         v-bind:to="{name: 'transactions', query : {currencyCode: currencyGroup.Currency.Code}}"
-        class="card-header bg-light"
-      >{{currencyGroup.Currency.Code}}</router-link>
-      <div class="list-group list-group-flush">
+        class="list-group-item list-group-item-action"
+      >
+      {{$t($t.keys.walletsView.wallets)}} ({{currencyGroup.Currency.Code}}) : {{currencyGroup.Total}} {{currencyGroup.Currency.Symbol}}
+      <span class="align-right" v-if="currencyGroup.Selection.length">{{currencyGroup.Selection.length}} {{$t($t.keys.common.selected, {count: currencyGroup.Selection.length})}} : {{currencyGroup.TotalSelected}} {{currencyGroup.Currency.Symbol}}</span></router-link>
+      <div
+        v-for="wallet in currencyGroup.Wallets"
+        v-bind:key="wallet.UUID"
+        v-on:contextmenu="toogleDropdown($event,wallet.UUID)"
+        class="list-group-item list-group-item-action"
+        v-bind:class="$route.query && (wallet.UUID === $route.query.wallet) ? ['active','text-white'] : []"
+      >
+        <router-link
+          class="list-group-item-action"
+          v-bind:class="$route.query && (wallet.UUID === $route.query.wallet) ? ['active','text-white'] : []"
+          v-bind:to="{name: 'transactions', query : {wallet: wallet.UUID}}"
+        >
+          <div class="container">
+            <div class="row">
+              <button
+                type="button"
+                v-on:click.prevent="selectLine(wallet.UUID)"
+                class="icon-lg btn"
+                v-bind:style="{backgroundColor: (selectedLines[wallet.UUID] ? 'rgb(134, 192, 255)' : wallet.Icon.Color) }"
+              >
+                <div
+                  v-if="wallet.Icon.Type === 'material'"
+                  class="material-icons"
+                >{{selectedLines[wallet.UUID] ? 'check' : $iconMap(wallet.Icon.Name)}}</div>
+              </button>
+              <div class="middle col">
+                <div>
+                  {{wallet.Name}}
+                  <span
+                    class="badge badge-pill badge-info"
+                    v-if="wallet.OperationsToCome"
+                  >{{wallet.OperationsToCome}}</span>
+                </div>
+                <div>
+                  <small>{{wallet.Description}}</small>
+                </div>
+              </div>
+              <div class="price">
+                <div class="price">{{wallet.Total}} {{wallet.Currency.Symbol}}</div>
+                <div class="toCome" v-if="wallet.TotalToCome">
+                  <small>{{$t($t.keys.walletsView.toCome)}} {{wallet.TotalToCome}} {{wallet.Currency.Symbol}}</small>
+                </div>
+              </div>
+            </div>
+          </div>
+        </router-link>
         <div
-          v-for="wallet in currencyGroup.Wallets"
-          v-bind:key="wallet.UUID"
-          v-on:contextmenu="toogleDropdown($event,wallet.UUID)"
+          class="dropdown-menu"
+          aria-labelledby="dropdownMenuLink"
+          v-on-clickaway="toogleDropdown"
+          v-if="dropdown[wallet.UUID]"
+          v-bind:class="{show:dropdown[wallet.UUID]}"
+          v-bind:style="{position:'fixed', display:'block', ...dropdown[wallet.UUID]}"
         >
           <router-link
-            v-bind:to="{name: 'transactions', query : {wallet: wallet.UUID}}"
-            class="list-group-item list-group-item-action"
-            v-bind:class="{active: $router.query && (wallet.UUID === $router.query.wallet)}"
-          >
-            {{wallet.Name}}
-            <span
-              class="badge badge-pill badge-info"
-              v-if="wallet.OperationsToCome"
-            >{{wallet.OperationsToCome}}</span>
-          </router-link>
-        </div>
-        <div v-for="wallet in currencyGroup.Wallets" v-bind:key="wallet.UUID+'2'">
-          <div
-            class="dropdown-menu"
-            aria-labelledby="dropdownMenuLink"
-            v-on-clickaway="toogleDropdown"
-            v-if="dropdown[wallet.UUID]"
-            v-bind:class="{show:dropdown[wallet.UUID]}"
-            v-bind:style="{position:'fixed', display:'block', ...dropdown[wallet.UUID]}"
-          >
-            <router-link
-              v-bind:to="{name: 'editWallet', params : {wallet: wallet.UUID}}"
-              class="dropdown-item"
-            >{{$t($t.keys.common.edit)}}</router-link>
-          </div>
+            v-bind:to="{name: 'editWallet', params : {wallet: wallet.UUID}}"
+            class="dropdown-item"
+          >{{$t($t.keys.common.edit)}}</router-link>
         </div>
       </div>
     </div>
@@ -80,6 +109,9 @@ import _ from "lodash";
 export interface IWalletsByCurrency {
   Currency: ICurrency;
   Wallets: Array<IWalletWithTotalToCome>;
+  Total: number;
+  Selection: Array<IWalletWithTotalToCome>;
+  TotalSelected: number; 
 }
 
 @Component({
@@ -102,17 +134,27 @@ export default class Wallets extends Vue {
     e.preventDefault();
   }
 
-  get selection(): Array<IWallet> {
-    return store.state.wallets.filter(l => this.selectedLines[l.UUID]);
+  selectLine(uuid: string) {
+    this.selectedLines[uuid] = !this.selectedLines[uuid];
+    this.selectedLines = { ...this.selectedLines };
+  }
+
+  get selection(): Array<IWalletWithTotalToCome> {
+    return store.getters.walletsWithPriceToCome.filter(l => this.selectedLines[l.UUID]);
   }
 
   get wallets(): Array<IWalletsByCurrency> {
     return _(store.getters.walletsWithPriceToCome)
       .groupBy(w => w.Currency.Code)
-      .map((wallets: Array<IWalletWithTotalToCome>, Currency: string) => ({
+      .map((wallets: Array<IWalletWithTotalToCome>, Currency: string) => {
+        const selection = this.selection.filter(s => wallets.find(w => w.UUID === s.UUID));
+        return {
         Currency: (_.first(wallets) as IWallet).Currency,
-        Wallets: wallets
-      }))
+        Wallets: wallets,
+        Total: _.sumBy(wallets, w => w.Total),
+        Selection: selection,
+        TotalSelected: _.sumBy(selection, s => s.Total),
+      }})
       .value();
   }
 }

@@ -48,6 +48,7 @@
         <router-link
           v-bind:to="{name:'addTransaction', query: this.wallet? {wallet:this.wallet.UUID}: {}}"
           class="btn btn-primary btn-sm float-left"
+          v-if="this.wallet"
         >
           <span class="material-icons">playlist_add</span>
           {{$t($t.keys.transactionsView.transaction)}}
@@ -55,6 +56,7 @@
         <router-link
           v-bind:to="{name:'addTransfert', query: this.wallet? {wallet:this.wallet.UUID}: {}}"
           class="btn btn-primary btn-sm float-left"
+          v-if="this.wallet"
         >
           <span class="material-icons">repeat_one</span>
           {{$t($t.keys.transactionsView.transfert)}}

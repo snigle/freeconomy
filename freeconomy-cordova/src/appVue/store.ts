@@ -16,7 +16,7 @@ interface IError {
     uuid: string;
 }
 
-export type IWalletWithTotalToCome = IWallet & { TotalToCome: number, OperationsToCome: number }
+export type IWalletWithTotalToCome = IWallet & { Total: number, TotalToCome: number, OperationsToCome: number }
 
 Vue.use(Vuex);
 const { store, rootActionContext, moduleActionContext } = createDirectStore({
@@ -56,7 +56,7 @@ const { store, rootActionContext, moduleActionContext } = createDirectStore({
                         }
                         price.OperationsToCome++;
                         return price
-                    },{TotalToCome: 0, OperationsToCome: 0})
+                    },{TotalToCome: 0, OperationsToCome: 0, Total: w.Solde+_.sumBy(w.TotalPerYear, (total) => total.Total)})
                 return {...w, ...totalToCome}
             });
         },
