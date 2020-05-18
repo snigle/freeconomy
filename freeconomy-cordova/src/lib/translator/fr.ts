@@ -26,6 +26,12 @@ const fr = {
     color: "Couleur",
     result: "Résultat",
     eg: "ex: ",
+    total: "Total",
+    timeRange: "Période",
+  },
+  stats: {
+    begin: "Début",
+    end: "Fin",
   },
   login: {
     buttonWithGoogle: "Connexion avec Google",
@@ -148,6 +154,7 @@ const fr = {
     thisYear: "Cette année",
     lastYear: "L'année dernière",
     all: "Toute les opérations",
+    customRange: "Personnalisée",
   },
   updateSoldeView: {
     newBalance: "Nouveau total",

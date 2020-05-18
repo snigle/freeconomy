@@ -101,7 +101,7 @@
 <script lang="ts">
 import Vue from "vue";
 import Component from "vue-class-component";
-import { IWallet, ICurrency } from "../lib/types";
+import { IWallet, ICurrency, displayPrice } from "../lib/types";
 import store, { IWalletWithTotalToCome } from "./store";
 import { mixin as clickaway } from "vue-clickaway";
 import _ from "lodash";
@@ -148,12 +148,13 @@ export default class Wallets extends Vue {
       .groupBy(w => w.Currency.Code)
       .map((wallets: Array<IWalletWithTotalToCome>, Currency: string) => {
         const selection = this.selection.filter(s => wallets.find(w => w.UUID === s.UUID));
+        console.log("total", displayPrice(_.sumBy(wallets, w => w.Total)))
         return {
         Currency: (_.first(wallets) as IWallet).Currency,
-        Wallets: wallets,
-        Total: _.sumBy(wallets, w => w.Total),
+        Wallets: wallets.map(w => ({...w, Total: displayPrice(w.Total), TotalToCome: displayPrice(w.TotalToCome)})),
+        Total: displayPrice(_.sumBy(wallets, w => w.Total)),
         Selection: selection,
-        TotalSelected: _.sumBy(selection, s => s.Total),
+        TotalSelected: displayPrice(_.sumBy(selection, s => s.Total)),
       }})
       .value();
   }

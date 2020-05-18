@@ -83,7 +83,7 @@
       </div>
     </div>
     <div v-if="currency" class="list-group">
-      <template v-for="day in groupedLines">
+      <template v-for="day in groupedLines.slice(0,60)">
         <div
           v-bind:key="day.Day.toString()"
           class="day list-group-item bg-secondary text-white"
@@ -132,7 +132,7 @@
                 </div>
               </div>
               <div class="price">
-                <div class="price">{{line.Price}} {{currency.Symbol}}</div>
+                <div class="price">{{line.DisplayPrice}} {{currency.Symbol}}</div>
                 <div class="total">
                   <small>{{line.TotalPrice}} {{currency.Symbol}}</small>
                 </div>
@@ -170,10 +170,11 @@ interface ITransactionByDay {
   Lines: Array<ILine>;
 }
 
-interface ILine {
+export interface ILine {
   Transaction?: ITransaction;
   Transfert?: ITransfert;
   Description: string;
+  DisplayPrice:number;
   Price: number;
   TotalPrice: number;
   Date: Date;
@@ -293,7 +294,8 @@ export default class Transactions extends Vue {
       ...t,
       Transaction: t,
       Price: t.Price,
-      TotalPrice: t.Price,
+      DisplayPrice: t.Price,
+      TotalPrice: 0,
       Description: t.Beneficiary,
       Category:
         _.find(this.categories, c => c.UUID === t.CategoryUUID) ||
@@ -361,7 +363,7 @@ export default class Transactions extends Vue {
     // totalPrice = price and description toto vers tata
 
     let price = 0;
-    let totalPrice = 0;
+    let displayPrice = 0;
     let description = "";
     const walletFrom = store.state.wallets.find(
       w => w.UUID === t.From.WalletUUID
@@ -369,8 +371,8 @@ export default class Transactions extends Vue {
     const walletTo = store.state.wallets.find(w => w.UUID === t.To.WalletUUID);
 
     if (this.wallet && this.wallet.UUID === t.From.WalletUUID) {
-      price = -t.From.Price;
-      totalPrice = price;
+      displayPrice = -t.From.Price;
+      price = displayPrice;
       const otherWallet = store.state.wallets.find(
         w => w.UUID === t.To.WalletUUID
       );
@@ -378,8 +380,8 @@ export default class Transactions extends Vue {
         wallet: otherWallet?.Name
       });
     } else if (this.wallet && this.wallet.UUID === t.To.WalletUUID) {
-      price = t.To.Price;
-      totalPrice = price;
+      displayPrice = t.To.Price;
+      price = displayPrice;
       let otherWallet = store.state.wallets.find(
         w => w.UUID === t.From.WalletUUID
       );
@@ -387,14 +389,14 @@ export default class Transactions extends Vue {
         wallet: otherWallet?.Name
       });
     } else if (walletFrom?.Currency.Code === walletTo?.Currency.Code) {
-      totalPrice = 0;
-      price = t.From.Price;
+      price = 0;
+      displayPrice = t.From.Price;
     } else if (walletFrom?.Currency.Code === this.currency?.Code) {
-      price = -t.From.Price;
-      totalPrice = price;
+      displayPrice = -t.From.Price;
+      price = displayPrice;
     } else {
-      price = -t.From.Price;
-      totalPrice = price;
+      displayPrice = -t.From.Price;
+      price = displayPrice;
     }
     description = [
       this.$t(this.$t.keys.transactionsView.transfert),
@@ -408,7 +410,8 @@ export default class Transactions extends Vue {
       ...t,
       Transfert: t,
       Price: price,
-      TotalPrice: totalPrice,
+      TotalPrice: 0,
+      DisplayPrice: displayPrice,
       Description: description,
       EditLink: repeatable
         ? undefined
@@ -423,7 +426,7 @@ export default class Transactions extends Vue {
           Name: "sync",
           Type: "material"
         },
-        Name: "",
+        Name: this.$t(this.$t.keys.transactionsView.transfert),
         UUID: "",
         LastUpdate: new Date()
       },
@@ -455,7 +458,7 @@ export default class Transactions extends Vue {
       total = this.wallet.Solde;
     }
     _.forEach(lines, line => {
-      total += line.TotalPrice;
+      total += line.Price;
       line.TotalPrice = total;
     });
     return _.reverse(lines);

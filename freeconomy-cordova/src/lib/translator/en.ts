@@ -26,6 +26,12 @@ const en : typeof keys = {
     color: "Color",
     result: "Result",
     eg: "eg: ",
+    total: "Total",
+    timeRange: "Time Range",
+  },
+  stats: {
+    begin: "From",
+    end: "To",
   },
   login: {
     buttonWithGoogle: "Login with Google",
@@ -147,6 +153,7 @@ const en : typeof keys = {
     thisYear: "This Year",
     lastYear: "Last Year",
     all: "All transactions",
+    customRange: "Custom",
   },
   updateSoldeView: {
     newBalance: "New Balance Value",
