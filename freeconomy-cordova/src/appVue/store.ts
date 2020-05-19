@@ -197,10 +197,10 @@ const { store, rootActionContext, moduleActionContext } = createDirectStore({
             Models.setAutoSync(true).then(() => state.commit("setAutosync", true));
         },
         login(state) {
-            return login().then((login => Models.SaveLogin(login))).then(login => state.commit("setLogged", login)).catch(e => { state.commit("setLoginError", e); throw e });
+            return login().then((login => Models.SaveLogin(login))).catch(e => { state.commit("setLoginError", e); throw e });
         },
         loginAndSync(state) {
-            return state.dispatch("login").then(() => state.dispatch("sync"));
+            return state.dispatch("login").then(() => state.dispatch("sync")).then(login => state.commit("setLogged", login));
         },
         logout(state) {
             return Models.CleanAll().then(() => state.commit("setLogout"));

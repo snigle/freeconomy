@@ -16,6 +16,7 @@
   "license": "Apache-2.0",
   "dependencies": {
     "bootstrap": "^4.4.1",
+    "chart.js": "^2.9.3",
     "cordova-plugin-googleplus": "8.4.0",
     "direct-vuex": "^0.10.4",
     "jquery": "^3.5.1",
@@ -30,6 +31,7 @@
   },
   "devDependencies": {
     "@types/bootstrap": "^4.3.2",
+    "@types/chart.js": "^2.9.20",
     "@types/cordova": "^0.0.34",
     "@types/jquery": "^3.3.35",
     "@types/vue-clickaway": "^2.2.0",

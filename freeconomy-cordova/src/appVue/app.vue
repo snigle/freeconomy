@@ -3,7 +3,7 @@
     <div v-if="!loading">
       <div v-if="!logged">
         <Navbar>
-          <div v-if="cordova" class="nav-link">Cordova active</div>
+          <div v-if="cordova" hidden class="nav-link">Cordova active</div>
         </Navbar>
         <Login />
       </div>
