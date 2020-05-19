@@ -162,11 +162,13 @@ export default class CategoryStats extends Transactions {
   setDateFrom(d: Date) {
     this.dateFrom = d;
     this.custom.from = d;
+    this.updateRoute();
   }
 
   setDateTo(d: Date) {
     this.dateTo = d;
     this.custom.to = d;
+    this.updateRoute();
   }
 
   previousRange() {
@@ -182,6 +184,7 @@ export default class CategoryStats extends Transactions {
         .toDate();
     }
     this.dateTo = from.toDate();
+    this.updateRoute();
   }
 
   nextRange() {
@@ -197,6 +200,7 @@ export default class CategoryStats extends Transactions {
         .toDate();
     }
     this.dateFrom = to.toDate();
+    this.updateRoute();
   }
 
   setTimeRange(label: string) {
@@ -208,11 +212,27 @@ export default class CategoryStats extends Transactions {
       this.dateFrom = this.custom.from;
       this.dateTo = this.custom.to;
     }
+    this.updateRoute();
+  }
+
+  updateRoute() {
+    this.$router.replace({
+      name: this.$route.name || "",
+      query: {
+        ...this.$route.query,
+        statsBeginDate: moment(this.dateFrom).format("YYYY-MM-DD"),
+        statsEndDate: moment(this.dateTo).format("YYYY-MM-DD")
+      }
+    });
   }
 
   created() {
-    this.dateFrom = this.periods[0].from;
-    this.dateTo = this.periods[0].to;
+    this.dateFrom = this.$route.query.statsBeginDate
+      ? moment(this.$route.query.statsBeginDate as string).toDate()
+      : this.periods[0].from;
+    this.dateTo = this.$route.query.statsEndDate
+      ? moment(this.$route.query.statsEndDate as string).toDate()
+      : this.periods[0].to;
   }
 
   get fromDateString(): string {
@@ -222,7 +242,9 @@ export default class CategoryStats extends Transactions {
   get timeRange(): IRange {
     let resp = _.find(
       this.periods,
-      p => p.from === this.dateFrom && p.to === this.dateTo
+      p =>
+        p.from.getTime() === this.dateFrom.getTime() &&
+        p.to.getTime() === this.dateTo.getTime()
     );
     if (!resp) {
       resp = this.custom;

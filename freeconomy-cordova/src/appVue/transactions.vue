@@ -447,8 +447,8 @@ export default class Transactions extends Vue {
     if (_.isString(this.$route.query.search)) {
       lines = lines.filter(
         l =>
-          JSON.stringify({ ...l, EditLink: undefined }).match(
-            this.$route.query.search as string
+          JSON.stringify({ ...l, EditLink: undefined }).toLowerCase().match(
+            this.$route.query.search.toString().toLowerCase()
           ) !== null
       );
     }
