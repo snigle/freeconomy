@@ -28,6 +28,9 @@ const fr = {
     eg: "ex: ",
     total: "Total",
     timeRange: "Période",
+    totalPeriod:"Total période",
+    income: "Recettes",
+    outcome: "Dépenses",
   },
   stats: {
     begin: "Début",
@@ -163,7 +166,7 @@ const fr = {
   },
   balanceReport: {
     title: "Évolution du solde",
-    thisYear: "Cette année",
+    last6months: "Les 6 derniers mois",
     last2Years: "Les 2 dernières années",
     all: "Toute les années",
   },

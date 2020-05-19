@@ -28,6 +28,9 @@ const en : typeof keys = {
     eg: "eg: ",
     total: "Total",
     timeRange: "Time Range",
+    totalPeriod:"Time Range Total",
+    income: "Recettes",
+    outcome: "Dépenses",
   },
   stats: {
     begin: "From",
@@ -162,7 +165,7 @@ const en : typeof keys = {
   },
   balanceReport: {
     title: "Balance Report",
-    thisYear: "This Year",
+    last6months: "Last 6 months",
     last2Years: "Last 2 Years",
     all: "All Years",
   },

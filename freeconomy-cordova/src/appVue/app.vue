@@ -59,8 +59,7 @@
             <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
           </form>
         </Navbar>
-        <!-- Key permit to rerender route with same component (eg: editTransaction component used for edit and create) -->
-        <router-view :key="$route.name"></router-view>
+        <router-view></router-view>
         <div>Loggin OK</div>
       </div>
     </div>
@@ -106,7 +105,15 @@ const EditTransactionModal = Vue.extend({
   template: `<Modal v-on:close="$router.back()"><template v-slot:header>{{$t($t.keys.transactionsView.editTransaction)}}</template><EditTransaction /></Modal>`,
   components: { Modal, EditTransaction }
 });
+const AddTransactionModal = Vue.extend({
+  template: `<Modal v-on:close="$router.back()"><template v-slot:header>{{$t($t.keys.transactionsView.editTransaction)}}</template><EditTransaction /></Modal>`,
+  components: { Modal, EditTransaction }
+});
 const EditTransfertModal = Vue.extend({
+  template: `<Modal v-on:close="$router.back()"><template v-slot:header>{{$t($t.keys.transactionsView.editTransfert)}}</template><EditTransfert /></Modal>`,
+  components: { Modal, EditTransfert }
+});
+const AddTransfertModal = Vue.extend({
   template: `<Modal v-on:close="$router.back()"><template v-slot:header>{{$t($t.keys.transactionsView.editTransfert)}}</template><EditTransfert /></Modal>`,
   components: { Modal, EditTransfert }
 });
@@ -119,8 +126,16 @@ const EditCategoryModal = Vue.extend({
   template: `<Modal v-on:close="$router.back()"><template v-slot:header>{{$t($t.keys.common.edit)}}</template><EditCategory /></Modal>`,
   components: { Modal, EditCategory }
 });
+const AddCategoryModal = Vue.extend({
+  template: `<Modal v-on:close="$router.back()"><template v-slot:header>{{$t($t.keys.common.edit)}}</template><EditCategory /></Modal>`,
+  components: { Modal, EditCategory }
+});
 
 const EditWalletModal = Vue.extend({
+  template: `<Modal v-on:close="$router.back()"><template v-slot:header>{{$t($t.keys.common.edit)}}</template><EditWallet /></Modal>`,
+  components: { Modal, EditWallet }
+});
+const AddWalletModal = Vue.extend({
   template: `<Modal v-on:close="$router.back()"><template v-slot:header>{{$t($t.keys.common.edit)}}</template><EditWallet /></Modal>`,
   components: { Modal, EditWallet }
 });
@@ -151,12 +166,12 @@ const routes: Array<RouteConfig> = [
       {
         path: "addWallet",
         name: "addWallet",
-        component: EditWalletModal
+        component: AddWalletModal
       },
       {
         path: "addCategory",
         name: "addCategory",
-        component: EditCategoryModal
+        component: AddCategoryModal
       },
       {
         path: "transaction/:transaction",
@@ -166,7 +181,7 @@ const routes: Array<RouteConfig> = [
       {
         path: "addTransaction",
         name: "addTransaction",
-        component: EditTransactionModal
+        component: AddTransactionModal
       },
       {
         path: "transfert/:transfert",

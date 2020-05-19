@@ -8,57 +8,20 @@ h3 {
   <div>
     <div class="row">
       <div class="col-sm-1">
-        <button class="btn btn-light" v-on:click="previousRange()">
+        <button class="btn btn-light" v-on:click="$refs.PeriodInput.previousRange()">
           <span class="material-icons">navigate_before</span>
         </button>
       </div>
       <h3
         class="col"
-      >{{$t($t.keys.common.total)}} {{income}} - {{Math.abs(outcome)}} = {{displayPrice(income + outcome)}} {{currency.Symbol}}</h3>
+      >{{$t($t.keys.common.totalPeriod)}}: {{displayPrice(income + outcome)}} {{currency.Symbol}}</h3>
       <div class="col-sm-1">
-        <button class="btn btn-light" v-on:click="nextRange()">
+        <button class="btn btn-light" v-on:click="$refs.PeriodInput.nextRange()">
           <span class="material-icons">navigate_next</span>
         </button>
       </div>
     </div>
-    <div class="form-row">
-      <div class="form-group col-sm-4">
-        <label for="timeRange">{{$t($t.keys.common.timeRange)}}</label>
-        <select
-          class="form-control"
-          id="timeRange"
-          v-bind:value="timeRange.label"
-          v-on:change="setTimeRange($event.target.value)"
-        >
-          <option
-            v-for="timeRange in periods"
-            v-bind:key="timeRange.label"
-            v-bind:value="timeRange.label"
-          >{{timeRange.label}}</option>
-          <option v-bind:value="custom.label">{{custom.label}}</option>
-        </select>
-      </div>
-      <div class="form-group col-sm-4">
-        <label for="begin">{{$t($t.keys.stats.begin)}}</label>
-        <input
-          type="date"
-          class="form-control"
-          id="begin"
-          v-bind:value="fromDateString"
-          v-on:input="setDateFrom(new Date($event.target.value))"
-        />
-      </div>
-      <div class="form-group col-sm-4">
-        <label for="end">{{$t($t.keys.stats.end)}}</label>
-        <input
-          type="date"
-          class="form-control"
-          id="end"
-          v-bind:value="toDateString"
-          v-on:input="setDateTo(new Date($event.target.value))"
-        />
-      </div>
-    </div>
+    <PeriodInput ref="PeriodInput" v-bind:periods="periods" v-bind:from="dateFrom" v-bind:to="dateTo" v-on:input="updatePeriod($event)"/>
     <div class="list-group">
       <div v-for="line in stats" v-bind:key="line.Category.UUID" class="list-group-item">
         <div class="container">
@@ -92,6 +55,7 @@ import Component from "vue-class-component";
 import store from "./store";
 import { ICategory, displayPrice } from "../lib/types";
 import Transactions, { ILine } from "./transactions.vue";
+import PeriodInput from "../components/periodInput.vue";
 import _ from "lodash";
 import moment from "moment";
 
@@ -106,7 +70,7 @@ interface IRange {
   to: Date;
 }
 
-@Component({ methods: { displayPrice } })
+@Component({ methods: { displayPrice }, components: { PeriodInput } })
 export default class CategoryStats extends Transactions {
   dateFrom: Date = new Date();
   dateTo: Date = new Date();
@@ -153,69 +117,10 @@ export default class CategoryStats extends Transactions {
     }
   ];
 
-  custom = {
-    label: this.$t(this.$t.keys.reportPie.customRange),
-    from: this.dateFrom,
-    to: this.dateTo
-  };
 
-  setDateFrom(d: Date) {
-    this.dateFrom = d;
-    this.custom.from = d;
-    this.updateRoute();
-  }
-
-  setDateTo(d: Date) {
-    this.dateTo = d;
-    this.custom.to = d;
-    this.updateRoute();
-  }
-
-  previousRange() {
-    const from = moment(this.dateFrom);
-    const to = moment(this.dateTo);
-    if (from.date() === to.date()) {
-      this.dateFrom = moment(this.dateFrom)
-        .add(from.diff(to, "month"), "month")
-        .toDate();
-    } else {
-      this.dateFrom = moment(this.dateFrom)
-        .add(from.diff(to))
-        .toDate();
-    }
-    this.dateTo = from.toDate();
-    this.updateRoute();
-  }
-
-  nextRange() {
-    const from = moment(this.dateFrom);
-    const to = moment(this.dateTo);
-    if (from.date() === to.date()) {
-      this.dateTo = moment(this.dateTo)
-        .add(to.diff(from, "month"), "month")
-        .toDate();
-    } else {
-      this.dateFrom = moment(this.dateTo)
-        .add(to.diff(from))
-        .toDate();
-    }
-    this.dateFrom = to.toDate();
-    this.updateRoute();
-  }
-
-  setTimeRange(label: string) {
-    const range = _.find(this.periods, p => p.label === label);
-    if (range) {
-      this.dateFrom = range.from;
-      this.dateTo = range.to;
-    } else {
-      this.dateFrom = this.custom.from;
-      this.dateTo = this.custom.to;
-    }
-    this.updateRoute();
-  }
-
-  updateRoute() {
+  updatePeriod({from, to}: {from:Date, to:Date}) {
+    this.dateFrom = from;
+    this.dateTo = to;
     this.$router.replace({
       name: this.$route.name || "",
       query: {
@@ -233,27 +138,6 @@ export default class CategoryStats extends Transactions {
     this.dateTo = this.$route.query.statsEndDate
       ? moment(this.$route.query.statsEndDate as string).toDate()
       : this.periods[0].to;
-  }
-
-  get fromDateString(): string {
-    return moment(this.dateFrom).format("YYYY-MM-DD");
-  }
-
-  get timeRange(): IRange {
-    let resp = _.find(
-      this.periods,
-      p =>
-        p.from.getTime() === this.dateFrom.getTime() &&
-        p.to.getTime() === this.dateTo.getTime()
-    );
-    if (!resp) {
-      resp = this.custom;
-    }
-    return resp as IRange;
-  }
-
-  get toDateString(): string {
-    return moment(this.dateTo).format("YYYY-MM-DD");
   }
 
   get linesFrom(): Array<ILine> {

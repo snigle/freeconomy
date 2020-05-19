@@ -395,7 +395,7 @@ export default class Transactions extends Vue {
       displayPrice = -t.From.Price;
       price = displayPrice;
     } else {
-      displayPrice = -t.From.Price;
+      displayPrice = t.To.Price;
       price = displayPrice;
     }
     description = [
@@ -453,10 +453,7 @@ export default class Transactions extends Vue {
       );
     }
 
-    let total = 0;
-    if (this.wallet) {
-      total = this.wallet.Solde;
-    }
+    let total = _.sumBy(this.wallets, w => w.Solde);
     _.forEach(lines, line => {
       total += line.Price;
       line.TotalPrice = total;
@@ -534,11 +531,6 @@ export default class Transactions extends Vue {
       r => r.Key === repeatKey
     );
     if (!repeat) {
-      console.log(
-        "repeat not found",
-        repeat,
-        store.getters.getRepeatOperations
-      );
       return;
     }
 

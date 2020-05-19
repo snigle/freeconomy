@@ -20,7 +20,7 @@
         <router-link
           type="button"
           class="btn btn-primary btn-sm float-left"
-          v-bind:to="{name:'addWallet'}"
+          v-bind:to="{name:'addWallet', query:{...$route.query}}"
         >
           <span class="material-icons">playlist_add</span>
           {{$t($t.keys.walletsView.wallets)}}
@@ -30,7 +30,7 @@
 
     <div class="list-group" v-for="currencyGroup in wallets" v-bind:key="currencyGroup.Code">
       <router-link
-        v-bind:to="{name: 'transactions', query : {currencyCode: currencyGroup.Currency.Code}}"
+        v-bind:to="{name: 'transactions', query:{...$route.query, wallet:undefined, currencyCode: currencyGroup.Currency.Code}}"
         class="list-group-item list-group-item-action"
       >
       {{$t($t.keys.walletsView.wallets)}} ({{currencyGroup.Currency.Code}}) : {{currencyGroup.Total}} {{currencyGroup.Currency.Symbol}}
@@ -45,7 +45,7 @@
         <router-link
           class="list-group-item-action"
           v-bind:class="$route.query && (wallet.UUID === $route.query.wallet) ? ['active','text-white'] : []"
-          v-bind:to="{name: 'transactions', query : {wallet: wallet.UUID}}"
+          v-bind:to="{name: 'transactions', query : {...$route.query, wallet: wallet.UUID}}"
         >
           <div class="container">
             <div class="row">
@@ -90,7 +90,7 @@
           v-bind:style="{position:'fixed', display:'block', ...dropdown[wallet.UUID]}"
         >
           <router-link
-            v-bind:to="{name: 'editWallet', params : {wallet: wallet.UUID}}"
+            v-bind:to="{name: 'editWallet', params : {...$route.query, wallet: wallet.UUID}}"
             class="dropdown-item"
           >{{$t($t.keys.common.edit)}}</router-link>
         </div>
@@ -148,7 +148,6 @@ export default class Wallets extends Vue {
       .groupBy(w => w.Currency.Code)
       .map((wallets: Array<IWalletWithTotalToCome>, Currency: string) => {
         const selection = this.selection.filter(s => wallets.find(w => w.UUID === s.UUID));
-        console.log("total", displayPrice(_.sumBy(wallets, w => w.Total)))
         return {
         Currency: (_.first(wallets) as IWallet).Currency,
         Wallets: wallets.map(w => ({...w, Total: displayPrice(w.Total), TotalToCome: displayPrice(w.TotalToCome)})),
