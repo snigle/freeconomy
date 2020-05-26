@@ -23,7 +23,7 @@
 }
 </style>
 <template>
-  <div>
+  <div class="m-2">
     <Modal
       v-if="deletionPopup"
       v-on:close="deletionPopup = false"
@@ -185,11 +185,7 @@ interface IWithWallet {
   Wallet?: IWallet;
 }
 
-@Component({
-  components: { Alert, RepeatInput, Modal }
-})
-export default class EditTransaction extends Vue {
-  transaction: ITransactionInput = {
+const emptyTransaction = {
     WalletUUID: "",
     CategoryUUID: "",
     Beneficiary: "",
@@ -198,6 +194,12 @@ export default class EditTransaction extends Vue {
     Comment: "",
     Repeat: null
   };
+
+@Component({
+  components: { Alert, RepeatInput, Modal }
+})
+export default class EditTransaction extends Vue {
+  transaction: ITransactionInput = {...emptyTransaction};
   error: string = "";
   formErrors = { date: false };
   deletionPopup = false;
@@ -349,6 +351,8 @@ export default class EditTransaction extends Vue {
         if (!andNew) {
           setTimeout(() => this.$router.back(), 0);
         } else {
+          this.transaction = {...emptyTransaction}
+          this.price = "-";
           setTimeout(() =>
             this.$router.replace({
               name: "addTransaction",

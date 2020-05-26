@@ -16,6 +16,7 @@
   "license": "Apache-2.0",
   "dependencies": {
     "bootstrap": "^4.4.1",
+    "bs-breakpoints": "^1.1.1",
     "chart.js": "^2.9.3",
     "cordova-plugin-googleplus": "8.4.0",
     "direct-vuex": "^0.10.4",

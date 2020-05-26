@@ -24,11 +24,6 @@ import store from "./store";
   }
 })
 export default class Desktop extends Vue {
-    loading = true
-  created() {
-    store.dispatch.loadData().then(() => {
-        this.loading = false;
-    });
-  }
+    loading = false
 }
 </script>

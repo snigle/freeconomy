@@ -49,6 +49,7 @@ const en : typeof keys = {
     home: "Home",
     categories: "Categories",
     categoryReport: "Report by Category",
+    graph: "Charts",
     sync: "Synchronize",
     syncing: "Synchronizing",
     logout: "Logout",

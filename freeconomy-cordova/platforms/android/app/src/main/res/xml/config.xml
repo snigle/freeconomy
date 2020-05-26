@@ -11,12 +11,13 @@
     <access origin="https://accounts.google.com/*" />
     <name>Freeconomy</name>
     <description>
-        A sample Apache Cordova application that responds to the deviceready event.
+        Freeconomy to manager your economies.
     </description>
-    <author email="dev@cordova.apache.org" href="http://cordova.io">
-        Apache Cordova Team
+    <author email="snigle64@gmail.com" href="http://github.com/snigle">
+        Ludovic Lamarche
     </author>
-    <content src="http://192.168.0.27:8080" />
+    <icon src="src/img/logoa.png" />
+    <content src="index.html" />
     <access origin="*" />
     <allow-intent href="http://*/*" />
     <allow-intent href="https://*/*" />

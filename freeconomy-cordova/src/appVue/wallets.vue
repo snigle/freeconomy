@@ -14,7 +14,7 @@
 }
 </style>
 <template>
-  <div>
+  <div class="m-1">
     <div class="row actions">
       <div class="col">
         <router-link
@@ -47,7 +47,6 @@
           v-bind:class="$route.query && (wallet.UUID === $route.query.wallet) ? ['active','text-white'] : []"
           v-bind:to="{name: 'transactions', query : {...$route.query, wallet: wallet.UUID}}"
         >
-          <div class="container">
             <div class="row">
               <button
                 type="button"
@@ -79,7 +78,6 @@
                 </div>
               </div>
             </div>
-          </div>
         </router-link>
         <div
           class="dropdown-menu"

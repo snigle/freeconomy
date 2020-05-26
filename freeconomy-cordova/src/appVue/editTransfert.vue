@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="m-2">
     <Modal
       v-if="deletionPopup"
       v-on:close="deletionPopup = false"
@@ -145,11 +145,7 @@ import moment from "moment";
 import Alert from "../components/alert.vue";
 import RepeatInput from "../components/repeatInput.vue";
 
-@Component({
-  components: { Alert, RepeatInput }
-})
-export default class EditTransfert extends Vue {
-  transfert: ITransfertInput = {
+const emptyTransfert = {
     From: {
       WalletUUID: "",
       Price: 0
@@ -162,6 +158,12 @@ export default class EditTransfert extends Vue {
     Comment: "",
     Repeat: null
   };
+
+@Component({
+  components: { Alert, RepeatInput }
+})
+export default class EditTransfert extends Vue {
+  transfert: ITransfertInput = {...emptyTransfert};
   error: string = "";
   formErrors = { date: false };
   deletionPopup = false;
@@ -250,6 +252,7 @@ export default class EditTransfert extends Vue {
         if (!andNew) {
           setTimeout(() => this.$router.back(), 0);
         } else {
+          this.transfert = {...emptyTransfert};
           setTimeout(() =>
             this.$router.replace({
               name: "addTransfert",

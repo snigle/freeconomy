@@ -9,7 +9,7 @@
 }
 </style>
 <template>
-  <div>
+  <div class="m-1">
     <Modal
       v-if="deletionPopup"
       v-on:close="deletionPopup = false"
@@ -60,7 +60,6 @@
         v-bind:key="category.UUID"
         v-bind:to="{name:'editCategory', params:{category:category.UUID}}"
       >
-        <div class="container">
           <div class="row">
             <button
               class="icon-md btn"
@@ -75,7 +74,6 @@
               <div>{{category.Name}}</div>
             </div>
           </div>
-        </div>
       </router-link>
     </div>
   </div>

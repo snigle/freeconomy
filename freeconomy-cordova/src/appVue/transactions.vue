@@ -16,9 +16,16 @@
   line-height: 1;
   padding: 1px;
 }
+.comment {
+  font-size: 12px;
+}
+.selection {
+  text-align: center;
+  line-height: 30px;
+}
 </style>
 <template>
-  <div>
+  <div class="m-1">
     <Modal
       v-if="deletionPopup"
       v-on:close="deletionPopup = false"
@@ -44,7 +51,7 @@
       </template>
     </Modal>
     <div class="row actions">
-      <div class="col">
+      <div class="col-12">
         <router-link
           v-bind:to="{name:'addTransaction', query: this.wallet? {wallet:this.wallet.UUID}: {}}"
           class="btn btn-primary btn-sm float-left"
@@ -69,12 +76,17 @@
           <span class="material-icons">playlist_add</span>
           {{repeatables.length}} {{$t($t.keys.walletsView.toCome)}}
         </button>
+        <router-link
+          v-if="repeatables.length"
+          v-bind:to="{name: 'stats', query: {...$route.query}}"
+          class="btn btn-info btn-sm float-right d-inline d-md-none"
+        >
+          <span class="material-icons">pie_chart</span>
+          {{$t($t.keys.sideBar.graph)}}
+        </router-link>
       </div>
-      <div
-        v-if="selection.length"
-        class="col-5"
-      >{{selection.length}} {{$t($t.keys.common.selected, {count: selection.length})}} : {{totalSelection}} {{currency.Symbol}}</div>
-      <div v-if="selection.length" class="col-1">
+      <div v-if="selection.length" class="col selection">
+        {{selection.length}} {{$t($t.keys.common.selected, {count: selection.length})}} : {{totalSelection}} {{currency.Symbol}}
         <button
           type="button"
           class="btn btn-danger btn-sm float-right"
@@ -95,47 +107,46 @@
           v-for="line in day.Lines"
           v-bind:key="line.UUID"
           v-bind:to="line.EditLink || {}"
+          v-bind:exact-active-class="'tata'"
           v-bind:event="line.EditLink? 'click' : 'toto'"
         >
-          <div class="container">
-            <div class="row">
-              <button
-                type="button"
-                v-on:click.prevent="selectLine(line.UUID)"
-                class="icon-lg btn"
-                v-bind:style="{backgroundColor: (selectedLines[line.UUID] ? 'rgb(134, 192, 255)' : line.Category.Icon.Color) }"
-              >
-                <div
-                  v-if="line.Category.Icon.Type === 'material'"
-                  class="material-icons"
-                >{{selectedLines[line.UUID] ? 'check' : $iconMap(line.Category.Icon.Name)}}</div>
-              </button>
-              <div class="middle col">
-                <div>
-                  {{line.Description}}
-                  <span
-                    v-if="line.Repeat && !line.repeatable"
-                    class="repeat material-icons"
-                  >sync</span>
-                  <button
-                    type="button"
-                    v-if="line.repeatable"
-                    class="repeat btn btn-info btn-sm material-icons"
-                    v-on:click="insertRepeat(line.UUID)"
-                  >add</button>
-                </div>
-                <div>
-                  {{line.Comment}}
-                  <small
-                    v-if="!wallet && walletsByUUID[line.WalletUUID]"
-                  >({{walletsByUUID[line.WalletUUID].Name}})</small>
-                </div>
+          <div class="row">
+            <button
+              type="button"
+              v-on:click.prevent="selectLine(line.UUID)"
+              class="icon-lg btn"
+              v-bind:style="{backgroundColor: (selectedLines[line.UUID] ? 'rgb(134, 192, 255)' : line.Category.Icon.Color) }"
+            >
+              <div
+                v-if="line.Category.Icon.Type === 'material'"
+                class="material-icons"
+              >{{selectedLines[line.UUID] ? 'check' : $iconMap(line.Category.Icon.Name)}}</div>
+            </button>
+            <div class="middle col">
+              <div>
+                {{line.Description}}
+                <span
+                  v-if="line.Repeat && !line.repeatable"
+                  class="repeat material-icons"
+                >sync</span>
+                <button
+                  type="button"
+                  v-if="line.repeatable"
+                  class="repeat btn btn-info btn-sm material-icons"
+                  v-on:click="insertRepeat(line.UUID)"
+                >add</button>
               </div>
-              <div class="price">
-                <div class="price">{{line.DisplayPrice}} {{currency.Symbol}}</div>
-                <div class="total">
-                  <small>{{line.TotalPrice}} {{currency.Symbol}}</small>
-                </div>
+              <div class="comment">
+                {{line.Comment}}
+                <small
+                  v-if="!wallet && walletsByUUID[line.WalletUUID]"
+                >({{walletsByUUID[line.WalletUUID].Name}})</small>
+              </div>
+            </div>
+            <div class="price">
+              <div class="price">{{line.DisplayPrice}} {{currency.Symbol}}</div>
+              <div class="total">
+                <small>{{line.TotalPrice}} {{currency.Symbol}}</small>
               </div>
             </div>
           </div>
@@ -174,7 +185,7 @@ export interface ILine {
   Transaction?: ITransaction;
   Transfert?: ITransfert;
   Description: string;
-  DisplayPrice:number;
+  DisplayPrice: number;
   Price: number;
   TotalPrice: number;
   Date: Date;
@@ -185,7 +196,6 @@ export interface ILine {
   Wallet?: IWallet;
   repeatable: boolean;
 }
-
 const defaultCategory: ICategory = {
   Icon: { Name: "help", Color: "#517fa4", Type: "material" },
   LastUpdate: new Date(),
@@ -216,7 +226,9 @@ export default class Transactions extends Vue {
   }
 
   get totalSelection(): number {
-    return this.selection.reduce((total, line) => total + line.Price, 0);
+    return displayPrice(
+      this.selection.reduce((total, line) => total + line.Price, 0)
+    );
   }
 
   get wallets(): Array<IWallet> {
@@ -447,9 +459,9 @@ export default class Transactions extends Vue {
     if (_.isString(this.$route.query.search)) {
       lines = lines.filter(
         l =>
-          JSON.stringify({ ...l, EditLink: undefined }).toLowerCase().match(
-            this.$route.query.search.toString().toLowerCase()
-          ) !== null
+          JSON.stringify({ ...l, EditLink: undefined })
+            .toLowerCase()
+            .match(this.$route.query.search.toString().toLowerCase()) !== null
       );
     }
 

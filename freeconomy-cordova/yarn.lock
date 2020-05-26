@@ -891,6 +891,11 @@ browserslist@4.10.0:
     node-releases "^1.1.52"
     pkg-up "^3.1.0"
 
+bs-breakpoints@^1.1.1:
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/bs-breakpoints/-/bs-breakpoints-1.1.1.tgz#023f0c501059529f6d2647e906cedd656a00b7a9"
+  integrity sha512-lSLbE0L2Nr1yHhukDHc7UIiNoWcKbBLcVNA7QKuHL3w+iNLIo6JlX3tHJWbaLqb/dGKD0xzlPLZ5FKfIMAJbXg==
+
 buffer-from@^1.0.0:
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/buffer-from/-/buffer-from-1.1.1.tgz#32713bc028f75c02fdb710d7c7bcec1f2c6070ef"

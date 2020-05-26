@@ -16,7 +16,7 @@
           <option v-bind:value="custom.label">{{custom.label}}</option>
         </select>
       </div>
-      <div class="form-group col-sm-4">
+      <div class="form-group col-sm-4" v-bind:hidden="timeRange.label!==custom.label">
         <label for="begin">{{$t($t.keys.stats.begin)}}</label>
         <input
           type="date"
@@ -26,7 +26,7 @@
           v-on:input="setDateFrom(new Date($event.target.value))"
         />
       </div>
-      <div class="form-group col-sm-4">
+      <div class="form-group col-sm-4" v-bind:hidden="timeRange.label!==custom.label" >
         <label for="end">{{$t($t.keys.stats.end)}}</label>
         <input
           type="date"

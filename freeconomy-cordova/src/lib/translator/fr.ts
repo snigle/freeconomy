@@ -49,6 +49,7 @@ const fr = {
     home: "Accueil",
     categories: "Catégories",
     categoryReport: "Total par catégorie",
+    graph: "Stats",
     sync: "Synchroniser",
     syncing: "Synchronisation",
     logout: "Déconnexion",

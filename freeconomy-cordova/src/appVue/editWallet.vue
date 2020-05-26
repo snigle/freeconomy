@@ -4,7 +4,7 @@
 }
 </style>
 <template>
-  <div>
+  <div class="m-2">
     <Modal
       v-if="deletionPopup"
       v-on:close="deletionPopup = false"

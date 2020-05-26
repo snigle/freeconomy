@@ -4,8 +4,14 @@
   "name": "Freeconomy",
   "short_name": "Freeconomy",
   "version": "com.github.snigle.freeconomy",
-  "description": "A sample Apache Cordova application that responds to the deviceready event.",
-  "author": "Apache Cordova Team",
-  "icons": [],
+  "description": "Freeconomy to manager your economies.",
+  "author": "Ludovic Lamarche",
+  "icons": [
+    {
+      "src": "src/img/logoa.png",
+      "type": "image/png",
+      "sizes": "undefinedxundefined"
+    }
+  ],
   "start_url": "index.html"
 }

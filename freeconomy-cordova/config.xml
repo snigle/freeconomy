@@ -2,11 +2,12 @@
 <widget id="com.github.snigle.freeconomy" version="1.0.0" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
     <name>Freeconomy</name>
     <description>
-        A sample Apache Cordova application that responds to the deviceready event.
+        Freeconomy to manager your economies.
     </description>
-    <author email="dev@cordova.apache.org" href="http://cordova.io">
-        Apache Cordova Team
+    <author email="snigle64@gmail.com" href="http://github.com/snigle">
+        Ludovic Lamarche
     </author>
+    <icon src="src/img/ic_launcher.png" />
     <content src="index.html" />
     <plugin name="cordova-plugin-whitelist" spec="1" />
     <plugin name="cordova-plugin-googleplus" source="npm">

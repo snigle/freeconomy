@@ -4,7 +4,7 @@
 }
 </style>
 <template>
-  <div>
+  <div class="m-2">
     <Modal
       v-if="deletionPopup"
       v-on:close="deletionPopup = false"
@@ -42,9 +42,9 @@
       </div>
       <div class="form-group">
         <label>{{$t($t.keys.common.icon)}}</label>
-        <div class="container">
-          <div class="row row-cols-8">
-            <div class="col" v-for="icon in icons" v-bind:key="icon.name">
+        <!-- <div class="container"> -->
+          <div class="row">
+            <div class="col-3 col-sm-2" v-for="icon in icons" v-bind:key="icon.name">
               <button
                 type="button"
                 v-bind:class="{'btn-outline-info': category.Icon.Name === icon.name}"
@@ -53,7 +53,7 @@
               >{{icon.name}}</button>
             </div>
           </div>
-        </div>
+        <!-- </div> -->
       </div>
       <div class="form-group">
         <label>{{$t($t.keys.common.result)}}</label>

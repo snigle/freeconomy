@@ -1,3 +1,9 @@
+<style lang="scss" scoped>
+.material-icons {
+  font-size: 30px;
+  vertical-align: middle;
+}
+</style>
 <template>
   <div id="appo" class="modal-open">
     <div v-if="!loading">
@@ -9,58 +15,33 @@
       </div>
       <div v-else>
         <Navbar>
-          <ul class="navbar-nav mr-auto">
-            <li class="nav-item active">
-              <router-link
-                class="nav-link"
-                v-bind:to="{name:'transactions'}"
-              >{{$t($t.keys.sideBar.home)}}</router-link>
-            </li>
-            <li class="nav-item active">
-              <router-link
-                class="nav-link"
-                v-bind:to="{name:'categories'}"
-              >{{$t($t.keys.sideBar.categories)}}</router-link>
-            </li>
-            <li class="nav-item active">
-              <button
-                v-if="!$store.state.sync.syncing"
-                class="nav-link btn my-2 my-sm-0"
-                v-on:click="sync()"
-              >
-                {{$t($t.keys.sideBar.sync)}}
-                <span
-                  v-if="$store.state.sync.error"
-                  class="material-icons"
-                >sync_problem</span>
-                <span v-if="$store.state.sync.synced" class="material-icons">check</span>
-              </button>
-              <button v-else class="nav-link btn my-2 my-sm-0" disabled>
-                {{$t($t.keys.sideBar.syncing)}}
-                <span class="material-icons rotate">sync</span>
-              </button>
-            </li>
-            <li class="nav-item active">
-              <button
-                class="nav-link btn my-2 my-sm-0"
-                v-on:click="logout()"
-              >{{$t($t.keys.sideBar.logout)}}</button>
-            </li>
-          </ul>
-          <form class="form-inline my-2 my-lg-0">
-            <input
-              class="form-control mr-sm-2"
-              type="search"
-              placeholder="Search"
-              aria-label="Search"
-              v-on:input="search($event.target.value)"
-              v-bind:value="navSearch"
-            />
-            <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
-          </form>
+          <li class="nav-item">
+            <router-link class="nav-link btn" v-bind:to="{name:'categories'}">
+              {{$t($t.keys.sideBar.categories)}}
+            </router-link>
+          </li>
+          <li class="nav-item">
+            <button
+              v-if="!$store.state.sync.syncing"
+              class="nav-link btn my-2 my-sm-0"
+              v-on:click="sync()"
+            >
+              {{$t($t.keys.sideBar.sync)}}
+              <span v-if="$store.state.sync.error" class="material-icons">sync_problem</span>
+              <span v-if="$store.state.sync.synced" class="material-icons">check</span>
+            </button>
+            <button v-else class="nav-link btn my-2 my-sm-0" disabled>
+              {{$t($t.keys.sideBar.syncing)}}
+              <span class="material-icons rotate">sync</span>
+            </button>
+          </li>
+          <li class="nav-item">
+            <button class="btn my-2 my-sm-0" v-on:click="logout()">
+              {{$t($t.keys.sideBar.logout)}}
+            </button>
+          </li>
         </Navbar>
         <router-view></router-view>
-        <div>Loggin OK</div>
       </div>
     </div>
     <div v-else>{{$t($t.keys.common.loading)}}</div>
@@ -76,11 +57,7 @@ import Login from "./login.vue";
 import Component from "vue-class-component";
 import * as Models from "../lib/models";
 import Vuex from "vuex";
-import EditTransaction from "./editTransaction.vue";
-import EditTransfert from "./editTransfert.vue";
-import Categories from "./categories.vue";
-import EditCategory from "./editCategory.vue";
-import EditWallet from "./editWallet.vue";
+import { routes } from "./router";
 import Desktop from "./desktop.vue";
 
 import store from "./store";
@@ -100,103 +77,6 @@ Vue.prototype.$iconMap = (name: string) => {
   return name.replace(/-/g, "_");
 };
 
-const Foo = Vue.extend({ template: "<div>foo</div>" });
-const EditTransactionModal = Vue.extend({
-  template: `<Modal v-on:close="$router.back()"><template v-slot:header>{{$t($t.keys.transactionsView.editTransaction)}}</template><EditTransaction /></Modal>`,
-  components: { Modal, EditTransaction }
-});
-const AddTransactionModal = Vue.extend({
-  template: `<Modal v-on:close="$router.back()"><template v-slot:header>{{$t($t.keys.transactionsView.editTransaction)}}</template><EditTransaction /></Modal>`,
-  components: { Modal, EditTransaction }
-});
-const EditTransfertModal = Vue.extend({
-  template: `<Modal v-on:close="$router.back()"><template v-slot:header>{{$t($t.keys.transactionsView.editTransfert)}}</template><EditTransfert /></Modal>`,
-  components: { Modal, EditTransfert }
-});
-const AddTransfertModal = Vue.extend({
-  template: `<Modal v-on:close="$router.back()"><template v-slot:header>{{$t($t.keys.transactionsView.editTransfert)}}</template><EditTransfert /></Modal>`,
-  components: { Modal, EditTransfert }
-});
-
-const CategoriesModal = Vue.extend({
-  template: `<Modal v-on:close="$router.back()"><template v-slot:header>{{$t($t.keys.sideBar.categories)}}</template><Categories /></Modal>`,
-  components: { Modal, Categories }
-});
-const EditCategoryModal = Vue.extend({
-  template: `<Modal v-on:close="$router.back()"><template v-slot:header>{{$t($t.keys.common.edit)}}</template><EditCategory /></Modal>`,
-  components: { Modal, EditCategory }
-});
-const AddCategoryModal = Vue.extend({
-  template: `<Modal v-on:close="$router.back()"><template v-slot:header>{{$t($t.keys.common.edit)}}</template><EditCategory /></Modal>`,
-  components: { Modal, EditCategory }
-});
-
-const EditWalletModal = Vue.extend({
-  template: `<Modal v-on:close="$router.back()"><template v-slot:header>{{$t($t.keys.common.edit)}}</template><EditWallet /></Modal>`,
-  components: { Modal, EditWallet }
-});
-const AddWalletModal = Vue.extend({
-  template: `<Modal v-on:close="$router.back()"><template v-slot:header>{{$t($t.keys.common.edit)}}</template><EditWallet /></Modal>`,
-  components: { Modal, EditWallet }
-});
-
-const toto: string = "10";
-const routes: Array<RouteConfig> = [
-  {
-    path: "/",
-    name: "home",
-    component: Desktop,
-    children: [
-      { path: "", name: "transactions" },
-      {
-        path: "categories",
-        name: "categories",
-        component: CategoriesModal
-      },
-      {
-        path: "editCategory/:category",
-        name: "editCategory",
-        component: EditCategoryModal
-      },
-        {
-        path: "editWallet/:wallet",
-        name: "editWallet",
-        component: EditWalletModal
-      },
-      {
-        path: "addWallet",
-        name: "addWallet",
-        component: AddWalletModal
-      },
-      {
-        path: "addCategory",
-        name: "addCategory",
-        component: AddCategoryModal
-      },
-      {
-        path: "transaction/:transaction",
-        name: "editTransaction",
-        component: EditTransactionModal
-      },
-      {
-        path: "addTransaction",
-        name: "addTransaction",
-        component: AddTransactionModal
-      },
-      {
-        path: "transfert/:transfert",
-        name: "editTransfert",
-        component: EditTransfertModal
-      },
-      {
-        path: "addTransfert",
-        name: "addTransfert",
-        component: EditTransfertModal
-      }
-    ]
-  }
-];
-
 const router = new VueRouter({
   routes,
   linkExactActiveClass: "active"
@@ -208,20 +88,15 @@ const router = new VueRouter({
     Navbar,
     Login
   },
-  store: store.original
+  store: store.original,
+  watch: { logged: "watchLogged" }
 })
 export default class AppVue extends Vue {
-  msg = "Welcome to Your Vue.js App";
-  message = "test";
   cordova = false;
   loading = true;
   error = "";
-  navSearch = "";
 
   created() {
-    this.navSearch = _.isString(this.$route.query.search)
-      ? this.$route.query.search
-      : "";
     Promise.all([
       new Promise((resolve, reject) => {
         document.addEventListener(
@@ -237,6 +112,12 @@ export default class AppVue extends Vue {
     ])
       .then(() => (this.loading = false))
       .catch(() => (this.loading = false));
+  }
+
+  watchLogged() {
+    store.dispatch.loadData().then(() => {
+      this.loading = false;
+    });
   }
 
   get logged() {
@@ -255,22 +136,6 @@ export default class AppVue extends Vue {
 
   sync() {
     store.dispatch.sync();
-  }
-
-  updateSearchQuery() {
-    console.log("debounce", this.navSearch);
-  }
-
-  search(search: string) {
-    this.navSearch = search;
-    _.debounce(() => {
-      if (this.$route.query.search !== search) {
-        this.$router.replace({
-          name: this.$route.name || "",
-          query: { ...this.$route.query, search }
-        });
-      }
-    }, 500)();
   }
 }
 </script>

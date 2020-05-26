@@ -1,12 +1,14 @@
 <style lang="scss" scoped>
 h3 {
   text-align:center;
+  font-size:18px;
+  margin-top:10px;
 }
 </style>
 <template>
-  <div>
+  <div class="container">
     <div class="row">
-      <div class="col-sm-1">
+      <div class="col-xs-1">
         <button class="btn btn-light" v-on:click="$refs.PeriodInput.previousRange()">
           <span class="material-icons">navigate_before</span>
         </button>
@@ -14,7 +16,7 @@ h3 {
       <h3
         class="col"
       >{{$t($t.keys.common.totalPeriod)}}: {{totalPeriod}} {{currency.Symbol}}</h3>
-      <div class="col-sm-1">
+      <div class="col-xs-1">
         <button class="btn btn-light" v-on:click="$refs.PeriodInput.nextRange()">
           <span class="material-icons">navigate_next</span>
         </button>
