@@ -1,6 +1,6 @@
 <style lang="scss" scoped>
 .material-icons {
-  font-size: 30px;
+  // font-size: 30px;
   vertical-align: middle;
 }
 </style>
