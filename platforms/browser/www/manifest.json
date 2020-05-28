@@ -8,7 +8,7 @@
   "author": "Ludovic Lamarche",
   "icons": [
     {
-      "src": "src/img/logoa.png",
+      "src": "src/img/ic_launcher.png",
       "type": "image/png",
       "sizes": "undefinedxundefined"
     }

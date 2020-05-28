@@ -7,7 +7,7 @@
     <author email="snigle64@gmail.com" href="http://github.com/snigle">
         Ludovic Lamarche
     </author>
-    <icon src="src/img/logoa.png" />
+    <icon src="src/img/ic_launcher.png" />
     <content src="index.html" />
     <access origin="*" />
     <allow-intent href="http://*/*" />
