@@ -1,0 +1,154 @@
+{
+  "_from": "cordova-plugin-webpack",
+  "_id": "cordova-plugin-webpack@1.0.2",
+  "_inBundle": false,
+  "_integrity": "sha512-FGN1KkqeqBKr42yoiu8X05yiGvnj2/7BtqDCQDvUz6EmaKmryCVw7PGrrN3ipe23dhssWZdad7DnQBzcKLe26A==",
+  "_location": "/cordova-plugin-webpack",
+  "_phantomChildren": {},
+  "_requested": {
+    "type": "tag",
+    "registry": true,
+    "raw": "cordova-plugin-webpack",
+    "name": "cordova-plugin-webpack",
+    "escapedName": "cordova-plugin-webpack",
+    "rawSpec": "",
+    "saveSpec": null,
+    "fetchSpec": "latest"
+  },
+  "_requiredBy": [
+    "#USER",
+    "/"
+  ],
+  "_resolved": "https://registry.npmjs.org/cordova-plugin-webpack/-/cordova-plugin-webpack-1.0.2.tgz",
+  "_shasum": "f1a0d258ead07b7623aa16f5fdb9a50a7be440bb",
+  "_spec": "cordova-plugin-webpack",
+  "_where": "/home/llamarch/Documents/freeconomy/cordova-plugin-webpack-example",
+  "author": {
+    "name": "Kotaro Sugawara"
+  },
+  "bugs": {
+    "url": "https://github.com/kotarella1110/cordova-plugin-webpack/issues"
+  },
+  "bundleDependencies": false,
+  "cordova": {
+    "id": "cordova-plugin-webpack",
+    "platforms": [
+      "android",
+      "ios",
+      "browser"
+    ]
+  },
+  "dependencies": {
+    "@sindresorhus/is": "^2.1.0",
+    "create-html": "^4.1.0",
+    "csp-parse": "0.0.2",
+    "current-device": "^0.10.0",
+    "elementtree": "^0.1.7",
+    "express": "^4.17.1",
+    "glob": "^7.1.6",
+    "is-ua-webview": "^1.0.1",
+    "react-dev-utils": "^10.2.1",
+    "source-map-support": "^0.5.16",
+    "supports-color": "^7.1.0",
+    "webpack-inject-plugin": "^1.5.4",
+    "yargs": "^15.3.1",
+    "yargs-unparser": "^1.5.0"
+  },
+  "deprecated": false,
+  "description": "Cordova Webpack Plugin",
+  "devDependencies": {
+    "@commitlint/cli": "^8.3.5",
+    "@commitlint/config-conventional": "^8.3.4",
+    "@commitlint/prompt-cli": "^8.3.5",
+    "@types/elementtree": "^0.1.0",
+    "@types/jest": "^25.1.4",
+    "@types/node": "^12.12.34",
+    "@types/react-dev-utils": "^9.0.4",
+    "@types/supports-color": "^5.3.0",
+    "@types/webpack": "^4.41.10",
+    "@types/webpack-dev-server": "^3.10.1",
+    "@types/yargs": "^15.0.4",
+    "@typescript-eslint/eslint-plugin": "^2.26.0",
+    "all-contributors-cli": "^6.14.0",
+    "clean-webpack-plugin": "^3.0.0",
+    "conventional-changelog-cli": "^2.0.31",
+    "conventional-github-releaser": "^3.1.3",
+    "cordova-set-version": "^9.0.2",
+    "eslint": "^6.8.0",
+    "eslint-config-airbnb-typescript": "^7.2.0",
+    "eslint-config-prettier": "^6.10.1",
+    "eslint-plugin-import": "^2.20.2",
+    "eslint-plugin-prettier": "^3.1.2",
+    "husky": "^4.2.3",
+    "install": "^0.13.0",
+    "jest": "^25.2.4",
+    "lint-staged": "^10.1.1",
+    "npm-check": "^5.9.2",
+    "prettier": "^2.0.2",
+    "rimraf": "^3.0.2",
+    "ts-jest": "^25.3.0",
+    "ts-loader": "^6.2.2",
+    "ts-node": "^8.8.1",
+    "typescript": "^3.8.3",
+    "webpack": "^4.42.1",
+    "webpack-cli": "^3.3.11",
+    "webpack-dev-server": "^3.10.3"
+  },
+  "files": [
+    "dist",
+    "plugin.xml"
+  ],
+  "homepage": "https://github.com/kotarella1110/cordova-plugin-webpack#readme",
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged",
+      "commit-msg": "commitlint -E HUSKY_GIT_PARAMS"
+    }
+  },
+  "keywords": [
+    "cordova",
+    "webpack",
+    "ecosystem:cordova",
+    "cordova-browser",
+    "cordova-android",
+    "cordova-ios"
+  ],
+  "license": "Apache-2.0",
+  "lint-staged": {
+    "*.{js,ts}": [
+      "npm run lint:fix",
+      "git add"
+    ],
+    "*.{md,json}": [
+      "prettier --write",
+      "git add"
+    ]
+  },
+  "name": "cordova-plugin-webpack",
+  "peerDependencies": {
+    "webpack": "^4.0.0",
+    "webpack-cli": "^3.0.0",
+    "webpack-dev-server": "^3.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kotarella1110/cordova-plugin-webpack.git"
+  },
+  "scripts": {
+    "build": "rimraf dist/* && tsc && webpack",
+    "changelog": "conventional-changelog -p angular -i CHANGELOG.md -s",
+    "commit": "commit",
+    "contributors:add": "all-contributors add",
+    "contributors:generate": "all-contributors generate",
+    "github-release": "conventional-github-releaser -p angular -r 0",
+    "lint": "eslint '**/*.{js,ts}'",
+    "lint:fix": "npm run lint -- --fix",
+    "precommit": "lint-staged",
+    "prepare": "npm run build",
+    "test": "jest --watch",
+    "test:coverage": "jest --coverage",
+    "upgrade-interactive": "npm-check --update",
+    "version": "npm run changelog && cordova-set-version plugin.xml && git add CHANGELOG.md plugin.xml"
+  },
+  "version": "1.0.2"
+}

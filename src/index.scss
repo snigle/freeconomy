@@ -1,0 +1,62 @@
+@import "~bootstrap/scss/bootstrap";
+@import "~material-design-icons/iconfont/material-icons.css";
+
+.input-group-prepend {
+    .material-icons {
+        font-size: 18px;
+    }
+}
+
+.material-icons {
+    font-size: inherit;
+}
+
+.rotate {
+    animation: rotation 2s infinite linear;
+}
+
+@keyframes rotation {
+    to {
+        transform: rotate(0deg);
+    }
+
+    from {
+        transform: rotate(359deg);
+    }
+}
+
+@mixin icon($iconSize) {
+    // @extend .rounded-circle;
+    width: $iconSize;
+    height: $iconSize;
+    text-align: center;
+    color: white;
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+    overflow: hidden;
+    font-size: $iconSize * 45 / 100;
+    border-radius: 100%;
+}
+
+.icon-lg {
+    @include icon(50px);
+}
+
+.icon-md {
+    @include icon(25px);
+}
+
+.icon-sm {
+    @include icon(15px);
+}
+
+.row-cols-8 {
+    // Three columns to start
+    @include row-cols(8);
+}
+
+// .actions {
+//     margin-bottom:1px;
+// }

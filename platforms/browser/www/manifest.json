@@ -1,0 +1,17 @@
+{
+  "background_color": "#FFF",
+  "display": "standalone",
+  "name": "Freeconomy",
+  "short_name": "Freeconomy",
+  "version": "com.github.snigle.freeconomy",
+  "description": "Freeconomy to manager your economies.",
+  "author": "Ludovic Lamarche",
+  "icons": [
+    {
+      "src": "src/img/ic_launcher.png",
+      "type": "image/png",
+      "sizes": "undefinedxundefined"
+    }
+  ],
+  "start_url": "index.html"
+}

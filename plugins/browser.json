@@ -1,0 +1,22 @@
+{
+  "prepare_queue": {
+    "installed": [],
+    "uninstalled": []
+  },
+  "config_munge": {
+    "files": {}
+  },
+  "installed_plugins": {
+    "cordova-plugin-whitelist": {
+      "PACKAGE_NAME": "com.github.snigle.freeconomy"
+    },
+    "cordova-plugin-webpack": {
+      "PACKAGE_NAME": "com.github.snigle.freeconomy"
+    },
+    "cordova-plugin-googleplus": {
+      "WEB_APPLICATION_CLIENT_ID": "com.googleusercontent.apps.136643286294-fv3o8ng5rodjv37cqpbfi63bok4i5084",
+      "PACKAGE_NAME": "com.github.snigle.freeconomy"
+    }
+  },
+  "dependent_plugins": {}
+}
