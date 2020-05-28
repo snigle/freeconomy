@@ -25,7 +25,7 @@
 }
 </style>
 <template>
-  <div class="m-1">
+  <div class="p-1">
     <Modal
       v-if="deletionPopup"
       v-on:close="deletionPopup = false"
@@ -94,7 +94,11 @@
         >{{$t($t.keys.common.delete)}}</button>
       </div>
     </div>
-    <div v-if="currency" class="list-group">
+    <div v-if="currency" class="list-group mt-1">
+      <div
+          class="day list-group-item bg-primary text-white font-weight-bold text-center"
+          v-if="wallet"
+        >{{wallet.Name}}: {{wallet.Total}} {{currency.Symbol}} </div>
       <template v-for="day in groupedLines.slice(0,60)">
         <div
           v-bind:key="day.Day.toString()"
@@ -255,7 +259,7 @@ export default class Transactions extends Vue {
   }
 
   get wallet(): IWallet | undefined {
-    return store.state.wallets.find(w => w.UUID === this.$route.query.wallet);
+    return store.getters.walletsWithPriceToCome.find(w => w.UUID === this.$route.query.wallet);
   }
 
   get currency(): ICurrency | undefined {

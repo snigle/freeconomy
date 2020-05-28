@@ -23,20 +23,20 @@
           <li class="nav-item">
             <button
               v-if="!$store.state.sync.syncing"
-              class="nav-link btn my-2 my-sm-0"
+              class="nav-link btn"
               v-on:click="sync()"
             >
               {{$t($t.keys.sideBar.sync)}}
               <span v-if="$store.state.sync.error" class="material-icons">sync_problem</span>
               <span v-if="$store.state.sync.synced" class="material-icons">check</span>
             </button>
-            <button v-else class="nav-link btn my-2 my-sm-0" disabled>
+            <button v-else class="nav-link btn" disabled>
               {{$t($t.keys.sideBar.syncing)}}
               <span class="material-icons rotate">sync</span>
             </button>
           </li>
           <li class="nav-item">
-            <button class="btn my-2 my-sm-0" v-on:click="logout()">
+            <button class="nav-link btn" v-on:click="logout()">
               {{$t($t.keys.sideBar.logout)}}
             </button>
           </li>

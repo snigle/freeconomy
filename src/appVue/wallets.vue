@@ -12,9 +12,12 @@
   text-align:right;
   float:right;
 }
+.title {
+  font-weight: 600;
+}
 </style>
 <template>
-  <div class="m-1">
+  <div class="p-1">
     <div class="row actions">
       <div class="col">
         <router-link
@@ -32,8 +35,9 @@
       <router-link
         v-bind:to="{name: 'transactions', query:{...$route.query, wallet:undefined, currencyCode: currencyGroup.Currency.Code}}"
         class="list-group-item list-group-item-action"
+        v-bind:class="{'text-center': !currencyGroup.Selection.length}"
       >
-      {{$t($t.keys.walletsView.wallets)}} ({{currencyGroup.Currency.Code}}) : {{currencyGroup.Total}} {{currencyGroup.Currency.Symbol}}
+      <span class="title">{{$t($t.keys.walletsView.wallets)}} ({{currencyGroup.Currency.Code}}) : {{currencyGroup.Total}} {{currencyGroup.Currency.Symbol}}</span>
       <span class="align-right" v-if="currencyGroup.Selection.length">{{currencyGroup.Selection.length}} {{$t($t.keys.common.selected, {count: currencyGroup.Selection.length})}} : {{currencyGroup.TotalSelected}} {{currencyGroup.Currency.Symbol}}</span></router-link>
       <div
         v-for="wallet in currencyGroup.Wallets"

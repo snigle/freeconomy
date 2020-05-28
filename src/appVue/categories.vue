@@ -9,7 +9,7 @@
 }
 </style>
 <template>
-  <div class="m-1">
+  <div class="p-1">
     <Modal
       v-if="deletionPopup"
       v-on:close="deletionPopup = false"
