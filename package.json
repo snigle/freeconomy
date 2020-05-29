@@ -8,7 +8,7 @@
     "dev": "cordova run browser -- -l",
     "dev-android": "cordova run android -- -l",
     "android-debug": "cordova run android",
-    "build-web": "cordova build --release web",
+    "build-web": "cordova build --release browser",
     "build-android":"cordova build --release android"
   },
   "keywords": [

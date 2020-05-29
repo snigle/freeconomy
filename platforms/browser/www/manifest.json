@@ -3,8 +3,8 @@
   "display": "standalone",
   "name": "Freeconomy",
   "short_name": "Freeconomy",
-  "version": "com.github.snigle.freeconomy",
-  "description": "Freeconomy to manager your economies.",
+  "version": "com.freeconomy",
+  "description": "Freeconomy to manage your economies.",
   "author": "Ludovic Lamarche",
   "icons": [
     {
