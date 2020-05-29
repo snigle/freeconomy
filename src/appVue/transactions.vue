@@ -77,7 +77,6 @@
           {{repeatables.length}} {{$t($t.keys.walletsView.toCome)}}
         </button>
         <router-link
-          v-if="repeatables.length"
           v-bind:to="{name: 'stats', query: {...$route.query}}"
           class="btn btn-info btn-sm float-right d-inline d-md-none"
         >
