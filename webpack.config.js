@@ -7,7 +7,20 @@ module.exports = {
     entry: './src/index.ts',
     output: {
         path: path.resolve(__dirname, 'www'),
-        filename: 'index.bundle.js',
+        filename: '[name].[contenthash].js',
+    },
+    optimization: {
+        runtimeChunk: 'single',
+        moduleIds: 'hashed',
+        splitChunks: {
+            cacheGroups: {
+                vendor: {
+                    test: /[\\/]node_modules[\\/]/,
+                    name: 'vendors',
+                    chunks: 'all',
+                },
+            },
+        },
     },
     plugins: [
         new HtmlWebpackPlugin({
@@ -18,7 +31,7 @@ module.exports = {
         new VueLoaderPlugin(),
     ],
     resolve: {
-        extensions: ['.ts','.js', '.jsx', '.tsx','.css'],
+        extensions: ['.ts', '.js', '.jsx', '.tsx', '.css'],
         alias: {
             'vue$': 'vue/dist/vue.esm.js'
         },
