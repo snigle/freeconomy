@@ -7,7 +7,9 @@
   "scripts": {
     "dev": "cordova run browser -- -l",
     "dev-android": "cordova run android -- -l",
-    "android-debug": "cordova run android"
+    "android-debug": "cordova run android",
+    "build-web": "cordova build --release web",
+    "build-android":"cordova build --release android"
   },
   "keywords": [
     "ecosystem:cordova"

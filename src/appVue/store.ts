@@ -3,7 +3,7 @@ import Vuex from "vuex";
 
 import { createDirectStore, StateDeclaration } from "direct-vuex"
 import * as Models from "../lib/models"
-import { ILogin, IWallet, ITransfert, ITransaction, ICategory, IRepeatable } from "../lib/types"
+import { ILogin, IWallet, ITransfert, ITransaction, ICategory, IRepeatable, displayPrice } from "../lib/types"
 import { login } from "../lib/oauth"
 import _ from "lodash";
 import { GoogleSync } from "../lib/sync";
@@ -56,7 +56,7 @@ const { store, rootActionContext, moduleActionContext } = createDirectStore({
                         }
                         price.OperationsToCome++;
                         return price
-                    },{TotalToCome: 0, OperationsToCome: 0, Total: w.Solde+_.sumBy(w.TotalPerYear, (total) => total.Total)})
+                    },{TotalToCome: 0, OperationsToCome: 0, Total: displayPrice(w.Solde+_.sumBy(w.TotalPerYear, (total) => total.Total))})
                 return {...w, ...totalToCome}
             });
         },
