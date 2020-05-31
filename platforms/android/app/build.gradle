@@ -128,6 +128,9 @@ if (ext.cdvReleaseSigningPropertiesFile == null && file('../release-signing.prop
     ext.cdvReleaseSigningPropertiesFile = '../release-signing.properties'
 }
 
+// Build debug with release key to avoid remove playstore version
+ext.cdvDebugSigningPropertiesFile = ext.cdvReleaseSigningPropertiesFile
+
 // Cast to appropriate types.
 ext.cdvBuildMultipleApks = cdvBuildMultipleApks == null ? false : cdvBuildMultipleApks.toBoolean();
 ext.cdvVersionCodeForceAbiDigit = cdvVersionCodeForceAbiDigit == null ? false : cdvVersionCodeForceAbiDigit.toBoolean();
