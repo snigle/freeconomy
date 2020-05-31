@@ -197,6 +197,7 @@ const en : typeof keys = {
     needWalletToAddTransfert: "You need to add wallet before adding a transfert.",
     saveError: "Issue when trying to save the element : %{err}",
     syncError: "There were an issue during the synchronisations.",
+    loginError: "There were an issue when trying to login.",
   },
 };
 

@@ -9,7 +9,8 @@
     "dev-android": "cordova run android -- -l",
     "android-debug": "cordova run android",
     "build-web": "cordova build --release browser",
-    "build-android":"cordova build --release android"
+    "build-android":"cordova build --release android",
+    "build": "cordova build --release browser && cordova build --release android"
   },
   "keywords": [
     "ecosystem:cordova"

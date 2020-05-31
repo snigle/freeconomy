@@ -198,6 +198,7 @@ const fr = {
     needWalletToAddTransfert:"Vous devez ajouter un compte pour pouvoir créer un virement.",
     saveError:"Bug lors de l'enregistrement de l'élément %{err}",
     syncError: "Il y a eu un bug lors de la synchronisation.",
+    loginError: "Il y a eu un problème lors de la connexion",
   },
 } ;
 

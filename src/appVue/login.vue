@@ -44,7 +44,7 @@ import { GoogleSync } from "../lib/sync";
 @Component({})
 export default class Login extends Vue {
   login() {
-    store.dispatch.loginAndSync();
+    store.dispatch.loginAndSync().catch(err => store.commit.showError({err, text: this.$t(this.$t.keys.errors.loginError)}));
   }
 }
 </script>
