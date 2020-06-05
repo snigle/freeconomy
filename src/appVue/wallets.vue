@@ -95,9 +95,14 @@
             v-bind:to="{name: 'editWallet', params : {...$route.query, wallet: wallet.UUID}}"
             class="dropdown-item"
           >{{$t($t.keys.common.edit)}}</router-link>
+          <router-link
+            v-bind:to="{name: 'editTotalWallet', params : {...$route.query, wallet: wallet.UUID}}"
+            class="dropdown-item"
+          >{{$t($t.keys.transactionsView.updateSolde)}}</router-link>
         </div>
       </div>
     </div>
+    <router-view/>
   </div>
 </template>
 <script lang="ts">

@@ -11,6 +11,7 @@ import EditTransfert from "./editTransfert.vue";
 import Categories from "./categories.vue";
 import EditCategory from "./editCategory.vue";
 import EditWallet from "./editWallet.vue";
+import EditTotalWallet from "./editTotalWallet.vue";
 import Desktop from "./desktop.vue";
 import Modal from "../components/modal.vue";
 import bsBreakpoints from 'bs-breakpoints'
@@ -39,17 +40,23 @@ const EditWalletModal = Vue.extend({
     components: { Modal, EditWallet }
 });
 
+const EditTotalWalletModal = Vue.extend({
+    template: `<Modal v-on:close="$router.back()"><template v-slot:header>{{$t($t.keys.common.edit)}}</template><EditTotalWallet /></Modal>`,
+    components: { Modal, EditTotalWallet }
+});
+
 export const desktopRoutes: Array<RouteConfig> = [
     {
         path: "/",
         name: "home",
         component: Desktop,
         children: [
-            { path: "", name: "transactions" },
+            { path: "", name: "transactions", },
             {
                 path: "",
                 name: "stats",
             },
+            { path: "editTotalWallet/:wallet", name: "editTotalWallet", component: EditTotalWalletModal},
             {
                 path: "categories",
                 name: "categories",
@@ -104,6 +111,9 @@ export const mobileRoutes = [
         path: "/",
         name: "home",
         component: Wallets,
+        children: [
+            { path: "/editTotalWallet/:wallet", name: "editTotalWallet", component: EditTotalWalletModal},
+        ]
     },
     {
         path: "/editWallet/:wallet",

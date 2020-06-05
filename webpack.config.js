@@ -3,7 +3,7 @@ var HtmlWebpackPlugin = require('html-webpack-plugin');
 const VueLoaderPlugin = require('vue-loader/lib/plugin')
 const BrotliPlugin = require('brotli-webpack-plugin')
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
-
+const _ = require("lodash");
 module.exports = (env = {}) => {
     return {
         mode: env.prod ? 'production' : 'development',
@@ -25,21 +25,24 @@ module.exports = (env = {}) => {
                 },
             },
         },
-        plugins: [
+        plugins: _.concat([
             new HtmlWebpackPlugin({
                 template: "src/index.html",
                 favicon: "src/img/faviconpng.png",
                 inject: true,
             }),
             new VueLoaderPlugin(),
-            new CleanWebpackPlugin(),
-            new BrotliPlugin({
-                asset: '[path].br[query]',
-                test: /\.(js|css|html|svg)$/,
-                threshold: 10240,
-                minRatio: 0.8
-            })
         ],
+            env.prod ? [
+                new CleanWebpackPlugin(),
+                new BrotliPlugin({
+                    asset: '[path].br[query]',
+                    test: /\.(js|css|html|svg)$/,
+                    threshold: 10240,
+                    minRatio: 0.8
+                })
+            ] : []
+        ),
         resolve: {
             extensions: ['.ts', '.js', '.jsx', '.tsx', '.css'],
             alias: {
@@ -81,6 +84,6 @@ module.exports = (env = {}) => {
                 },
             ]
         },
-        devtool: env.prod? "": 'inline-source-map',
+        devtool: env.prod ? "" : 'inline-source-map',
     }
 };
