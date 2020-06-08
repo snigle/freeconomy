@@ -31,6 +31,7 @@ const fr = {
     totalPeriod:"Total période",
     income: "Recettes",
     outcome: "Dépenses",
+    search: "Recherche",
   },
   stats: {
     begin: "Début",

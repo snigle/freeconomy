@@ -13,33 +13,6 @@
         <Login />
       </div>
       <div v-else>
-        <Navbar>
-          <li class="nav-item">
-            <router-link class="nav-link btn" v-bind:to="{name:'categories'}">
-              {{$t($t.keys.sideBar.categories)}}
-            </router-link>
-          </li>
-          <li class="nav-item">
-            <button
-              v-if="!$store.state.sync.syncing"
-              class="nav-link btn"
-              v-on:click="sync()"
-            >
-              {{$t($t.keys.sideBar.sync)}}
-              <span v-if="$store.state.sync.error" class="material-icons">sync_problem</span>
-              <span v-if="$store.state.sync.synced" class="material-icons">check</span>
-            </button>
-            <button v-else class="nav-link btn" disabled>
-              {{$t($t.keys.sideBar.syncing)}}
-              <span class="material-icons rotate">sync</span>
-            </button>
-          </li>
-          <li class="nav-item">
-            <button class="nav-link btn" v-on:click="logout()">
-              {{$t($t.keys.sideBar.logout)}}
-            </button>
-          </li>
-        </Navbar>
         <router-view></router-view>
       </div>
     </div>
@@ -50,7 +23,7 @@
 <script lang="ts">
 import Vue from "vue";
 import VueRouter, { Route, RouteConfig } from "vue-router";
-import Navbar from "../components/navbar.vue";
+import Navbar from "../components/navbar-desktop.vue";
 import Modal from "../components/modal.vue";
 import Login from "./login.vue";
 import Component from "vue-class-component";
@@ -62,6 +35,8 @@ import Desktop from "./desktop.vue";
 import store from "./store";
 import { TranslatePlugin } from "../lib/translator";
 import _ from "lodash";
+
+
 Vue.use(VueRouter);
 Vue.use(TranslatePlugin);
 

@@ -1,6 +1,11 @@
+<style lang="scss" scoped>
+.nav-bar-top {
+  height: 55px;
+}
+</style>
 <template>
-<div>
-   <nav class="navbar navbar-expand navbar-light bg-light">
+  <div>
+    <nav class="navbar navbar-expand navbar-light bg-light">
       <router-link class="navbar-brand" v-bind:to="{name:'home'}">
         <img
           src="../img/logoa.png"
@@ -16,16 +21,17 @@
       </ul>
 
       <form class="form-inline d-none d-md-flex">
-          <input
-            class="form-control"
-            type="search"
-            placeholder="Search"
-            aria-label="Search"
-            v-on:input="search($event.target.value)"
-            v-bind:value="navSearch"
-          />
-        </form>
+        <input
+          class="form-control"
+          type="search"
+          v-bind:placeholder="$t($t.keys.common.search)"
+          v-bind:aria-label="$t($t.keys.common.search)"
+          v-on:input="search($event.target.value)"
+          v-bind:value="navSearch"
+        />
+      </form>
     </nav>
+
     <Alert
       v-for="err in $store.state.errors"
       v-bind:key="err.uuid"
@@ -44,7 +50,7 @@ import _ from "lodash";
 @Component({
   components: { Alert }
 })
-export default class Login extends Vue {
+export default class NavbarDesktop extends Vue {
   navSearch = "";
 
   created() {

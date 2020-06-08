@@ -1,5 +1,7 @@
 <template>
   <div>
+      <Navbar v-if="!hideNav" :title="$t($t.keys.sideBar.graph)"/>
+
     <ul class="nav nav-tabs">
   <li class="nav-item">
     <router-link v-bind:to="{...$route, query:{...$route.query, stats: undefined, statsBeginDate: undefined, statsEndDate: undefined}}" class="nav-link" v-bind:class="{active:!$route.query.stats}">Categories</router-link>
@@ -23,11 +25,13 @@ import Component from "vue-class-component";
 import CategoryStats from "./categoryStats.vue";
 import BeneficiaryStats from "./beneficiaryStats.vue";
 import ChartStats from "./chartStats.vue";
+import Navbar from "../components/navbar-mobile.vue";
 
 @Component({
-    components: {CategoryStats,BeneficiaryStats, ChartStats}
+    components: {CategoryStats,BeneficiaryStats, ChartStats, Navbar},
+    props: ["hideNav"]
 })
 export default class Stats extends Vue {
-
+  hideNav! : boolean;
 };
 </script>

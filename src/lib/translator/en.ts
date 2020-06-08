@@ -31,6 +31,7 @@ const en : typeof keys = {
     totalPeriod:"Time Range Total",
     income: "Recettes",
     outcome: "Dépenses",
+    search: "Search",
   },
   stats: {
     begin: "From",

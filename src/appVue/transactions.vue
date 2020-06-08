@@ -23,9 +23,14 @@
   text-align: center;
   line-height: 30px;
 }
+.transactions {
+  margin-bottom: 60px;
+}
 </style>
 <template>
-  <div class="p-1">
+<div>
+  <Navbar v-if="!hideNav" :title="title" :actions="menu" :iconLinks="icons" :selected="selection.length" :selectedIcons="selectedIcons" :unselectAll="unselectAll"/>
+  <div class="p-1 transactions">
     <Modal
       v-if="deletionPopup"
       v-on:close="deletionPopup = false"
@@ -50,32 +55,8 @@
         </div>
       </template>
     </Modal>
-    <div class="row actions">
+    <div class="row actions" v-if="hideNav">
       <div class="col-12">
-        <router-link
-          v-bind:to="{name:'addTransaction', query: this.wallet? {wallet:this.wallet.UUID}: {}}"
-          class="btn btn-primary btn-sm float-left"
-          v-if="this.wallet"
-        >
-          <span class="material-icons">playlist_add</span>
-          {{$t($t.keys.transactionsView.transaction)}}
-        </router-link>
-        <router-link
-          v-bind:to="{name:'addTransfert', query: this.wallet? {wallet:this.wallet.UUID}: {}}"
-          class="btn btn-primary btn-sm float-left"
-          v-if="this.wallet"
-        >
-          <span class="material-icons">repeat_one</span>
-          {{$t($t.keys.transactionsView.transfert)}}
-        </router-link>
-        <button
-          v-if="repeatables.length"
-          class="btn btn-info btn-sm float-left"
-          v-on:click="addAllRepeatables()"
-        >
-          <span class="material-icons">playlist_add</span>
-          {{repeatables.length}} {{$t($t.keys.walletsView.toCome)}}
-        </button>
         <router-link
           v-bind:to="{name: 'stats', query: {...$route.query}}"
           class="btn btn-info btn-sm float-right d-inline d-md-none"
@@ -95,9 +76,9 @@
     </div>
     <div v-if="currency" class="list-group mt-1">
       <div
-          class="day list-group-item bg-primary text-white font-weight-bold text-center"
-          v-if="wallet"
-        >{{wallet.Name}}: {{wallet.Total}} {{currency.Symbol}} </div>
+        class="day list-group-item bg-primary text-white font-weight-bold text-center"
+        v-if="hideNav"
+      >{{title}}</div>
       <template v-for="day in groupedLines.slice(0,60)">
         <div
           v-bind:key="day.Day.toString()"
@@ -156,6 +137,8 @@
         </router-link>
       </template>
     </div>
+    <Fab :actions="actions" />
+  </div>
   </div>
 </template>
 
@@ -174,10 +157,12 @@ import {
   IRepeatable
 } from "../lib/types";
 import * as Models from "../lib/models";
-import store from "./store";
+import store, { IWalletWithTotalToCome } from "./store";
 import moment, { Moment } from "moment";
 import _ from "lodash";
 import Modal from "../components/modal.vue";
+import Navbar from "../components/navbar-mobile.vue";
+import Fab, { IAction } from "../components/fab.vue";
 
 interface ITransactionByDay {
   Day: string;
@@ -207,15 +192,37 @@ const defaultCategory: ICategory = {
 };
 
 @Component({
-  components: { Modal }
+  components: { Modal, Fab, Navbar },
+  props: ["hideNav"],
 })
 export default class Transactions extends Vue {
   selectedLines: { [key: string]: boolean } = {};
   deletionPopup = false;
+  hideNav! : boolean;
+  actions: Array<IAction> = [];
+  menu: Array<IAction> = [];
+  icons: Array<IAction> = [];
+  selectedIcons: Array<IAction> = [];
 
   selectLine(uuid: string) {
     this.selectedLines[uuid] = !this.selectedLines[uuid];
     this.selectedLines = { ...this.selectedLines };
+  }
+  unselectAll() {
+    this.selectedLines = {};
+  }
+
+  get title(): string {
+    if (this.currency && this.selection.length) {
+      return `${this.selection.length} ${this.$t(this.$t.keys.common.selected as string, {count: this.selection.length})} : ${this.totalSelection} ${this.currency.Symbol}`
+    }
+    if (this.wallet && this.currency) {
+      return `${this.wallet.Name}: ${this.wallet.Total} ${this.currency.Symbol}`
+    } else if (this.currency){
+      return `${this.currency.Code}: ${this.lines.length ? this.lines[0].TotalPrice : 0} ${this.currency.Symbol}`
+    } else {
+      return this.$t(this.$t.keys.common.title);
+    }
   }
 
   get selection(): Array<ILine> {
@@ -257,8 +264,10 @@ export default class Transactions extends Vue {
     return wallets;
   }
 
-  get wallet(): IWallet | undefined {
-    return store.getters.walletsWithPriceToCome.find(w => w.UUID === this.$route.query.wallet);
+  get wallet(): IWalletWithTotalToCome | undefined {
+    return store.getters.walletsWithPriceToCome.find(
+      w => w.UUID === this.$route.query.wallet
+    );
   }
 
   get currency(): ICurrency | undefined {
@@ -413,13 +422,15 @@ export default class Transactions extends Vue {
       displayPrice = t.To.Price;
       price = displayPrice;
     }
-    description = [
-      this.$t(this.$t.keys.transactionsView.transfert),
-      this.$t(this.$t.keys.addTransfertView.from),
-      walletFrom?.Name,
-      this.$t(this.$t.keys.addTransfertView.to).toLowerCase(),
-      walletTo?.Name
-    ].join(" ");
+    if( description == "") {
+      description = [
+        this.$t(this.$t.keys.transactionsView.transfert),
+        this.$t(this.$t.keys.addTransfertView.from),
+        walletFrom?.Name,
+        this.$t(this.$t.keys.addTransfertView.to).toLowerCase(),
+        walletTo?.Name
+      ].join(" ");
+    }
 
     return {
       ...t,
@@ -500,7 +511,7 @@ export default class Transactions extends Vue {
         total = transactionAndTranfertsByDay[0].Lines[0].TotalPrice;
       }
       _.forEach(this.repeatableLines, line => {
-        total += line.TotalPrice;
+        total += line.Price;
         line.TotalPrice = total;
       });
 
@@ -584,6 +595,52 @@ export default class Transactions extends Vue {
       store.commit.setTransactions(transactions);
     }
     store.dispatch.sync();
+  }
+
+  created() {
+    const $t = this.$t;
+    const actions : Array<IAction> = [];
+    const menu : Array<IAction> = [];
+    if (this.repeatables.length) {
+      actions.push( {
+          label: $t($t.keys.walletsView.repeatable, {number: this.repeatableLines.length}),
+          icon: "playlist_add",
+          class: "bg-info",
+          click: () => this.addAllRepeatables()
+        })
+    }
+    if (this.wallet) {
+      const walletActions = [
+        {
+          label: $t($t.keys.transactionsView.addTransaction),
+          icon: "playlist_add",
+          class: "bg-primary",
+          click: () => this.$router.push({name:'addTransaction', query: this.wallet? {wallet:this.wallet.UUID}: {}}),
+        },
+        {
+          label: $t($t.keys.transactionsView.addTransfert),
+          icon: "repeat_one",
+          class: "bg-primary",
+          click: () => this.$router.push({name:'addTransfert', query: this.wallet? {wallet:this.wallet.UUID}: {}}),
+        }
+      ]
+      
+      _.forEach(walletActions, a => actions.push(a));
+      _.forEach(walletActions, a => menu.push(a));
+    }
+
+    this.actions = actions;
+    this.menu = menu;
+    this.icons = [{
+          label: $t($t.keys.sideBar.graph),
+          icon: "pie_chart",
+          click: () => this.$router.push({name: 'stats', query: {...this.$route.query}}),
+        }];
+    this.selectedIcons = [{
+        label: $t($t.keys.common.delete),
+        icon: "delete",
+        click: () => this.deletionPopup = true,
+    }]
   }
 }
 </script>
