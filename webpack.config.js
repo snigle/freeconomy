@@ -3,6 +3,8 @@ var HtmlWebpackPlugin = require('html-webpack-plugin');
 const VueLoaderPlugin = require('vue-loader/lib/plugin')
 const BrotliPlugin = require('brotli-webpack-plugin')
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
+const autoprefixer = require('autoprefixer');
+
 const _ = require("lodash");
 module.exports = (env = {}) => {
     return {
@@ -44,7 +46,7 @@ module.exports = (env = {}) => {
             ] : []
         ),
         resolve: {
-            extensions: ['.ts', '.js', '.jsx', '.tsx', '.css'],
+            extensions: ['.ts', '.js', '.jsx', '.tsx', '.css', 'scsss'],
             alias: {
                 'vue$': 'vue/dist/vue.esm.js'
             },
@@ -63,9 +65,39 @@ module.exports = (env = {}) => {
                     use: ['style-loader', 'css-loader', 'less-loader']
                 },
                 {
-                    test: /\.sa|css$/,
+                    test: /\.s(a|c)ss$/,
                     exclude: [/node_modules/],
-                    use: ['style-loader', 'css-loader', 'sass-loader']
+                    use: ['style-loader', 'css-loader',
+                        // Only need saas-loader for freeconomy but need postcss and sass option for material :
+                        // https://github.com/material-components/material-components-web/blob/master/docs/getting-started.md
+                        {
+                            loader: 'postcss-loader',
+                            options: {
+                                plugins: () => [autoprefixer()]
+                            }
+                        },
+                        {
+                            loader: 'sass-loader',
+                            options: {
+                                // Prefer Dart Sass
+                                implementation: require('sass'),
+
+                                // See https://github.com/webpack-contrib/sass-loader/issues/804
+                                webpackImporter: false,
+                                sassOptions: {
+                                    includePaths: ['./node_modules']
+                                },
+                            },
+                        }]
+                },
+                // Used to import material web components javascript
+                // https://github.com/material-components/material-components-web/blob/master/docs/getting-started.md
+                {
+                    test: /\.js$/,
+                    loader: 'babel-loader',
+                    query: {
+                        presets: ['@babel/preset-env'],
+                    },
                 },
                 // {
                 //     test: /\.css$/,
