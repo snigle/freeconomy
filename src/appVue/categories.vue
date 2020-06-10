@@ -16,6 +16,7 @@
       :selected="selection.length"
       @cancel="$router.back()"
       :selectedIcons="selectedIcons"
+      :actions="actions"
     />
   <div class="p-1">
     <Modal
@@ -84,6 +85,7 @@
           </div>
       </router-link>
     </div>
+        <Fab :actions="actions"/>
   </div>
   </div>
 </template>
@@ -95,9 +97,10 @@ import { ICategory } from "../lib/types";
 import * as Models from "../lib/models";
 import Modal from "../components/modal.vue";
 import Navbar, { IAction } from "../components/navbar-mobile.vue";
+import Fab from "../components/fab.vue";
 
 @Component({
-  components: { Modal, Navbar },
+  components: { Modal, Navbar, Fab },
     props: ["hideNav"]
 })
 export default class Categories extends Vue {
@@ -107,6 +110,7 @@ export default class Categories extends Vue {
     // Nav props
   selectedIcons: Array<IAction> = [];
   hideNav!: boolean;
+    actions : Array<IAction> = [];
 
   get title(): string {
     const $t = this.$t;
@@ -142,6 +146,11 @@ export default class Categories extends Vue {
         click: () => (this.deletionPopup = true)
       },
     ];
+    this.actions = [{
+      icon: "add",
+      label: this.$t(this.$t.keys.categoriesView.addCategory),
+      click: () => this.$router.push({name:"addCategory"}),
+    }]
   }
 }
 </script>
