@@ -29,7 +29,7 @@
 </style>
 <template>
 <div>
-  <Navbar v-if="!hideNav" :title="title" :actions="menu" :iconLinks="icons" :selected="selection.length" :selectedIcons="selectedIcons" :unselectAll="unselectAll"/>
+  <Navbar v-if="!hideNav" :title="title" :actions="menu" :iconLinks="icons" :selected="selection.length" :selectedIcons="selectedIcons" @cancel="unselectAll"/>
   <div class="p-1 transactions">
     <Modal
       v-if="deletionPopup"

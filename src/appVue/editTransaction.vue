@@ -23,6 +23,14 @@
 }
 </style>
 <template>
+<div>
+  <Navbar
+      v-if="!hideNav"
+      :title="$t($t.keys.common.edit)"
+      :selected="true"
+      @cancel="$router.back()"
+      :selectedIcons="selectedIcons"
+    />
   <div class="m-2">
     <Modal
       v-if="deletionPopup"
@@ -160,6 +168,7 @@
       </div>
     </form>
   </div>
+  </div>
 </template>
 <script lang="ts">
 import Vue from "vue";
@@ -177,6 +186,7 @@ import moment from "moment";
 import Alert from "../components/alert.vue";
 import RepeatInput from "../components/repeatInput.vue";
 import Modal from "../components/modal.vue";
+import Navbar, { IAction } from "../components/navbar-mobile.vue";
 
 interface IWithCategory {
   Category?: ICategory;
@@ -196,7 +206,9 @@ const emptyTransaction = {
   };
 
 @Component({
-  components: { Alert, RepeatInput, Modal }
+  components: { Alert, RepeatInput, Modal, Navbar },
+    props: ["hideNav"]
+
 })
 export default class EditTransaction extends Vue {
   transaction: ITransactionInput = {...emptyTransaction};
@@ -205,6 +217,9 @@ export default class EditTransaction extends Vue {
   deletionPopup = false;
   loading = false;
   price = "-";
+
+  selectedIcons: Array<IAction> = [];
+  hideNav!: boolean;
 
   setPrice(n: string) {
     this.price = n;
@@ -253,6 +268,19 @@ export default class EditTransaction extends Vue {
       this.transaction.CategoryUUID = category.UUID;
       this.transaction = {...this.transaction};
     }
+
+    this.selectedIcons = [
+      {
+        label: this.$t(this.$t.keys.common.delete),
+        icon: "delete",
+        click: () => (this.deletionPopup = true)
+      },
+      {
+        label: this.$t(this.$t.keys.common.save),
+        icon: "check",
+        click: () => this.save(false)
+      }
+    ];
   }
 
   get autocomplete(): Array<ITransaction & IWithCategory & IWithWallet> {

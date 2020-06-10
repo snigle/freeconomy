@@ -77,6 +77,9 @@ export default class Fab extends Vue {
     if (this.actions.length !== 1) {
       this.clickAway();
     }
+    $(this.$refs["fab"])
+      .find('[data-toggle="tooltip"]')
+      .tooltip("hide");
     action.click();
   }
 

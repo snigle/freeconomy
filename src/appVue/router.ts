@@ -17,26 +17,26 @@ import Modal from "../components/modal.vue";
 import bsBreakpoints from 'bs-breakpoints'
 
 const EditTransactionModal = Vue.extend({
-    template: `<Modal v-on:close="$router.back()"><template v-slot:header>{{$t($t.keys.transactionsView.editTransaction)}}</template><EditTransaction /></Modal>`,
+    template: `<Modal v-on:close="$router.back()"><template v-slot:header>{{$t($t.keys.transactionsView.editTransaction)}}</template><EditTransaction hideNav="true"/></Modal>`,
     components: { Modal, EditTransaction }
 });
 
 const EditTransfertModal = Vue.extend({
-    template: `<Modal v-on:close="$router.back()"><template v-slot:header>{{$t($t.keys.transactionsView.editTransfert)}}</template><EditTransfert /></Modal>`,
+    template: `<Modal v-on:close="$router.back()"><template v-slot:header>{{$t($t.keys.transactionsView.editTransfert)}}</template><EditTransfert hideNav="true"/></Modal>`,
     components: { Modal, EditTransfert }
 });
 
 const CategoriesModal = Vue.extend({
-    template: `<Modal v-on:close="$router.back()"><template v-slot:header>{{$t($t.keys.sideBar.categories)}}</template><Categories /></Modal>`,
+    template: `<Modal v-on:close="$router.back()"><template v-slot:header>{{$t($t.keys.sideBar.categories)}}</template><Categories hideNav="true"/></Modal>`,
     components: { Modal, Categories }
 });
 const EditCategoryModal = Vue.extend({
-    template: `<Modal v-on:close="$router.back()"><template v-slot:header>{{$t($t.keys.common.edit)}}</template><EditCategory /></Modal>`,
+    template: `<Modal v-on:close="$router.back()"><template v-slot:header>{{$t($t.keys.common.edit)}}</template><EditCategory hideNav="true"/></Modal>`,
     components: { Modal, EditCategory }
 });
 
 const EditWalletModal = Vue.extend({
-    template: `<Modal v-on:close="$router.back()"><template v-slot:header>{{$t($t.keys.common.edit)}}</template><EditWallet /></Modal>`,
+    template: `<Modal v-on:close="$router.back()"><template v-slot:header>{{$t($t.keys.common.edit)}}</template><EditWallet hideNav="true" /></Modal>`,
     components: { Modal, EditWallet }
 });
 

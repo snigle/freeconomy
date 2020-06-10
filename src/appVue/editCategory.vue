@@ -4,45 +4,55 @@
 }
 </style>
 <template>
-  <div class="m-2">
-    <Modal
-      v-if="deletionPopup"
-      v-on:close="deletionPopup = false"
-      v-on:backdropClick="deletionPopup = false"
-    >
-      <template v-slot:header>
-        <div>{{$t($t.keys.common.areYourSure)}}</div>
-      </template>
-      {{$t($t.keys.deleteCategoryView.areYouSure,{name:category.Name})}}
-      <template v-slot:footer>
-        <div>
-          <button
-            type="button"
-            class="btn btn-secondary"
-            v-on:click="deletionPopup = false"
-          >{{$t($t.keys.common.cancel)}}</button>
-          <button
-            type="button"
-            class="btn btn-danger"
-            v-on:click="deleteCategory()"
-          >{{$t($t.keys.common.remove)}}</button>
-        </div>
-      </template>
-    </Modal>
-    <Alert v-if="error" v-on:close="error=null">{{error}}</Alert>
+  <div>
+    <Navbar
+      v-if="!hideNav"
+      :title="$t($t.keys.common.edit)"
+      :selected="true"
+      @cancel="$router.back()"
+      :selectedIcons="selectedIcons"
+    />
+    <div class="m-2">
+      <Modal
+        v-if="deletionPopup"
+        v-on:close="deletionPopup = false"
+        v-on:backdropClick="deletionPopup = false"
+      >
+        <template v-slot:header>
+          <div>{{$t($t.keys.common.areYourSure)}}</div>
+        </template>
+        {{$t($t.keys.deleteCategoryView.areYouSure,{name:category.Name})}}
+        <template
+          v-slot:footer
+        >
+          <div>
+            <button
+              type="button"
+              class="btn btn-secondary"
+              v-on:click="deletionPopup = false"
+            >{{$t($t.keys.common.cancel)}}</button>
+            <button
+              type="button"
+              class="btn btn-danger"
+              v-on:click="deleteCategory()"
+            >{{$t($t.keys.common.remove)}}</button>
+          </div>
+        </template>
+      </Modal>
+      <Alert v-if="error" v-on:close="error=null">{{error}}</Alert>
 
-    <form v-on:submit="save(false)">
-      <div class="form-group">
-        <label for="name">{{$t($t.keys.common.name)}}</label>
-        <input class="form-control" id="name" v-model="category.Name" />
-      </div>
-      <div class="form-group">
-        <label for="color">{{$t($t.keys.common.color)}}</label>
-        <input class="form-control" id="color" type="color" v-model="category.Icon.Color" />
-      </div>
-      <div class="form-group">
-        <label>{{$t($t.keys.common.icon)}}</label>
-        <!-- <div class="container"> -->
+      <form v-on:submit="save(false)">
+        <div class="form-group">
+          <label for="name">{{$t($t.keys.common.name)}}</label>
+          <input class="form-control" id="name" v-model="category.Name" />
+        </div>
+        <div class="form-group">
+          <label for="color">{{$t($t.keys.common.color)}}</label>
+          <input class="form-control" id="color" type="color" v-model="category.Icon.Color" />
+        </div>
+        <div class="form-group">
+          <label>{{$t($t.keys.common.icon)}}</label>
+          <!-- <div class="container"> -->
           <div class="row">
             <div class="col-3 col-sm-2" v-for="icon in icons" v-bind:key="icon.name">
               <button
@@ -53,40 +63,41 @@
               >{{icon.name}}</button>
             </div>
           </div>
-        <!-- </div> -->
-      </div>
-      <div class="form-group">
-        <label>{{$t($t.keys.common.result)}}</label>
-        <div class="icon-lg" v-bind:style="{backgroundColor: category.Icon.Color }">
-          <div class="material-icons">{{$iconMap(category.Icon.Name)}}</div>
+          <!-- </div> -->
         </div>
-      </div>
+        <div class="form-group">
+          <label>{{$t($t.keys.common.result)}}</label>
+          <div class="icon-lg" v-bind:style="{backgroundColor: category.Icon.Color }">
+            <div class="material-icons">{{$iconMap(category.Icon.Name)}}</div>
+          </div>
+        </div>
 
-      <div class="form-group">
-        <div class="float-left">
-          <button
-            type="button"
-            v-if="$route.params.category"
-            class="btn btn-danger"
-            v-on:click="deletionPopup = true"
-          >{{$t($t.keys.common.delete)}}</button>
-          <button
-            type="button"
-            v-else
-            class="btn btn-danger"
-            v-on:click="$router.back()"
-          >{{$t($t.keys.common.cancel)}}</button>
+        <div class="form-group">
+          <div class="float-left">
+            <button
+              type="button"
+              v-if="$route.params.category"
+              class="btn btn-danger"
+              v-on:click="deletionPopup = true"
+            >{{$t($t.keys.common.delete)}}</button>
+            <button
+              type="button"
+              v-else
+              class="btn btn-danger"
+              v-on:click="$router.back()"
+            >{{$t($t.keys.common.cancel)}}</button>
+          </div>
+          <div class="float-right">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              v-on:click="save(true)"
+            >{{$t($t.keys.common.saveAndNew)}}</button>
+            <button type="submit" class="btn btn-primary">{{$t($t.keys.common.save)}}</button>
+          </div>
         </div>
-        <div class="float-right">
-          <button
-            type="button"
-            class="btn btn-secondary"
-            v-on:click="save(true)"
-          >{{$t($t.keys.common.saveAndNew)}}</button>
-          <button type="submit" class="btn btn-primary">{{$t($t.keys.common.save)}}</button>
-        </div>
-      </div>
-    </form>
+      </form>
+    </div>
   </div>
 </template>
 <script lang="ts">
@@ -96,11 +107,14 @@ import store from "./store";
 import { IconType, ICategoryInput, ICategory } from "../lib/types";
 import * as Models from "../lib/models";
 import Modal from "../components/modal.vue";
+import Navbar, { IAction } from "../components/navbar-mobile.vue";
 
 @Component({
-    components: {
-        Modal
-    }
+  components: {
+    Modal,
+    Navbar
+  },
+  props: ["hideNav"]
 })
 export default class EditCategory extends Vue {
   icons: Array<{ name: string; type: IconType }> = [
@@ -152,10 +166,14 @@ export default class EditCategory extends Vue {
   error = "";
   deletionPopup = false;
 
+  // Nav props
+  selectedIcons: Array<IAction> = [];
+  hideNav!: boolean;
+
   created() {
     if (this.$route.params.category) {
       const category = store.state.categories.find(
-        c => (c.UUID === this.$route.params.category)
+        c => c.UUID === this.$route.params.category
       );
       if (!category) {
         this.error = this.$t(this.$t.keys.errors.notFound);
@@ -163,6 +181,18 @@ export default class EditCategory extends Vue {
       }
       this.category = { ...category };
     }
+    this.selectedIcons = [
+      {
+        label: this.$t(this.$t.keys.common.delete),
+        icon: "delete",
+        click: () => (this.deletionPopup = true)
+      },
+      {
+        label: this.$t(this.$t.keys.common.save),
+        icon: "check",
+        click: () => this.save(false)
+      }
+    ];
   }
 
   async deleteCategory() {
@@ -180,18 +210,16 @@ export default class EditCategory extends Vue {
         this.category
       );
     } else {
-      categories = await Models.CreateCategory(
-        this.category
-      );
+      categories = await Models.CreateCategory(this.category);
     }
     store.commit.setCategories(categories);
     store.dispatch.sync();
     if (andNew) {
-        this.$router.replace({
-              name: "addCategory",
-            })
+      this.$router.replace({
+        name: "addCategory"
+      });
     } else {
-        setTimeout(() => this.$router.back(),0);
+      setTimeout(() => this.$router.back(), 0);
     }
   }
 }

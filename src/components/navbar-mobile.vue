@@ -193,7 +193,7 @@
           <section class="mdc-top-app-bar__section mdc-top-app-bar__section--align-start">
             <button
               class="material-icons mdc-top-app-bar__navigation-icon mdc-icon-button"
-              @click="() => unselectAll()"
+              @click="$emit('cancel')"
               aria-label="Close"
             >close</button>
 
@@ -233,7 +233,7 @@ import { MDCTextField } from "@material/textfield";
 import { MDCDrawer } from "@material/drawer";
 import store from "../appVue/store";
 
-interface IAction {
+export interface IAction {
   label: string;
   icon: string;
   click: () => void;
@@ -246,7 +246,6 @@ interface IAction {
     "iconLinks",
     "actions",
     "selectedIcons",
-    "unselectAll",
     "selected"
   ]
 })
@@ -256,7 +255,6 @@ export default class NavbarMobile extends Vue {
   iconLinks!: Array<IAction>;
   actions!: Array<IAction>;
   selectedIcons!: Array<IAction>;
-  unselectAll!: () => void;
   selected!: boolean;
   displaySearch = false;
   drawer?: MDCDrawer;

@@ -9,6 +9,14 @@
 }
 </style>
 <template>
+  <div>
+    <Navbar
+      v-if="!hideNav"
+      :title="title"
+      :selected="selection.length"
+      @cancel="$router.back()"
+      :selectedIcons="selectedIcons"
+    />
   <div class="p-1">
     <Modal
       v-if="deletionPopup"
@@ -34,7 +42,7 @@
         </div>
       </template>
     </Modal>
-    <div class="row">
+    <div class="row d-none d-md-block">
       <div class="col">
         <router-link type="button" class="btn btn-primary btn-sm float-left" v-bind:to="{name:'addCategory'}">
           <span class="material-icons">playlist_add</span>
@@ -44,7 +52,7 @@
       <div
         v-if="selection.length"
         class="col middle"
-      >{{selection.length}} {{$t($t.keys.common.selected, {count: selection.length})}}</div>
+      >{{title}}</div>
       <div v-if="selection.length" class="col">
         <button
           type="button"
@@ -77,6 +85,7 @@
       </router-link>
     </div>
   </div>
+  </div>
 </template>
 <script lang="ts">
 import Vue from "vue";
@@ -85,13 +94,24 @@ import store from "./store";
 import { ICategory } from "../lib/types";
 import * as Models from "../lib/models";
 import Modal from "../components/modal.vue";
+import Navbar, { IAction } from "../components/navbar-mobile.vue";
 
 @Component({
-  components: { Modal }
+  components: { Modal, Navbar },
+    props: ["hideNav"]
 })
 export default class Categories extends Vue {
   selectedLines: { [key: string]: boolean } = {};
   deletionPopup = false;
+
+    // Nav props
+  selectedIcons: Array<IAction> = [];
+  hideNav!: boolean;
+
+  get title(): string {
+    const $t = this.$t;
+    return this.selection.length ? `${this.selection.length} ${$t($t.keys.common.selected as string, {count: this.selection.length})}` : $t($t.keys.sideBar.categories);
+  }
 
   selectCategory(uuid: string) {
     this.selectedLines[uuid] = !this.selectedLines[uuid];
@@ -112,6 +132,16 @@ export default class Categories extends Vue {
       this.deletionPopup = false;
       this.$router.back();
     }
+  }
+
+  created() {
+    this.selectedIcons = [
+      {
+        label: this.$t(this.$t.keys.common.delete),
+        icon: "delete",
+        click: () => (this.deletionPopup = true)
+      },
+    ];
   }
 }
 </script>

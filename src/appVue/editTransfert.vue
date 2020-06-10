@@ -1,129 +1,138 @@
 <template>
-  <div class="m-2">
-    <Modal
-      v-if="deletionPopup"
-      v-on:close="deletionPopup = false"
-      v-on:backdropClick="deletionPopup = false"
-    >
-      <template v-slot:header>
-        <div>{{$t($t.keys.common.areYourSure)}}</div>
-      </template>
-      {{$t($t.keys.transactionView.deleteSelectionConfirm)}}
-      <template v-slot:footer>
-        <div>
-          <button
-            type="button"
-            class="btn btn-secondary"
-            v-on:click="deletionPopup = false"
-          >{{$t($t.keys.common.cancel)}}</button>
-          <button
-            type="button"
-            class="btn btn-danger"
-            v-on:click="deleteTransfert()"
-          >{{$t($t.keys.common.remove)}}</button>
+  <div>
+    <Navbar
+      v-if="!hideNav"
+      :title="$t($t.keys.common.edit)"
+      :selected="true"
+      @cancel="$router.back()"
+      :selectedIcons="selectedIcons"
+    />
+    <div class="m-2">
+      <Modal
+        v-if="deletionPopup"
+        v-on:close="deletionPopup = false"
+        v-on:backdropClick="deletionPopup = false"
+      >
+        <template v-slot:header>
+          <div>{{$t($t.keys.common.areYourSure)}}</div>
+        </template>
+        {{$t($t.keys.transactionView.deleteSelectionConfirm)}}
+        <template v-slot:footer>
+          <div>
+            <button
+              type="button"
+              class="btn btn-secondary"
+              v-on:click="deletionPopup = false"
+            >{{$t($t.keys.common.cancel)}}</button>
+            <button
+              type="button"
+              class="btn btn-danger"
+              v-on:click="deleteTransfert()"
+            >{{$t($t.keys.common.remove)}}</button>
+          </div>
+        </template>
+      </Modal>
+      <Alert v-if="error" v-on:close="error=null">{{error}}</Alert>
+      <form v-on:submit="save(false)">
+        <div class="form-row">
+          <div class="form-group col-sm-6">
+            <label for="inputFrom">{{$t($t.keys.addTransfertView.from)}}</label>
+            <select class="form-control" id="inputFrom" v-model="transfert.From.WalletUUID">
+              <option
+                v-for="wallet in wallets"
+                v-bind:key="wallet.UUID"
+                v-bind:value="wallet.UUID"
+              >{{wallet.Name}} ({{wallet.Currency.Code}})</option>
+            </select>
+          </div>
+          <div class="form-group col-sm-6">
+            <label for="inputTo">{{$t($t.keys.addTransfertView.to)}}</label>
+            <select class="form-control" id="inputTo" v-model="transfert.To.WalletUUID">
+              <option
+                v-for="wallet in wallets"
+                v-bind:key="wallet.UUID"
+                v-bind:value="wallet.UUID"
+              >{{wallet.Name}} ({{wallet.Currency.Code}})</option>
+            </select>
+          </div>
         </div>
-      </template>
-    </Modal>
-    <Alert v-if="error" v-on:close="error=null">{{error}}</Alert>
-    <form v-on:submit="save(false)">
-      <div class="form-row">
-        <div class="form-group col-sm-6">
-          <label for="inputFrom">{{$t($t.keys.addTransfertView.from)}}</label>
-          <select class="form-control" id="inputFrom" v-model="transfert.From.WalletUUID">
-            <option
-              v-for="wallet in wallets"
-              v-bind:key="wallet.UUID"
-              v-bind:value="wallet.UUID"
-            >{{wallet.Name}} ({{wallet.Currency.Code}})</option>
-          </select>
-        </div>
-        <div class="form-group col-sm-6">
-          <label for="inputTo">{{$t($t.keys.addTransfertView.to)}}</label>
-          <select class="form-control" id="inputTo" v-model="transfert.To.WalletUUID">
-            <option
-              v-for="wallet in wallets"
-              v-bind:key="wallet.UUID"
-              v-bind:value="wallet.UUID"
-            >{{wallet.Name}} ({{wallet.Currency.Code}})</option>
-          </select>
-        </div>
-      </div>
 
-      <div class="form-row">
-        <div class="col-5">
-          <label for="price">{{$t($t.keys.common.price)}}</label>
+        <div class="form-row">
+          <div class="col-5">
+            <label for="price">{{$t($t.keys.common.price)}}</label>
+            <input
+              type="number"
+              step="0.01"
+              class="form-control"
+              id="price"
+              v-model.number="fromPrice"
+            />
+          </div>
+          <div
+            class="col-2"
+            v-bind:style="{display:'flex', flexDirection:'column', justifyContent:'center', textAlign:'center'}"
+          >
+            <div class="material-icons">arrow_forward</div>
+            <div>x{{transfert.From.Price ? transfert.To.Price / transfert.From.Price : 1}}</div>
+          </div>
+          <div class="form-group col-5">
+            <label for="price">{{$t($t.keys.common.price)}}</label>
+            <input
+              type="number"
+              step="0.01"
+              class="form-control"
+              id="price"
+              v-bind:disabled="walletFrom.Currency.Code === walletTo.Currency.Code"
+              v-model.number="transfert.To.Price"
+            />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="comment">{{$t($t.keys.addTransactionView.comment)}}</label>
+          <input type="text" class="form-control" id="comment" v-model="transfert.Comment" />
+        </div>
+
+        <div class="form-group">
+          <label for="date">{{$t($t.keys.common.date)}}</label>
           <input
-            type="number"
-            step="0.01"
+            type="date"
             class="form-control"
-            id="price"
-            v-model.number="fromPrice"
+            v-bind:class="{'is-invalid':formErrors.date}"
+            id="date"
+            v-bind:value="date"
+            v-on:input="date = $event.target.value"
           />
         </div>
-        <div
-          class="col-2"
-          v-bind:style="{display:'flex', flexDirection:'column', justifyContent:'center', textAlign:'center'}"
-        >
-          <div class="material-icons">arrow_forward</div>
-          <div>x{{transfert.From.Price ? transfert.To.Price / transfert.From.Price : 1}}</div>
-        </div>
-        <div class="form-group col-5">
-          <label for="price">{{$t($t.keys.common.price)}}</label>
-          <input
-            type="number"
-            step="0.01"
-            class="form-control"
-            id="price"
-            v-bind:disabled="walletFrom.Currency.Code === walletTo.Currency.Code"
-            v-model.number="transfert.To.Price"
-          />
-        </div>
-      </div>
 
-      <div class="form-group">
-        <label for="comment">{{$t($t.keys.addTransactionView.comment)}}</label>
-        <input type="text" class="form-control" id="comment" v-model="transfert.Comment" />
-      </div>
+        <RepeatInput v-model="transfert.Repeat" />
 
-      <div class="form-group">
-        <label for="date">{{$t($t.keys.common.date)}}</label>
-        <input
-          type="date"
-          class="form-control"
-          v-bind:class="{'is-invalid':formErrors.date}"
-          id="date"
-          v-bind:value="date"
-          v-on:input="date = $event.target.value"
-        />
-      </div>
-
-      <RepeatInput v-model="transfert.Repeat" />
-
-      <div class="form-group">
-        <div class="float-left">
-          <button
-            type="button"
-            v-if="$route.params.transfert"
-            class="btn btn-danger"
-            v-on:click="deleteTransfert()"
-          >{{$t($t.keys.common.delete)}}</button>
-          <button
-            type="button"
-            v-else
-            class="btn btn-danger"
-            v-on:click="$route.back()"
-          >{{$t($t.keys.common.cancel)}}</button>
+        <div class="form-group">
+          <div class="float-left">
+            <button
+              type="button"
+              v-if="$route.params.transfert"
+              class="btn btn-danger"
+              v-on:click="deleteTransfert()"
+            >{{$t($t.keys.common.delete)}}</button>
+            <button
+              type="button"
+              v-else
+              class="btn btn-danger"
+              v-on:click="$route.back()"
+            >{{$t($t.keys.common.cancel)}}</button>
+          </div>
+          <div class="float-right">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              v-on:click="save(true)"
+            >{{$t($t.keys.common.saveAndNew)}}</button>
+            <button type="submit" class="btn btn-primary">{{$t($t.keys.common.save)}}</button>
+          </div>
         </div>
-        <div class="float-right">
-          <button
-            type="button"
-            class="btn btn-secondary"
-            v-on:click="save(true)"
-          >{{$t($t.keys.common.saveAndNew)}}</button>
-          <button type="submit" class="btn btn-primary">{{$t($t.keys.common.save)}}</button>
-        </div>
-      </div>
-    </form>
+      </form>
+    </div>
   </div>
 </template>
 <script lang="ts">
@@ -144,30 +153,36 @@ import _ from "lodash";
 import moment from "moment";
 import Alert from "../components/alert.vue";
 import RepeatInput from "../components/repeatInput.vue";
+import Navbar, { IAction } from "../components/navbar-mobile.vue";
 
 const emptyTransfert = {
-    From: {
-      WalletUUID: "",
-      Price: 0
-    },
-    To: {
-      WalletUUID: "",
-      Price: 0
-    },
-    Date: new Date(),
-    Comment: "",
-    Repeat: null
-  };
+  From: {
+    WalletUUID: "",
+    Price: 0
+  },
+  To: {
+    WalletUUID: "",
+    Price: 0
+  },
+  Date: new Date(),
+  Comment: "",
+  Repeat: null
+};
 
 @Component({
-  components: { Alert, RepeatInput }
+  components: { Alert, RepeatInput, Navbar },
+  props: ["hideNav"]
 })
 export default class EditTransfert extends Vue {
-  transfert: ITransfertInput = {...emptyTransfert};
+  transfert: ITransfertInput = { ...emptyTransfert };
   error: string = "";
   formErrors = { date: false };
   deletionPopup = false;
   loading = false;
+
+  // Nav props
+  selectedIcons: Array<IAction> = [];
+  hideNav!: boolean;
 
   get wallets(): Array<IWallet> {
     return store.state.wallets;
@@ -230,6 +245,19 @@ export default class EditTransfert extends Vue {
     if (!this.transfert.To.WalletUUID) {
       this.transfert.To.WalletUUID = wallet.UUID;
     }
+
+    this.selectedIcons = [
+      {
+        label: this.$t(this.$t.keys.common.delete),
+        icon: "delete",
+        click: () => (this.deletionPopup = true)
+      },
+      {
+        label: this.$t(this.$t.keys.common.save),
+        icon: "check",
+        click: () => this.save(false)
+      }
+    ];
   }
 
   save(andNew: boolean) {
@@ -252,7 +280,7 @@ export default class EditTransfert extends Vue {
         if (!andNew) {
           setTimeout(() => this.$router.back(), 0);
         } else {
-          this.transfert = {...emptyTransfert};
+          this.transfert = { ...emptyTransfert };
           setTimeout(() =>
             this.$router.replace({
               name: "addTransfert",
