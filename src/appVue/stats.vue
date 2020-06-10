@@ -1,6 +1,6 @@
 <template>
   <div>
-      <Navbar v-if="!hideNav" :title="$t($t.keys.sideBar.graph)"/>
+      <Navbar v-if="!hideNav" :title="title"/>
 
     <ul class="nav nav-tabs">
   <li class="nav-item">
@@ -13,9 +13,9 @@
     <router-link v-bind:to="{...$route, query:{...$route.query, stats: 'chart', statsBeginDate: undefined, statsEndDate: undefined}}" class="nav-link">Chart</router-link>
   </li>
 </ul>
-<CategoryStats v-if="!$route.query.stats" />
-<BeneficiaryStats v-else-if="$route.query.stats === 'beneficiary'" />
-<ChartStats v-else-if="$route.query.stats === 'chart'" />
+<CategoryStats ref="category" v-if="!$route.query.stats" @title="setTitle"/>
+<BeneficiaryStats v-else-if="$route.query.stats === 'beneficiary'" @title="setTitle"/>
+<ChartStats v-else-if="$route.query.stats === 'chart'" @title="setTitle"/>
   </div>
 </template>
 <script
@@ -33,5 +33,14 @@ import Navbar from "../components/navbar-mobile.vue";
 })
 export default class Stats extends Vue {
   hideNav! : boolean;
+  title: string = "";
+
+  // Get title from tab component
+  setTitle(title : string) {
+   this.title = title;
+  }
+  mounted() {
+    console.log("this")
+  }
 };
 </script>

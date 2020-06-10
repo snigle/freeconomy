@@ -1,6 +1,5 @@
 /// <reference types="cordova-plugin-device" />
 import "bootstrap";
-import "framework7";
 import "./index.scss";
 import "./img/faviconpng.png";
 

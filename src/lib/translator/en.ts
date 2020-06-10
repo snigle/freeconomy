@@ -51,6 +51,7 @@ const en : typeof keys = {
     categories: "Categories",
     categoryReport: "Report by Category",
     graph: "Charts",
+    transactions: "Transactions",
     sync: "Synchronize",
     syncing: "Synchronizing",
     logout: "Logout",

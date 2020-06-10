@@ -202,6 +202,8 @@ export interface ILogin {
   id: string;
   token: string;
   expires: Date;
+  displayName: string;
+  email: string;
 }
 
 export interface ICollection {

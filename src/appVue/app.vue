@@ -98,16 +98,6 @@ export default class AppVue extends Vue {
     return store.state.login.logged;
   }
 
-  logout() {
-    (window as any).plugins.googleplus.disconnect(
-      () => {
-        store.dispatch.logout();
-      },
-      (err: any) => store.commit.showError({ err, text: "fail to logout" })
-    );
-    store.dispatch.logout();
-  }
-
   sync() {
     store.dispatch.sync();
   }

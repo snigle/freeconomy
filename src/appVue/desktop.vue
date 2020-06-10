@@ -10,7 +10,7 @@
             <button
               v-if="!$store.state.sync.syncing"
               class="nav-link btn"
-              v-on:click="sync()"
+              v-on:click="$store.dispatch('sync')"
             >
               {{$t($t.keys.sideBar.sync)}}
               <span v-if="$store.state.sync.error" class="material-icons">sync_problem</span>
@@ -57,5 +57,14 @@ import store from "./store";
 })
 export default class Desktop extends Vue {
     loading = false
+     logout() {
+    (window as any).plugins.googleplus.disconnect(
+      () => {
+        store.dispatch.logout();
+      },
+      (err: any) => store.commit.showError({ err, text: "fail to logout" })
+    );
+    store.dispatch.logout();
+  }
 }
 </script>

@@ -2,8 +2,15 @@
 @use "@material/top-app-bar/mdc-top-app-bar";
 @use "@material/fab/mdc-fab";
 
+@use "@material/drawer/mdc-drawer";
+@use "@material/list/mdc-list";
+
 @import "bootstrap/scss/bootstrap";
 @import "~material-design-icons/iconfont/material-icons.css";
+
+.mdc-list-item.active {
+    @extend .mdc-list-item--activated;
+}
 
 @include icon-button.core-styles;
 
@@ -14,7 +21,7 @@
 }
 
 .material-icons {
-    font-size: inherit; 
+    font-size: inherit;
 }
 
 .rotate {

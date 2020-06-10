@@ -212,7 +212,7 @@ export default class Transactions extends Vue {
     this.selectedLines = {};
   }
 
-  get title(): string {
+  public get title(): string {
     if (this.currency && this.selection.length) {
       return `${this.selection.length} ${this.$t(this.$t.keys.common.selected as string, {count: this.selection.length})} : ${this.totalSelection} ${this.currency.Symbol}`
     }
@@ -641,6 +641,8 @@ export default class Transactions extends Vue {
         icon: "delete",
         click: () => this.deletionPopup = true,
     }]
+
+    this.$emit("title", this.title);
   }
 }
 </script>

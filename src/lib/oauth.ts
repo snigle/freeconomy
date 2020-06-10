@@ -42,5 +42,7 @@ const loginSuccess = (credentials: any) : ILogin => {
       today.getDate() + 1),
     id: credentials.idToken,
     token: credentials.accessToken,
+    displayName: credentials.displayName,
+    email: credentials.email,
   };
 }

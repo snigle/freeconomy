@@ -53,6 +53,7 @@ const fr = {
     graph: "Stats",
     sync: "Synchroniser",
     syncing: "Synchronisation",
+    transactions: "Opérations",
     logout: "Déconnexion",
     logoutConfirm: "Se déconnecter ?",
     logoutConfirmText: `Êtes-vous sûr de vouloir vous déconnecter ?
