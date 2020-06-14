@@ -79,9 +79,13 @@
         class="day list-group-item bg-primary text-white font-weight-bold text-center"
         v-if="hideNav"
       >{{title}}</div>
-      <template v-for="day in groupedLines.slice(0,60)">
+      <template v-for="(day, index) in groupedLinesSized">
+      <div 
+      :style="{height: `${day.size}px`, overflow:'hidden'}"
+          v-bind:key="day.Day"
+          v-if="index < 10 || visibleDays[day.Day]"
+      >
         <div
-          v-bind:key="day.Day.toString()"
           class="day list-group-item bg-secondary text-white"
           v-bind:class="{'bg-info':day.Lines[0].repeatable}"
         >{{day.Day}}</div>
@@ -135,6 +139,12 @@
             </div>
           </div>
         </router-link>
+      </div>
+      <div v-else :style="{height: `${day.size}px`, overflow:'hidden'}"
+                v-bind:key="day.Day"
+                v-view.once="() => displayDay(day.Day)"
+>
+        </div>
       </template>
     </div>
     <Fab :actions="actions" />
@@ -204,6 +214,13 @@ export default class Transactions extends Vue {
   icons: Array<IAction> = [];
   selectedIcons: Array<IAction> = [];
 
+
+visibleDays : {[key:string]: boolean} = {};
+displayDay(day: string) {
+  const visible : {[key:string]: boolean}= {};
+  visible[day] = true;
+  this.visibleDays = {...this.visibleDays, ...visible};
+}
   selectLine(uuid: string) {
     this.selectedLines[uuid] = !this.selectedLines[uuid];
     this.selectedLines = { ...this.selectedLines };
@@ -485,6 +502,10 @@ export default class Transactions extends Vue {
       line.TotalPrice = total;
     });
     return _.reverse(lines);
+  }
+
+  get groupedLinesSized() : Array<ITransactionByDay & { size: number}> {
+    return this.groupedLines.map(g => ({...g, size: 30 + 75*g.Lines.length}))
   }
 
   get groupedLines(): Array<ITransactionByDay> {

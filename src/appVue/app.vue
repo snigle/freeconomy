@@ -35,11 +35,11 @@ import Desktop from "./desktop.vue";
 import store from "./store";
 import { TranslatePlugin } from "../lib/translator";
 import _ from "lodash";
-
-
+const checkView = require('vue-check-view') as any;
+Vue.use(checkView)
 Vue.use(VueRouter);
 Vue.use(TranslatePlugin);
-
+ 
 declare module "vue/types/vue" {
   // 3. Déclarez l'augmentation pour Vue
   interface Vue {
