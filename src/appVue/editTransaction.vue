@@ -269,18 +269,21 @@ export default class EditTransaction extends Vue {
       this.transaction = {...this.transaction};
     }
 
-    this.selectedIcons = [
-      {
+    const selectedIcons = [];
+    if (this.$route.params.transaction) {
+      selectedIcons.push({
         label: this.$t(this.$t.keys.common.delete),
         icon: "delete",
         click: () => (this.deletionPopup = true)
-      },
-      {
+      });
+    }
+    selectedIcons.push({
         label: this.$t(this.$t.keys.common.save),
         icon: "check",
         click: () => this.save(false)
-      }
-    ];
+      });
+
+    this.selectedIcons = selectedIcons;
   }
 
   get autocomplete(): Array<ITransaction & IWithCategory & IWithWallet> {

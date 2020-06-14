@@ -14,6 +14,7 @@
           id="newTotal"
           class="form-control"
           type="number"
+          step="0.01"
           v-model.number="newTotal"
           v-bind:placeholder="$t($t.keys.updateSoldeView.newBalance)"
         />

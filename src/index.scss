@@ -5,8 +5,13 @@
 @use "@material/drawer/mdc-drawer";
 @use "@material/list/mdc-list";
 
+@use "@material/linear-progress";
+
 @import "bootstrap/scss/bootstrap";
 @import "~material-design-icons/iconfont/material-icons.css";
+
+
+@include linear-progress.core-styles;
 
 .mdc-list-item.active {
     @extend .mdc-list-item--activated;

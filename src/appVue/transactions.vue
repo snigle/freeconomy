@@ -214,12 +214,12 @@ export default class Transactions extends Vue {
 
   public get title(): string {
     if (this.currency && this.selection.length) {
-      return `${this.selection.length} ${this.$t(this.$t.keys.common.selected as string, {count: this.selection.length})} : ${this.totalSelection} ${this.currency.Symbol}`
+      return `${this.selection.length} ${this.$t(this.$t.keys.common.selected as string, {count: this.selection.length})} : ${displayPrice(this.totalSelection)} ${this.currency.Symbol}`
     }
     if (this.wallet && this.currency) {
-      return `${this.wallet.Name}: ${this.wallet.Total} ${this.currency.Symbol}`
+      return `${this.wallet.Name}: ${displayPrice(this.wallet.Total)} ${this.currency.Symbol}`
     } else if (this.currency){
-      return `${this.currency.Code}: ${this.lines.length ? this.lines[0].TotalPrice : 0} ${this.currency.Symbol}`
+      return `${this.currency.Code}: ${this.lines.length ? displayPrice(this.lines[0].TotalPrice) : 0} ${this.currency.Symbol}`
     } else {
       return this.$t(this.$t.keys.common.title);
     }

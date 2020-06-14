@@ -209,18 +209,21 @@ export default class EditWallet extends Vue {
       }
       this.wallet = { ...wallet };
     }
-    this.selectedIcons = [
-      {
+
+    const selectedIcons = [];
+    if(this.$route.params.wallet){
+      selectedIcons.push({
         label: this.$t(this.$t.keys.common.delete),
         icon: "delete",
         click: () => (this.deletionPopup = true)
-      },
-      {
+      });
+    }
+    selectedIcons.push({
         label: this.$t(this.$t.keys.common.save),
         icon: "check",
         click: () => this.save(false)
-      }
-    ];
+      });
+    this.selectedIcons = selectedIcons;
   }
 
   async deleteCategory() {

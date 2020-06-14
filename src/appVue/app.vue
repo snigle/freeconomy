@@ -63,7 +63,7 @@ const router = new VueRouter({
     Login
   },
   store: store.original,
-  watch: { logged: "watchLogged" }
+  watch: { logged: "watchLogged" },
 })
 export default class AppVue extends Vue {
   cordova = false;

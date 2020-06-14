@@ -36,8 +36,8 @@ const { store, rootActionContext, moduleActionContext } = createDirectStore({
         },
         wallets: [] as Array<IWallet>,
         categories: [] as Array<ICategory>, 
-        transactions: [] as Array<ITransaction>,
-        transferts: [] as Array<ITransfert>,
+        transactions: [] as Readonly<Array<ITransaction>>,
+        transferts: [] as Readonly<Array<ITransfert>>,
     },
     getters: {
         walletsWithPriceToCome(state, getters): Array<IWalletWithTotalToCome> {
@@ -132,10 +132,10 @@ const { store, rootActionContext, moduleActionContext } = createDirectStore({
             state.wallets = wallets;
         },
         setTransactions(state, transactions: Array<ITransaction>) {
-            state.transactions = transactions;
+            state.transactions = Object.freeze(transactions);
         },
         setTransferts(state, transferts: Array<ITransfert>) {
-            state.transferts = transferts;
+            state.transferts = Object.freeze(transferts);
         },
         setCategories(state, categories: Array<ICategory>) {
             state.categories = categories;

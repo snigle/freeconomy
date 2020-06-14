@@ -12,7 +12,7 @@
     "build-android": "cordova build android --release --bundle -- --webpack.env.prod",
     "bundle-android": "cd ./platforms/android ; ./gradlew app:bundleRelease ; cd ../.. ;",
     "release-android": "perl -i -pe 's/(android-versionCode=\")(\\d+)/$1.($2+1)/e' config.xml && yarn build-android",
-    "release": "yarn build-web && yarn release-android && bundle-android"
+    "release": "yarn build-web && yarn release-android && yarn bundle-android"
   },
   "keywords": [
     "ecosystem:cordova"
@@ -24,6 +24,8 @@
     "@material/fab": "^6.0.0",
     "@material/form-field": "^6.0.0",
     "@material/icon-button": "^6.0.0",
+    "@material/linear-progress": "^6.0.0",
+    "@material/progress-indicator": "^6.0.0",
     "@material/tab-bar": "^6.0.0",
     "@material/textfield": "^6.0.0",
     "@material/top-app-bar": "^6.0.0",

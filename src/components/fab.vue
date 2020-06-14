@@ -73,6 +73,11 @@ export default class Fab extends Vue {
     (fabElement as any).style.left = `${position.left - 15}px`;
   }
 
+  destroyed() {
+    // Will remove all tooltip :/
+    $('.tooltip.show').remove();
+  }
+
   click(action: IAction) {
     if (this.actions.length !== 1) {
       this.clickAway();

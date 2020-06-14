@@ -246,18 +246,21 @@ export default class EditTransfert extends Vue {
       this.transfert.To.WalletUUID = wallet.UUID;
     }
 
-    this.selectedIcons = [
-      {
+    const selectedIcons = [];
+    if (this.$route.params.transfert) {
+      selectedIcons.push({
         label: this.$t(this.$t.keys.common.delete),
         icon: "delete",
         click: () => (this.deletionPopup = true)
-      },
-      {
+      });
+    }
+    selectedIcons.push({
         label: this.$t(this.$t.keys.common.save),
         icon: "check",
         click: () => this.save(false)
-      }
-    ];
+      });
+
+    this.selectedIcons = selectedIcons;
   }
 
   save(andNew: boolean) {

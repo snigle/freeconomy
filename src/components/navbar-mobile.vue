@@ -4,6 +4,7 @@
 }
 .mdc-icon-button {
   width: 35px;
+  padding: inherit;
 }
 
 .mdc-top-app-bar.selected {
@@ -49,7 +50,8 @@
           <router-link
             class="mdc-list-item"
             v-bind:to="{name:'transactions', query: {...$route.query}}"
-          v-slot="{ href, navigate, isExactActive }">
+            v-slot="{ href, navigate, isExactActive }"
+          >
             <a
               class="mdc-list-item"
               :class="isExactActive && 'active'"
@@ -57,13 +59,16 @@
               :href="href"
               @navigate="navigate"
             >
-            <i class="material-icons mdc-list-item__graphic" aria-hidden="true">view_list</i>
-            <span class="mdc-list-item__text">{{$t($t.keys.sideBar.transactions)}}</span>
+              <i class="material-icons mdc-list-item__graphic" aria-hidden="true">view_list</i>
+              <span class="mdc-list-item__text">{{$t($t.keys.sideBar.transactions)}}</span>
             </a>
           </router-link>
 
-          <router-link class="mdc-list-item" v-bind:to="{name:'stats', query: {...$route.query}}"
-          v-slot="{ href, navigate, isExactActive }">
+          <router-link
+            class="mdc-list-item"
+            v-bind:to="{name:'stats', query: {...$route.query}}"
+            v-slot="{ href, navigate, isExactActive }"
+          >
             <a
               class="mdc-list-item"
               :class="isExactActive && 'active'"
@@ -71,14 +76,17 @@
               :href="href"
               @navigate="navigate"
             >
-            <i class="material-icons mdc-list-item__graphic" aria-hidden="true">pie_chart</i>
-            <span class="mdc-list-item__text">{{$t($t.keys.sideBar.graph)}}</span>
+              <i class="material-icons mdc-list-item__graphic" aria-hidden="true">pie_chart</i>
+              <span class="mdc-list-item__text">{{$t($t.keys.sideBar.graph)}}</span>
             </a>
           </router-link>
 
           <div role="separator" class="mdc-list-divider"></div>
-          <router-link class="mdc-list-item" v-bind:to="{name:'categories'}"
-          v-slot="{ href, navigate, isExactActive }">
+          <router-link
+            class="mdc-list-item"
+            v-bind:to="{name:'categories'}"
+            v-slot="{ href, navigate, isExactActive }"
+          >
             <a
               class="mdc-list-item"
               :class="isExactActive && 'active'"
@@ -86,8 +94,8 @@
               :href="href"
               @navigate="navigate"
             >
-            <i class="material-icons mdc-list-item__graphic" aria-hidden="true">widgets</i>
-            <span class="mdc-list-item__text">{{$t($t.keys.sideBar.categories)}}</span>
+              <i class="material-icons mdc-list-item__graphic" aria-hidden="true">widgets</i>
+              <span class="mdc-list-item__text">{{$t($t.keys.sideBar.categories)}}</span>
             </a>
           </router-link>
           <a
@@ -153,6 +161,22 @@
             class="mdc-top-app-bar__section mdc-top-app-bar__section--align-end"
             role="toolbar"
           >
+            <button
+              class="material-icons mdc-top-app-bar__action-item mdc-icon-button rotate"
+              aria-label="Syncing"
+              v-if="$store.state.sync.syncing"
+            >sync</button>
+            <button
+              v-if="$store.state.sync.error"
+              class="material-icons mdc-top-app-bar__action-item mdc-icon-button"
+              aria-label="Sync error"
+            >sync_problem</button>
+            <button
+              class="material-icons mdc-top-app-bar__action-item mdc-icon-button"
+              aria-label="Synced"
+              v-if="$store.state.sync.synced"
+            >check</button>
+
             <button
               class="material-icons mdc-top-app-bar__action-item mdc-icon-button"
               v-on:click="displaySearch=!displaySearch"
@@ -241,13 +265,7 @@ export interface IAction {
 
 @Component({
   components: { Alert },
-  props: [
-    "title",
-    "iconLinks",
-    "actions",
-    "selectedIcons",
-    "selected"
-  ]
+  props: ["title", "iconLinks", "actions", "selectedIcons", "selected"]
 })
 export default class NavbarMobile extends Vue {
   navSearch = "";
