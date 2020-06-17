@@ -51,16 +51,22 @@ export interface IAction {
 
 @Component({
   props: ["actions"],
-  mixins: [clickaway]
+  mixins: [clickaway],
+  watch: {actions: "watchActions"}
 })
 export default class Fab extends Vue {
   actions!: Array<IAction>;
   displayActions = false;
 
   created() {
-    if (this.actions.length === 1) {
-      this.displayActions = true;
-    }
+    this.displayActions = this.actions.length === 1;
+  }
+
+  watchActions() {
+      this.displayActions = this.actions.length === 1;
+      $(this.$refs["fab"])
+      .find('[data-toggle="tooltip"]')
+      .tooltip("hide");
   }
 
   mounted() {

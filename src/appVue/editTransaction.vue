@@ -382,7 +382,7 @@ export default class EditTransaction extends Vue {
         if (!andNew) {
           setTimeout(() => this.$router.back(), 0);
         } else {
-          this.transaction = {...emptyTransaction}
+          this.transaction = {...emptyTransaction, WalletUUID : this.transaction.WalletUUID}
           this.price = "-";
           setTimeout(() =>
             this.$router.replace({

@@ -209,11 +209,6 @@ export default class Transactions extends Vue {
   selectedLines: { [key: string]: boolean } = {};
   deletionPopup = false;
   hideNav! : boolean;
-  actions: Array<IAction> = [];
-  menu: Array<IAction> = [];
-  icons: Array<IAction> = [];
-  selectedIcons: Array<IAction> = [];
-
 
 visibleDays : {[key:string]: boolean} = {};
 displayDay(day: string) {
@@ -230,16 +225,19 @@ displayDay(day: string) {
   }
 
   public get title(): string {
+    let title = "";
     if (this.currency && this.selection.length) {
-      return `${this.selection.length} ${this.$t(this.$t.keys.common.selected as string, {count: this.selection.length})} : ${displayPrice(this.totalSelection)} ${this.currency.Symbol}`
+      title= `${this.selection.length} ${this.$t(this.$t.keys.common.selected as string, {count: this.selection.length})} : ${displayPrice(this.totalSelection)} ${this.currency.Symbol}`
     }
     if (this.wallet && this.currency) {
-      return `${this.wallet.Name}: ${displayPrice(this.wallet.Total)} ${this.currency.Symbol}`
+      title= `${this.wallet.Name}: ${displayPrice(this.wallet.Total)} ${this.currency.Symbol}`
     } else if (this.currency){
-      return `${this.currency.Code}: ${this.lines.length ? displayPrice(this.lines[0].TotalPrice) : 0} ${this.currency.Symbol}`
+      title= `${this.currency.Code}: ${this.lines.length ? displayPrice(this.lines[0].TotalPrice) : 0} ${this.currency.Symbol}`
     } else {
-      return this.$t(this.$t.keys.common.title);
+      title= this.$t(this.$t.keys.common.title);
     }
+    this.$emit("title", title);
+    return title;
   }
 
   get selection(): Array<ILine> {
@@ -618,10 +616,9 @@ displayDay(day: string) {
     store.dispatch.sync();
   }
 
-  created() {
+  get actions() :  Array<IAction> {
     const $t = this.$t;
     const actions : Array<IAction> = [];
-    const menu : Array<IAction> = [];
     if (this.repeatables.length) {
       actions.push( {
           label: $t($t.keys.walletsView.repeatable, {number: this.repeatableLines.length}),
@@ -630,6 +627,16 @@ displayDay(day: string) {
           click: () => this.addAllRepeatables()
         })
     }
+    if (this.wallet) {
+      _.forEach(this.menu, a => actions.push(a));
+    }
+
+    return actions;
+  }
+
+  get menu() :  Array<IAction> {
+const $t = this.$t;
+    const menu : Array<IAction> = [];
     if (this.wallet) {
       const walletActions = [
         {
@@ -646,24 +653,29 @@ displayDay(day: string) {
         }
       ]
       
-      _.forEach(walletActions, a => actions.push(a));
       _.forEach(walletActions, a => menu.push(a));
     }
 
-    this.actions = actions;
-    this.menu = menu;
-    this.icons = [{
-          label: $t($t.keys.sideBar.graph),
+    return menu;
+  }
+
+    
+    get icons () {
+      return [{
+          label: this.$t(this.$t.keys.sideBar.graph),
           icon: "pie_chart",
           click: () => this.$router.push({name: 'stats', query: {...this.$route.query}}),
         }];
-    this.selectedIcons = [{
-        label: $t($t.keys.common.delete),
+    }
+    
+    get selectedIcons() {
+      return [{
+        label: this.$t(this.$t.keys.common.delete),
         icon: "delete",
         click: () => this.deletionPopup = true,
     }]
+    }
 
-    this.$emit("title", this.title);
-  }
+    
 }
 </script>

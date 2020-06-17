@@ -36,6 +36,8 @@ const en : typeof keys = {
   stats: {
     begin: "From",
     end: "To",
+    beneficiaries: "Beneficiaries",
+    chart: "Chart"
   },
   login: {
     buttonWithGoogle: "Login with Google",

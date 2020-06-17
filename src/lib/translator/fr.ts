@@ -36,6 +36,8 @@ const fr = {
   stats: {
     begin: "Début",
     end: "Fin",
+    chart: "Graph",
+    beneficiaries: "Bénéficiaires",
   },
   login: {
     buttonWithGoogle: "Connexion avec Google",
