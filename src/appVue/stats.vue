@@ -1,16 +1,16 @@
 <template>
   <div>
-      <Navbar v-if="!hideNav" :title="title"/>
+      <Navbar v-if="!hideNav" :title="title" :searchButton="true"/>
 
     <ul class="nav nav-tabs">
   <li class="nav-item">
     <router-link v-bind:to="{...$route, query:{...$route.query, stats: undefined, ...($route.query.stats !== 'chart' ? {statsBeginDate: $route.query.statsBeginDate, statsEndDate: $route.query.statsEndDate} : {statsBeginDate: undefined, statsEndDate: undefined})}}" class="nav-link" v-bind:class="{active:!$route.query.stats}">{{$t($t.keys.sideBar.categories)}}</router-link>
   </li>
     <li class="nav-item">
-    <router-link v-bind:to="{...$route, query:{...$route.query, stats: 'beneficiary', ...($route.query.stats !== 'chart' ? {statsBeginDate: $route.query.statsBeginDate, statsEndDate: $route.query.statsEndDate} : {statsBeginDate: undefined, statsEndDate: undefined})}}" class="nav-link">{{$t($t.keys.stats.beneficiaries)}}</router-link>
+    <router-link v-bind:to="{...$route, query:{...$route.query, stats: 'beneficiary', ...($route.query.stats !== 'chart' ? {statsBeginDate: $route.query.statsBeginDate, statsEndDate: $route.query.statsEndDate} : {statsBeginDate: undefined, statsEndDate: undefined})}}" class="nav-link" :class="{active:$route.query.stats === 'beneficiary'}">{{$t($t.keys.stats.beneficiaries)}}</router-link>
   </li>
   <li class="nav-item">
-    <router-link v-bind:to="{...$route, query:{...$route.query, stats: 'chart', ...($route.query.stats === 'chart' ? {statsBeginDate: $route.query.statsBeginDate, statsEndDate: $route.query.statsEndDate} : {statsBeginDate: undefined, statsEndDate: undefined})}}" class="nav-link">{{$t($t.keys.stats.chart)}}</router-link>
+    <router-link v-bind:to="{...$route, query:{...$route.query, stats: 'chart', ...($route.query.stats === 'chart' ? {statsBeginDate: $route.query.statsBeginDate, statsEndDate: $route.query.statsEndDate} : {statsBeginDate: undefined, statsEndDate: undefined})}}" class="nav-link" :class="{active:$route.query.stats === 'chart'}">{{$t($t.keys.stats.chart)}}</router-link>
   </li>
 </ul>
 <CategoryStats ref="category" v-if="!$route.query.stats" @title="setTitle"/>
@@ -37,6 +37,7 @@ export default class Stats extends Vue {
 
   // Get title from tab component
   setTitle(title : string) {
+    console.log("emit title", title);
    this.title = title;
   }
   mounted() {

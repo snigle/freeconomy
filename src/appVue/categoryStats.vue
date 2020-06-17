@@ -139,6 +139,7 @@ export default class CategoryStats extends Transactions {
     this.dateTo = this.$route.query.statsEndDate
       ? moment(this.$route.query.statsEndDate as string).toDate()
       : this.periods[0].to;
+      this.$emit("title", this.title);
   }
 
   get linesFrom(): Array<ILine> {

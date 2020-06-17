@@ -183,6 +183,7 @@ export default class chartStats extends Transactions {
   }
   mounted() {
     this.watchLines();
+    this.$emit("title", this.title);
   }
 }
 </script>

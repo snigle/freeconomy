@@ -38,5 +38,9 @@ export default class BeneficiaryStats extends CategoryStats {
     return groups;
   }
 
+  created() {
+    this.$emit("title", this.title);
+  }
+
 }
 </script>

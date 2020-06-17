@@ -181,6 +181,7 @@
               class="material-icons mdc-top-app-bar__action-item mdc-icon-button"
               v-on:click="displaySearch=!displaySearch"
               aria-label="Search"
+              v-if="searchButton"
             >{{displaySearch? "close" : "search"}}</button>
 
             <button
@@ -188,7 +189,7 @@
               :key="action.label"
               class="material-icons mdc-top-app-bar__action-item mdc-icon-button"
               v-on:click="action.click"
-              aria-label="Search"
+              :aria-label="action.label"
             >{{action.icon}}</button>
 
             <div class="dropdown">
@@ -265,7 +266,7 @@ export interface IAction {
 
 @Component({
   components: { Alert },
-  props: ["title", "iconLinks", "actions", "selectedIcons", "selected"]
+  props: ["title", "iconLinks", "actions", "selectedIcons", "selected", "searchButton"]
 })
 export default class NavbarMobile extends Vue {
   navSearch = "";
@@ -276,6 +277,7 @@ export default class NavbarMobile extends Vue {
   selected!: boolean;
   displaySearch = false;
   drawer?: MDCDrawer;
+  searchButton! : boolean;
 
   created() {
     this.navSearch = _.isString(this.$route.query.search)

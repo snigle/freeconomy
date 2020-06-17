@@ -29,7 +29,7 @@
 </style>
 <template>
 <div>
-  <Navbar v-if="!hideNav" :title="title" :actions="menu" :iconLinks="icons" :selected="selection.length" :selectedIcons="selectedIcons" @cancel="unselectAll"/>
+  <Navbar v-if="!hideNav" :title="title" :actions="menu" :iconLinks="icons" :selected="selection.length" :selectedIcons="selectedIcons" @cancel="unselectAll" :searchButton="true"/>
   <div class="p-1 transactions">
     <Modal
       v-if="deletionPopup"
@@ -236,7 +236,6 @@ displayDay(day: string) {
     } else {
       title= this.$t(this.$t.keys.common.title);
     }
-    this.$emit("title", title);
     return title;
   }
 
