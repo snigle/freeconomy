@@ -19,10 +19,6 @@
 .comment {
   font-size: 12px;
 }
-.selection {
-  text-align: center;
-  line-height: 30px;
-}
 .transactions {
   margin-bottom: 60px;
 }
@@ -55,25 +51,6 @@
         </div>
       </template>
     </Modal>
-    <div class="row actions" v-if="hideNav">
-      <div class="col-12">
-        <router-link
-          v-bind:to="{name: 'stats', query: {...$route.query}}"
-          class="btn btn-info btn-sm float-right d-inline d-md-none"
-        >
-          <span class="material-icons">pie_chart</span>
-          {{$t($t.keys.sideBar.graph)}}
-        </router-link>
-      </div>
-      <div v-if="selection.length" class="col selection">
-        {{selection.length}} {{$t($t.keys.common.selected, {count: selection.length})}} : {{totalSelection}} {{currency.Symbol}}
-        <button
-          type="button"
-          class="btn btn-danger btn-sm float-right"
-          v-on:click="deletionPopup = true"
-        >{{$t($t.keys.common.delete)}}</button>
-      </div>
-    </div>
     <div v-if="currency" class="list-group mt-1">
       <div
         class="day list-group-item bg-primary text-white font-weight-bold text-center"
@@ -228,8 +205,7 @@ displayDay(day: string) {
     let title = "";
     if (this.currency && this.selection.length) {
       title= `${this.selection.length} ${this.$t(this.$t.keys.common.selected as string, {count: this.selection.length})} : ${displayPrice(this.totalSelection)} ${this.currency.Symbol}`
-    }
-    if (this.wallet && this.currency) {
+    } else if (this.wallet && this.currency) {
       title= `${this.wallet.Name}: ${displayPrice(this.wallet.Total)} ${this.currency.Symbol}`
     } else if (this.currency){
       title= `${this.currency.Code}: ${this.lines.length ? displayPrice(this.lines[0].TotalPrice) : 0} ${this.currency.Symbol}`

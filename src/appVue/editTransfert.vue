@@ -278,6 +278,7 @@ export default class EditTransfert extends Vue {
     savePromise
       .then(transferts => {
         store.commit.setTransferts(transferts);
+        store.dispatch.loadWallets();
         store.dispatch.sync();
 
         if (!andNew) {

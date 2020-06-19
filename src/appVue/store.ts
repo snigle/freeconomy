@@ -9,6 +9,7 @@ import _ from "lodash";
 import { GoogleSync } from "../lib/sync";
 import { v4 } from "uuid"; 
 import moment from "moment";
+import bsBreakpoints from "bs-breakpoints";
 
 interface IError { 
     text: string;
@@ -27,6 +28,7 @@ const { store, rootActionContext, moduleActionContext } = createDirectStore({
             data: null as ILogin | null,
             error: null as string | null,
         },
+        mobileView: ["small", "xSmall"].indexOf(bsBreakpoints.detectBreakpoint()) !== -1,
         errors: [] as Array<IError>,
         autosync: false,
         sync: {
@@ -217,11 +219,14 @@ const { store, rootActionContext, moduleActionContext } = createDirectStore({
         },
         loadData(state) {
             return Promise.all([
-                Models.GetWallets().then(wallets => state.commit("setWallets", wallets)),
+                state.dispatch("loadWallets"),
                 Models.GetAllTransactions().then(transactions => state.commit("setTransactions", transactions)),
                 Models.GetTransferts().then(transferts => state.commit("setTransferts", transferts)),
                 Models.GetCategories().then(categories => state.commit("setCategories", categories)),
             ])
+        },
+        loadWallets(state) {
+            return Models.GetWallets().then(wallets => state.commit("setWallets", wallets));
         }
     }
 })

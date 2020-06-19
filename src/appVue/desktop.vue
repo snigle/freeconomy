@@ -30,9 +30,9 @@
       
   <div class="container-fluid" v-if="!loading">
     <div class="row">
-      <Wallets class="col-4" :hideNav="true"/>
-      <Transactions class="col-4" :hideNav="true"/>
-      <Stats class="col-4" :hideNav="true"/>
+      <Wallets class="col-4"/>
+      <Transactions class="col-4"/>
+      <Stats class="col-4"/>
     </div>
     <router-view></router-view>
   </div>

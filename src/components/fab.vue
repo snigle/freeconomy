@@ -17,10 +17,10 @@
           :data-trigger="actions.length === 1? 'hover focus' : 'manual'"
           :title="action.label"
           :class="action.class"
+          v-on:click.prevent.stop="click(action)"
         >
           <span
             class="material-icons mdc-fab__icon"
-            v-on:click.prevent.stop="click(action)"
           >{{action.icon}}</span>
         </button>
       </div>

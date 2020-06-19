@@ -32,11 +32,6 @@
       </form>
     </nav>
 
-    <Alert
-      v-for="err in $store.state.errors"
-      v-bind:key="err.uuid"
-      v-on:close="$store.commit('hideError', err.uuid)"
-    >{{err.text}}: {{JSON.stringify(err.err)}}</Alert>
   </div>
 </template>
 
@@ -44,11 +39,9 @@
 import Vue from "vue";
 import Component from "vue-class-component";
 import t from "../lib/translator";
-import Alert from "./alert.vue";
 import _ from "lodash";
 
 @Component({
-  components: { Alert }
 })
 export default class NavbarDesktop extends Vue {
   navSearch = "";

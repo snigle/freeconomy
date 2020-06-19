@@ -378,6 +378,8 @@ export default class EditTransaction extends Vue {
     savePromise
       .then(transactions => {
         store.commit.setTransactions(transactions);
+        // Refresh wallet stored to get updated total
+        store.dispatch.loadWallets();
         store.dispatch.sync();
         if (!andNew) {
           setTimeout(() => this.$router.back(), 0);

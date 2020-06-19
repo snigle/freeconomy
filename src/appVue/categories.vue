@@ -11,7 +11,6 @@
 <template>
   <div>
     <Navbar
-      v-if="!hideNav"
       :title="title"
       :selected="selection.length"
       @cancel="$router.back()"
@@ -43,25 +42,6 @@
         </div>
       </template>
     </Modal>
-    <div class="row d-none d-md-block">
-      <div class="col">
-        <router-link type="button" class="btn btn-primary btn-sm float-left" v-bind:to="{name:'addCategory'}">
-          <span class="material-icons">playlist_add</span>
-          {{$t($t.keys.categoriesView.addCategory)}}
-        </router-link>
-      </div>
-      <div
-        v-if="selection.length"
-        class="col middle"
-      >{{title}}</div>
-      <div v-if="selection.length" class="col">
-        <button
-          type="button"
-          class="btn btn-danger btn-sm float-right"
-          v-on:click="deletionPopup = true"
-        >{{$t($t.keys.common.delete)}}</button>
-      </div>
-    </div>
     <div class="list-group">
       <router-link
         class="list-group-item list-group-item-action"
