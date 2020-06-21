@@ -193,6 +193,13 @@ const fr = {
     insertAll: "Enregistrer tout",
     insertSelected: "Enregistrer la sélection",
   },
+  filters: {
+    filters: "Filtres",
+    category: "Categorie",
+    description: "Description",
+    transactionFrom: "Depuis",
+    transactionTo: "Jusqu'au",
+  },
   errors: {
     invalidDate: "Le champs date est mal écrit.",
     invalidPrice:"Le prix n'est pas un nombre correct",

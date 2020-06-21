@@ -4,16 +4,10 @@ import Component from "vue-class-component";
 import store from "./store";
 import { ICategory, displayPrice } from "../lib/types";
 import Transactions, { ILine } from "./transactions.vue";
-import CategoryStats from "./categoryStats.vue";
+import CategoryStats, { ICategoryStats } from "./categoryStats.vue";
 
 import _ from "lodash";
 import moment from "moment";
-
-interface ICategoryStats {
-  Category: ICategory;
-  Total: number;
-  Percent: number;
-}
 
 @Component({ methods: { displayPrice } })
 export default class BeneficiaryStats extends CategoryStats {
@@ -28,7 +22,17 @@ export default class BeneficiaryStats extends CategoryStats {
       .map(group => ({
         Category: { ...group[0].Category, Name: group[0].Description, UUID: group[0].UUID},
         Total: displayPrice(_.sumBy(group, g => g.Price)),
-        Percent: 100
+        Percent: 100,
+        Link: {
+          name: "transactions",
+          query: {
+            ...this.$route.query,
+            description: group[0].Description,
+            transactionFrom: this.queryDateFrom,
+            transactionTo: this.queryDateTo,
+            category: undefined,
+          }
+        }
       }))
       .sortBy(g => Math.abs(g.Total))
       .reverse()

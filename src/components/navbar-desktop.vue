@@ -20,6 +20,18 @@
         <slot />
       </ul>
 
+      <ul class="navbar-nav mr-auto filters" v-if="filters.length">
+        <li class="nav-item">
+            {{$t($t.keys.filters.filters)}}: 
+            <button class="btn btn-info badge badge-info align-middle mr-1"
+            v-for="f in filters"
+            :key="f"
+            @click="dropFilter(f)"
+            >{{$t($t.keys.filters[f])}}: {{f === 'category' ? category.Name : $route.query[f]}} <span class="material-icons align-middle">close</span>
+            </button>
+          </li>
+      </ul>
+
       <form class="form-inline d-none d-md-flex">
         <input
           class="form-control"
@@ -40,6 +52,8 @@ import Vue from "vue";
 import Component from "vue-class-component";
 import t from "../lib/translator";
 import _ from "lodash";
+import { ICategory } from "../lib/types";
+import store from "../appVue/store";
 
 @Component({
 })
@@ -62,6 +76,24 @@ export default class NavbarDesktop extends Vue {
         });
       }
     }, 500)();
+  }
+
+  get category(): ICategory | undefined {
+    if (_.isString(this.$route.query.category)) {
+      return store.state.categories.find(c => c.UUID === this.$route.query.category);
+    }
+    return undefined;
+  }
+
+  get filters() : string[] {
+    const allowedFilters = ["category", "description", "transactionFrom", "transactionTo"];
+    return allowedFilters.filter(f => _.isString(this.$route.query[f]))
+  }
+
+  dropFilter(filter :string) {
+    const query = {...this.$route.query, }
+    delete(query[filter]);
+    this.$router.push({name: this.$route.name || "", query});
   }
 }
 </script>

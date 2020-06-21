@@ -192,6 +192,13 @@ const en : typeof keys = {
     insertAll: "Save all",
     insertSelected: "Save selected",
   },
+  filters: {
+    filters: "Filtres",
+    category: "Category",
+    description: "Description",
+    transactionFrom: "From",
+    transactionTo: "To",
+  },
   errors: {
     invalidDate: "Date is invalid",
     invalidPrice:"Price is not a correct number",

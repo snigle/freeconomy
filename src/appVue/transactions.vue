@@ -24,108 +24,118 @@
 }
 </style>
 <template>
-<div>
-  <Navbar v-if="!hideNav" :title="title" :actions="menu" :iconLinks="icons" :selected="selection.length" :selectedIcons="selectedIcons" @cancel="unselectAll" :searchButton="true"/>
-  <div class="p-1 transactions">
-    <Modal
-      v-if="deletionPopup"
-      v-on:close="deletionPopup = false"
-      v-on:backdropClick="deletionPopup = false"
-    >
-      <template v-slot:header>
-        <div>{{$t($t.keys.common.areYourSure)}}</div>
-      </template>
-      {{$t($t.keys.transactionsView.deleteSelectionConfirm)}}
-      <template v-slot:footer>
-        <div>
-          <button
-            type="button"
-            class="btn btn-secondary"
-            v-on:click="deletionPopup = false"
-          >{{$t($t.keys.common.cancel)}}</button>
-          <button
-            type="button"
-            class="btn btn-primary"
-            v-on:click="deleteSelection()"
-          >{{$t($t.keys.common.remove)}}</button>
-        </div>
-      </template>
-    </Modal>
-    <div v-if="currency" class="list-group mt-1">
-      <div
-        class="day list-group-item bg-primary text-white font-weight-bold text-center"
-        v-if="hideNav"
-      >{{title}}</div>
-      <template v-for="(day, index) in groupedLinesSized">
-      <div 
-      :style="{height: `${day.size}px`, overflow:'hidden'}"
-          v-bind:key="day.Day"
-          v-if="index < 10 || visibleDays[day.Day]"
+  <div>
+    <Navbar
+      v-if="!hideNav"
+      :title="title"
+      :actions="menu"
+      :iconLinks="icons"
+      :selected="selection.length"
+      :selectedIcons="selectedIcons"
+      @cancel="unselectAll"
+      :searchButton="true"
+    />
+    <div class="p-1 transactions">
+      <Modal
+        v-if="deletionPopup"
+        v-on:close="deletionPopup = false"
+        v-on:backdropClick="deletionPopup = false"
       >
-        <div
-          class="day list-group-item bg-secondary text-white"
-          v-bind:class="{'bg-info':day.Lines[0].repeatable}"
-        >{{day.Day}}</div>
-        <router-link
-          class="list-group-item list-group-item-action"
-          v-bind:class="{'noLink': !line.EditLink}"
-          v-for="line in day.Lines"
-          v-bind:key="line.UUID"
-          v-bind:to="line.EditLink || {}"
-          v-bind:exact-active-class="'tata'"
-          v-bind:event="line.EditLink? 'click' : 'toto'"
-        >
-          <div class="row">
+        <template v-slot:header>
+          <div>{{$t($t.keys.common.areYourSure)}}</div>
+        </template>
+        {{$t($t.keys.transactionsView.deleteSelectionConfirm)}}
+        <template v-slot:footer>
+          <div>
             <button
               type="button"
-              v-on:click.prevent="selectLine(line.UUID)"
-              class="icon-lg btn"
-              v-bind:style="{backgroundColor: (selectedLines[line.UUID] ? 'rgb(134, 192, 255)' : line.Category.Icon.Color) }"
+              class="btn btn-secondary"
+              v-on:click="deletionPopup = false"
+            >{{$t($t.keys.common.cancel)}}</button>
+            <button
+              type="button"
+              class="btn btn-primary"
+              v-on:click="deleteSelection()"
+            >{{$t($t.keys.common.remove)}}</button>
+          </div>
+        </template>
+      </Modal>
+      <div v-if="currency" class="list-group mt-1">
+        <div
+          class="day list-group-item bg-primary text-white font-weight-bold text-center"
+          v-if="hideNav"
+        >{{title}}</div>
+        <template v-for="(day, index) in groupedLinesSized">
+          <div
+            :style="{height: `${day.size}px`, overflow:'hidden'}"
+            v-bind:key="day.Day"
+            v-if="index < 10 || visibleDays[day.Day]"
+          >
+            <div
+              class="day list-group-item bg-secondary text-white"
+              v-bind:class="{'bg-info':day.Lines[0].repeatable}"
+            >{{day.Day}}</div>
+            <router-link
+              class="list-group-item list-group-item-action"
+              v-bind:class="{'noLink': !line.EditLink}"
+              v-for="line in day.Lines"
+              v-bind:key="line.UUID"
+              v-bind:to="line.EditLink || {}"
+              v-bind:exact-active-class="'tata'"
+              v-bind:event="line.EditLink? 'click' : 'toto'"
             >
-              <div
-                v-if="line.Category.Icon.Type === 'material'"
-                class="material-icons"
-              >{{selectedLines[line.UUID] ? 'check' : $iconMap(line.Category.Icon.Name)}}</div>
-            </button>
-            <div class="middle col">
-              <div>
-                {{line.Description}}
-                <span
-                  v-if="line.Repeat && !line.repeatable"
-                  class="repeat material-icons"
-                >sync</span>
+              <div class="row">
                 <button
                   type="button"
-                  v-if="line.repeatable"
-                  class="repeat btn btn-info btn-sm material-icons"
-                  v-on:click="insertRepeat(line.UUID)"
-                >add</button>
+                  v-on:click.prevent="selectLine(line.UUID)"
+                  class="icon-lg btn"
+                  v-bind:style="{backgroundColor: (selectedLines[line.UUID] ? 'rgb(134, 192, 255)' : line.Category.Icon.Color) }"
+                >
+                  <div
+                    v-if="line.Category.Icon.Type === 'material'"
+                    class="material-icons"
+                  >{{selectedLines[line.UUID] ? 'check' : $iconMap(line.Category.Icon.Name)}}</div>
+                </button>
+                <div class="middle col">
+                  <div>
+                    {{line.Description}}
+                    <span
+                      v-if="line.Repeat && !line.repeatable"
+                      class="repeat material-icons"
+                    >sync</span>
+                    <button
+                      type="button"
+                      v-if="line.repeatable"
+                      class="repeat btn btn-info btn-sm material-icons"
+                      v-on:click="insertRepeat(line.UUID)"
+                    >add</button>
+                  </div>
+                  <div class="comment">
+                    {{line.Comment}}
+                    <small
+                      v-if="!wallet && walletsByUUID[line.WalletUUID]"
+                    >({{walletsByUUID[line.WalletUUID].Name}})</small>
+                  </div>
+                </div>
+                <div class="price">
+                  <div class="price">{{line.DisplayPrice}} {{currency.Symbol}}</div>
+                  <div class="total">
+                    <small>{{line.TotalPrice}} {{currency.Symbol}}</small>
+                  </div>
+                </div>
               </div>
-              <div class="comment">
-                {{line.Comment}}
-                <small
-                  v-if="!wallet && walletsByUUID[line.WalletUUID]"
-                >({{walletsByUUID[line.WalletUUID].Name}})</small>
-              </div>
-            </div>
-            <div class="price">
-              <div class="price">{{line.DisplayPrice}} {{currency.Symbol}}</div>
-              <div class="total">
-                <small>{{line.TotalPrice}} {{currency.Symbol}}</small>
-              </div>
-            </div>
+            </router-link>
           </div>
-        </router-link>
+          <div
+            v-else
+            :style="{height: `${day.size}px`, overflow:'hidden'}"
+            v-bind:key="day.Day"
+            v-view.once="() => displayDay(day.Day)"
+          ></div>
+        </template>
       </div>
-      <div v-else :style="{height: `${day.size}px`, overflow:'hidden'}"
-                v-bind:key="day.Day"
-                v-view.once="() => displayDay(day.Day)"
->
-        </div>
-      </template>
+      <Fab :actions="actions" />
     </div>
-    <Fab :actions="actions" />
-  </div>
   </div>
 </template>
 
@@ -180,19 +190,19 @@ const defaultCategory: ICategory = {
 
 @Component({
   components: { Modal, Fab, Navbar },
-  props: ["hideNav"],
+  props: ["hideNav"]
 })
 export default class Transactions extends Vue {
   selectedLines: { [key: string]: boolean } = {};
   deletionPopup = false;
-  hideNav! : boolean;
+  hideNav!: boolean;
 
-visibleDays : {[key:string]: boolean} = {};
-displayDay(day: string) {
-  const visible : {[key:string]: boolean}= {};
-  visible[day] = true;
-  this.visibleDays = {...this.visibleDays, ...visible};
-}
+  visibleDays: { [key: string]: boolean } = {};
+  displayDay(day: string) {
+    const visible: { [key: string]: boolean } = {};
+    visible[day] = true;
+    this.visibleDays = { ...this.visibleDays, ...visible };
+  }
   selectLine(uuid: string) {
     this.selectedLines[uuid] = !this.selectedLines[uuid];
     this.selectedLines = { ...this.selectedLines };
@@ -203,20 +213,34 @@ displayDay(day: string) {
 
   public get title(): string {
     let title = "";
+
     if (this.currency && this.selection.length) {
-      title= `${this.selection.length} ${this.$t(this.$t.keys.common.selected as string, {count: this.selection.length})} : ${displayPrice(this.totalSelection)} ${this.currency.Symbol}`
+      title = `${this.selection.length} ${this.$t(
+        this.$t.keys.common.selected as string,
+        { count: this.selection.length }
+      )} : ${displayPrice(this.totalSelection)} ${this.currency.Symbol}`;
+    } else if (_.isString(this.$route.query.category)) {
+      title = `${this.$t(this.$t.keys.filters.category)}: ${this.$route.query.category}`;
+    } else if (_.isString(this.$route.query.description)) {
+      title = `${this.$t(this.$t.keys.filters.description)}: ${this.$route.query.description}`;
     } else if (this.wallet && this.currency) {
-      title= `${this.wallet.Name}: ${displayPrice(this.wallet.Total)} ${this.currency.Symbol}`
-    } else if (this.currency){
-      title= `${this.currency.Code}: ${this.lines.length ? displayPrice(this.lines[0].TotalPrice) : 0} ${this.currency.Symbol}`
+      title = `${this.wallet.Name}: ${displayPrice(this.wallet.Total)} ${
+        this.currency.Symbol
+      }`;
+    } else if (this.currency) {
+      title = `${this.currency.Code}: ${
+        this.filteredLines.length
+          ? displayPrice(this.filteredLines[0].TotalPrice)
+          : 0
+      } ${this.currency.Symbol}`;
     } else {
-      title= this.$t(this.$t.keys.common.title);
+      title = this.$t(this.$t.keys.common.title);
     }
     return title;
   }
 
   get selection(): Array<ILine> {
-    return this.lines
+    return this.filteredLines
       .concat(this.repeatableLines)
       .filter(l => this.selectedLines[l.UUID]);
   }
@@ -412,7 +436,7 @@ displayDay(day: string) {
       displayPrice = t.To.Price;
       price = displayPrice;
     }
-    if( description == "") {
+    if (description == "") {
       description = [
         this.$t(this.$t.keys.transactionsView.transfert),
         this.$t(this.$t.keys.addTransfertView.from),
@@ -477,12 +501,42 @@ displayDay(day: string) {
     return _.reverse(lines);
   }
 
-  get groupedLinesSized() : Array<ITransactionByDay & { size: number}> {
-    return this.groupedLines.map(g => ({...g, size: 30 + 75*g.Lines.length}))
+  get filteredLines(): Array<ILine> {
+    let lines = this.lines;
+    if (_.isString(this.$route.query.category)) {
+      lines = lines.filter(l => l.Category.UUID === this.$route.query.category);
+    }
+    if (_.isString(this.$route.query.description)) {
+      lines = lines.filter(
+        l => l.Description === this.$route.query.description
+      );
+    }
+    if (_.isString(this.$route.query.transactionFrom)) {
+      lines = lines.filter(l =>
+        moment(l.Date).isSameOrAfter(
+          moment(this.$route.query.transactionFrom as string)
+        )
+      );
+    }
+    if (_.isString(this.$route.query.transactionTo)) {
+      lines = lines.filter(l =>
+        moment(l.Date).isBefore(
+          moment(this.$route.query.transactionTo as string)
+        )
+      );
+    }
+    return lines;
+  }
+
+  get groupedLinesSized(): Array<ITransactionByDay & { size: number }> {
+    return this.groupedLines.map(g => ({
+      ...g,
+      size: 30 + 75 * g.Lines.length
+    }));
   }
 
   get groupedLines(): Array<ITransactionByDay> {
-    const transactionAndTranfertsByDay = _(this.lines)
+    const transactionAndTranfertsByDay = _(this.filteredLines)
       .groupBy(t =>
         moment(t.Date)
           .startOf("day")
@@ -591,16 +645,18 @@ displayDay(day: string) {
     store.dispatch.sync();
   }
 
-  get actions() :  Array<IAction> {
+  get actions(): Array<IAction> {
     const $t = this.$t;
-    const actions : Array<IAction> = [];
+    const actions: Array<IAction> = [];
     if (this.repeatables.length) {
-      actions.push( {
-          label: $t($t.keys.walletsView.repeatable, {number: this.repeatableLines.length}),
-          icon: "playlist_add",
-          class: "bg-info",
-          click: () => this.addAllRepeatables()
-        })
+      actions.push({
+        label: $t($t.keys.walletsView.repeatable, {
+          number: this.repeatableLines.length
+        }),
+        icon: "playlist_add",
+        class: "bg-info",
+        click: () => this.addAllRepeatables()
+      });
     }
     if (this.wallet) {
       _.forEach(this.menu, a => actions.push(a));
@@ -609,48 +665,67 @@ displayDay(day: string) {
     return actions;
   }
 
-  get menu() :  Array<IAction> {
-const $t = this.$t;
-    const menu : Array<IAction> = [];
+  get menu(): Array<IAction> {
+    const $t = this.$t;
+    const menu: Array<IAction> = [];
     if (this.wallet) {
       const walletActions = [
         {
           label: $t($t.keys.transactionsView.addTransaction),
           icon: "playlist_add",
           class: "bg-primary",
-          click: () => this.$router.push({name:'addTransaction', query: this.wallet? {wallet:this.wallet.UUID}: {}}),
+          click: () =>
+            this.$router.push({
+              name: "addTransaction",
+              query: this.wallet ? { wallet: this.wallet.UUID } : {}
+            })
         },
         {
           label: $t($t.keys.transactionsView.addTransfert),
           icon: "repeat_one",
           class: "bg-primary",
-          click: () => this.$router.push({name:'addTransfert', query: this.wallet? {wallet:this.wallet.UUID}: {}}),
+          click: () =>
+            this.$router.push({
+              name: "addTransfert",
+              query: this.wallet ? { wallet: this.wallet.UUID } : {}
+            })
         }
-      ]
-      
+      ];
+
       _.forEach(walletActions, a => menu.push(a));
     }
 
     return menu;
   }
 
-    
-    get icons () {
-      return [{
-          label: this.$t(this.$t.keys.sideBar.graph),
-          icon: "pie_chart",
-          click: () => this.$router.push({name: 'stats', query: {...this.$route.query}}),
-        }];
-    }
-    
-    get selectedIcons() {
-      return [{
+  get icons() {
+    return [
+      {
+        label: this.$t(this.$t.keys.sideBar.graph),
+        icon: "pie_chart",
+        click: () =>
+          this.$router.push({
+            name: "stats",
+            query: {
+              ...this.$route.query,
+              category: undefined,
+              description: undefined,
+              transactionFrom: undefined,
+              transactionTo: undefined
+            }
+          })
+      }
+    ];
+  }
+
+  get selectedIcons() {
+    return [
+      {
         label: this.$t(this.$t.keys.common.delete),
         icon: "delete",
-        click: () => this.deletionPopup = true,
-    }]
-    }
-
-    
+        click: () => (this.deletionPopup = true)
+      }
+    ];
+  }
 }
 </script>

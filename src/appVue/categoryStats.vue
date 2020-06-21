@@ -2,7 +2,7 @@
 h3 {
   text-align: center;
   margin-top: 10px;
-  font-size:18px;
+  font-size: 18px;
 }
 </style>
 <template>
@@ -22,9 +22,20 @@ h3 {
         </button>
       </div>
     </div>
-    <PeriodInput ref="PeriodInput" v-bind:periods="periods" v-bind:from="dateFrom" v-bind:to="dateTo" v-on:input="updatePeriod($event)"/>
+    <PeriodInput
+      ref="PeriodInput"
+      v-bind:periods="periods"
+      v-bind:from="dateFrom"
+      v-bind:to="dateTo"
+      v-on:input="updatePeriod($event)"
+    />
     <div class="list-group">
-      <div v-for="line in stats" v-bind:key="line.Category.UUID" class="list-group-item">
+      <router-link
+        v-for="line in stats"
+        v-bind:key="line.Category.UUID"
+        class="list-group-item list-group-item-action"
+        :to="line.Link"
+      >
         <div class="container">
           <div class="row">
             <div class="icon-md" v-bind:style="{backgroundColor: line.Category.Icon.Color}">
@@ -46,12 +57,13 @@ h3 {
             </div>
           </div>
         </div>
-      </div>
+      </router-link>
     </div>
   </div>
 </template>
 <script lang="ts">
 import Vue from "vue";
+import { Location } from "vue-router";
 import Component from "vue-class-component";
 import store from "./store";
 import { ICategory, displayPrice } from "../lib/types";
@@ -60,8 +72,9 @@ import PeriodInput from "../components/periodInput.vue";
 import _ from "lodash";
 import moment from "moment";
 
-interface ICategoryStats {
+export interface ICategoryStats {
   Category: ICategory;
+  Link: Location;
   Total: number;
   Percent: number;
 }
@@ -118,8 +131,14 @@ export default class CategoryStats extends Transactions {
     }
   ];
 
+  get queryDateFrom(): string {
+    return moment(this.dateFrom).format("YYYY-MM-DD");
+  }
+  get queryDateTo(): string {
+    return moment(this.dateTo).format("YYYY-MM-DD");
+  }
 
-  updatePeriod({from, to}: {from:Date, to:Date}) {
+  updatePeriod({ from, to }: { from: Date; to: Date }) {
     this.dateFrom = from;
     this.dateTo = to;
     this.$router.replace({
@@ -127,7 +146,9 @@ export default class CategoryStats extends Transactions {
       query: {
         ...this.$route.query,
         statsBeginDate: moment(this.dateFrom).format("YYYY-MM-DD"),
-        statsEndDate: moment(this.dateTo).format("YYYY-MM-DD")
+        statsEndDate: moment(this.dateTo).format("YYYY-MM-DD"),
+        transactionFrom: this.queryDateFrom,
+        transactionTo: this.queryDateTo
       }
     });
   }
@@ -139,7 +160,7 @@ export default class CategoryStats extends Transactions {
     this.dateTo = this.$route.query.statsEndDate
       ? moment(this.$route.query.statsEndDate as string).toDate()
       : this.periods[0].to;
-      this.$emit("title", this.title);
+    this.$emit("title", this.title);
   }
 
   get linesFrom(): Array<ILine> {
@@ -169,7 +190,17 @@ export default class CategoryStats extends Transactions {
       .map(group => ({
         Category: group[0].Category,
         Total: displayPrice(_.sumBy(group, g => g.Price)),
-        Percent: 100
+        Percent: 100,
+        Link: {
+          name: "transactions",
+          query: {
+            ...this.$route.query,
+            category: group[0].Category.UUID,
+            description: undefined,
+            transactionFrom: this.queryDateFrom,
+            transactionTo: this.queryDateTo
+          }
+        }
       }))
       .sortBy(g => Math.abs(g.Total))
       .reverse()
