@@ -29,7 +29,7 @@
         >
           <span
             class="title"
-          >{{$t($t.keys.walletsView.wallets)}} ({{currencyGroup.Currency.Code}}) : {{currencyGroup.Total}} {{currencyGroup.Currency.Symbol}}</span>
+          >{{$t($t.keys.walletsView.wallets)}} ({{currencyGroup.Currency.Code}}) : <Discret>{{currencyGroup.Total}}</Discret> {{currencyGroup.Currency.Symbol}}</span>
           <span
             class="align-right"
             v-if="currencyGroup.Selection.length"
@@ -76,7 +76,7 @@
                 </div>
               </div>
               <div class="price">
-                <div class="price">{{wallet.Total}} {{wallet.Currency.Symbol}}</div>
+                <div class="price"><Discret>{{wallet.Total}}</Discret> {{wallet.Currency.Symbol}}</div>
                 <div class="toCome" v-if="wallet.TotalToCome">
                   <small>{{$t($t.keys.walletsView.toCome)}} {{wallet.TotalToCome}} {{wallet.Currency.Symbol}}</small>
                 </div>
@@ -122,6 +122,7 @@ import store, { IWalletWithTotalToCome } from "./store";
 import { mixin as clickaway } from "vue-clickaway";
 import Fab from "../components/fab.vue";
 import Navbar, { IAction } from "../components/navbar-mobile.vue";
+import Discret from "../components/discret.vue";
 import _ from "lodash";
 import * as Models from "../lib/models";
 
@@ -135,7 +136,7 @@ export interface IWalletsByCurrency {
 
 @Component({
   mixins: [clickaway],
-  components: { Fab, Navbar },
+  components: { Fab, Navbar, Discret },
   props: ["hideNav"]
 })
 export default class Wallets extends Vue {

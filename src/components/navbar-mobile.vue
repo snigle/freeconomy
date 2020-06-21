@@ -128,6 +128,13 @@
 
             <div role="separator" class="mdc-list-divider"></div>
 
+            <a class="mdc-list-item" v-on:click="toggleDiscretMode()">
+              <span class="material-icons mdc-list-item__graphic">{{$store.state.settings.discretMode ? 'visibility_off' : 'visibility'}}</span>
+              <span class="mdc-list-item__text">{{$t($store.state.settings.discretMode?$t.keys.sideBar.desactivateDiscretMode: $t.keys.sideBar.activateDiscretMode)}}</span>
+            </a>
+
+            <div role="separator" class="mdc-list-divider"></div>
+
             <a class="mdc-list-item" v-on:click="logout()">
               <span class="material-icons mdc-list-item__graphic">exit_to_app</span>
               <span class="mdc-list-item__text">{{$t($t.keys.sideBar.logout)}}</span>
@@ -322,6 +329,13 @@ export default class NavbarMobile extends Vue {
     const drawerElement = document.querySelector(".mdc-drawer");
     if (drawerElement) {
       this.drawer = MDCDrawer.attachTo(drawerElement);
+    }
+  }
+
+  toggleDiscretMode() {
+    store.commit.toggleDiscretMode();
+    if (this.drawer) {
+      this.drawer.open = false;
     }
   }
 

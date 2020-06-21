@@ -15,7 +15,7 @@ h3 {
       </div>
       <h3
         class="col"
-      >{{$t($t.keys.common.totalPeriod)}}: {{displayPrice(income + outcome)}} {{currency.Symbol}}</h3>
+      >{{$t($t.keys.common.totalPeriod)}}: <Discret>{{displayPrice(income + outcome)}}</Discret> {{currency.Symbol}}</h3>
       <div class="col-xs-1">
         <button class="btn btn-light" v-on:click="$refs.PeriodInput.nextRange()">
           <span class="material-icons">navigate_next</span>
@@ -42,7 +42,7 @@ h3 {
               <span class="material-icons">{{$iconMap(line.Category.Icon.Name)}}</span>
             </div>
             <div class="col">
-              <div>{{line.Category.Name}}: {{line.Total}} {{currency.Symbol}}</div>
+              <div>{{line.Category.Name}}: <Discret>{{line.Total}}</Discret> {{currency.Symbol}}</div>
               <div class="progress">
                 <div
                   class="progress-bar"
@@ -71,6 +71,8 @@ import Transactions, { ILine } from "./transactions.vue";
 import PeriodInput from "../components/periodInput.vue";
 import _ from "lodash";
 import moment from "moment";
+import Discret from "../components/discret.vue"
+
 
 export interface ICategoryStats {
   Category: ICategory;
@@ -84,7 +86,11 @@ interface IRange {
   to: Date;
 }
 
-@Component({ methods: { displayPrice }, components: { PeriodInput } })
+@Component({ 
+  methods: { displayPrice }, 
+  components: { PeriodInput, Discret },
+  watch : {title: 'watchTitle'}
+  })
 export default class CategoryStats extends Transactions {
   dateFrom: Date = new Date();
   dateTo: Date = new Date();
@@ -160,7 +166,6 @@ export default class CategoryStats extends Transactions {
     this.dateTo = this.$route.query.statsEndDate
       ? moment(this.$route.query.statsEndDate as string).toDate()
       : this.periods[0].to;
-    this.$emit("title", this.title);
   }
 
   get linesFrom(): Array<ILine> {
@@ -170,6 +175,7 @@ export default class CategoryStats extends Transactions {
         date.isSameOrAfter(this.dateFrom) && date.isSameOrBefore(this.dateTo)
       );
     });
+
     if (this.$route.query.category && this.$route.query.stats === "beneficiary") {
       lines = lines.filter(l => l.Category.UUID === this.$route.query.category)
     }
@@ -219,6 +225,13 @@ export default class CategoryStats extends Transactions {
   }
   get outcome(): number {
     return displayPrice(_.sumBy(this.outcomeLines, g => g.Price));
+  }
+
+  mounted() {
+    this.$emit('title', this.title);
+  }
+  watchTitle() {
+    this.$emit('title', this.title);
   }
 }
 </script>

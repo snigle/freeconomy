@@ -1,6 +1,6 @@
 import keys from "./type";
 
-const en : typeof keys = {
+const en: typeof keys = {
   common: {
     title: "Freeconomy",
     cancel: "Cancel",
@@ -17,8 +17,8 @@ const en : typeof keys = {
     removeName: "Remove %{name} ?",
     update: "Update",
     loadingApplication: "Chargement de l'application",
-    date:"Date",
-    category:"Category",
+    date: "Date",
+    category: "Category",
     modify: "Modify",
     delete: "Delete",
     selected: "Selected",
@@ -28,7 +28,7 @@ const en : typeof keys = {
     eg: "eg: ",
     total: "Total",
     timeRange: "Time Range",
-    totalPeriod:"Time Range Total",
+    totalPeriod: "Time Range Total",
     income: "Recettes",
     outcome: "Dépenses",
     search: "Search",
@@ -60,6 +60,8 @@ const en : typeof keys = {
     logoutConfirm: "Are you sure to logout ?",
     logoutConfirmText: "Are you sure to logout ?" +
       "All not synced data will be removed. Be sure to sync all your data before logout.",
+    desactivateDiscretMode: "Desactivate discret mode",
+    activateDiscretMode: "Activate discret mode",
   },
   walletsView: {
     loading: "Loading wallets",
@@ -87,8 +89,8 @@ const en : typeof keys = {
     importFromCSV: "Import from CSV",
     loading: "Loading transactions",
     updateSolde: "Update current balance",
-    transfert:"transfert",
-    transaction:"transaction",
+    transfert: "transfert",
+    transaction: "transaction",
     deleteSelectionConfirm: "Are you sure to delete all the selection ?",
     transfertFrom: "Transfert from %{wallet}",
     transfertTo: "Transfert to %{wallet}",
@@ -96,12 +98,12 @@ const en : typeof keys = {
   addTransactionView: {
     beneficiary: "Bénéficiaire",
     comment: "Commentaire",
-    beneficiaryHelp:"Name of the person/entity who takes/gives money.",
+    beneficiaryHelp: "Name of the person/entity who takes/gives money.",
     priceHelp: "Negative number is an outcome (expense) and positive is an income."
   },
   addTransfertView: {
-    from:"From",
-    to:"To",
+    from: "From",
+    to: "To",
   },
   categoriesView: {
     loading: "Loading categories",
@@ -201,7 +203,7 @@ const en : typeof keys = {
   },
   errors: {
     invalidDate: "Date is invalid",
-    invalidPrice:"Price is not a correct number",
+    invalidPrice: "Price is not a correct number",
     notFound: "Page not found",
     needCategoryToAddTransaction: "You have to add categories before adding transaction.",
     needWalletToDisplayTransactions: "You have to add a wallet to display transactions.",

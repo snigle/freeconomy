@@ -28,6 +28,9 @@ const { store, rootActionContext, moduleActionContext } = createDirectStore({
             data: null as ILogin | null,
             error: null as string | null,
         },
+        settings: {
+            discretMode: localStorage.getItem("settings.discretMode") === "true",
+        },
         mobileView: ["small", "xSmall"].indexOf(bsBreakpoints.detectBreakpoint()) !== -1,
         errors: [] as Array<IError>,
         autosync: false,
@@ -130,6 +133,10 @@ const { store, rootActionContext, moduleActionContext } = createDirectStore({
         }
     },
     mutations: {
+        toggleDiscretMode(state) {
+            state.settings.discretMode = !state.settings.discretMode
+            localStorage.setItem("settings.discretMode",`${state.settings.discretMode}`)
+        },
         setWallets(state, wallets: Array<IWallet>) {
             state.wallets = wallets;
         },

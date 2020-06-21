@@ -120,7 +120,7 @@
                 <div class="price">
                   <div class="price">{{line.DisplayPrice}} {{currency.Symbol}}</div>
                   <div class="total">
-                    <small>{{line.TotalPrice}} {{currency.Symbol}}</small>
+                    <small><Discret>{{line.TotalPrice}}</Discret> {{currency.Symbol}}</small>
                   </div>
                 </div>
               </div>
@@ -159,6 +159,7 @@ import moment, { Moment } from "moment";
 import _ from "lodash";
 import Modal from "../components/modal.vue";
 import Navbar from "../components/navbar-mobile.vue";
+import Discret, { discret } from "../components/discret.vue";
 import Fab, { IAction } from "../components/fab.vue";
 
 interface ITransactionByDay {
@@ -189,7 +190,7 @@ const defaultCategory: ICategory = {
 };
 
 @Component({
-  components: { Modal, Fab, Navbar },
+  components: { Modal, Fab, Navbar, Discret },
   props: ["hideNav"]
 })
 export default class Transactions extends Vue {
@@ -220,17 +221,18 @@ export default class Transactions extends Vue {
         { count: this.selection.length }
       )} : ${displayPrice(this.totalSelection)} ${this.currency.Symbol}`;
     } else if (_.isString(this.$route.query.category)) {
-      title = `${this.$t(this.$t.keys.filters.category)}: ${this.$route.query.category}`;
+      const category = store.state.categories.find(c => c.UUID === this.$route.query.category)
+      title = `${this.$t(this.$t.keys.filters.category)}: ${category?.Name || this.$route.query.category}`;
     } else if (_.isString(this.$route.query.description)) {
       title = `${this.$t(this.$t.keys.filters.description)}: ${this.$route.query.description}`;
     } else if (this.wallet && this.currency) {
-      title = `${this.wallet.Name}: ${displayPrice(this.wallet.Total)} ${
+      title = `${this.wallet.Name}: ${discret(displayPrice(this.wallet.Total))} ${
         this.currency.Symbol
       }`;
     } else if (this.currency) {
       title = `${this.currency.Code}: ${
         this.filteredLines.length
-          ? displayPrice(this.filteredLines[0].TotalPrice)
+          ? discret(displayPrice(this.filteredLines[0].TotalPrice))
           : 0
       } ${this.currency.Symbol}`;
     } else {

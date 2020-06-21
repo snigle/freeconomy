@@ -61,6 +61,8 @@ const fr = {
     logoutConfirmText: `Êtes-vous sûr de vouloir vous déconnecter ?
     Toutes les données non synchronisées seront supprimées.
     Vérifiez d'avoir synchronisé une dernière fois avant de vous déconnecter.`,
+    desactivateDiscretMode: "Mode discret",
+    activateDiscretMode: "Activer le mode discret",
   },
   walletsView: {
     loading: "Chargement de comptes",
