@@ -493,12 +493,7 @@ export default class Transactions extends Vue {
       );
     }
 
-    let total = _.sumBy(this.wallets, w => w.Solde);
-    _.forEach(lines, line => {
-      total += line.Price;
-      line.TotalPrice = total;
-    });
-    return _.reverse(lines);
+    return lines
   }
 
   get filteredLines(): Array<ILine> {
@@ -525,7 +520,19 @@ export default class Transactions extends Vue {
         )
       );
     }
-    return lines;
+
+    let total = _.sumBy(this.wallets, w => w.Solde);
+    
+    // Reset total when filter transactions to count only displayed data.
+    if(this.$route.query.category || this.$route.query.description || this.$route.query.search) {
+      total = 0;
+    }
+
+    _.forEach(lines, line => {
+      total += line.Price;
+      line.TotalPrice = total;
+    });
+    return _.reverse(lines);
   }
 
   get groupedLinesSized(): Array<ITransactionByDay & { size: number }> {

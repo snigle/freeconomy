@@ -164,12 +164,16 @@ export default class CategoryStats extends Transactions {
   }
 
   get linesFrom(): Array<ILine> {
-    return this.lines.filter(l => {
+    let lines = this.lines.filter(l => {
       const date = moment(l.Date);
       return (
         date.isSameOrAfter(this.dateFrom) && date.isSameOrBefore(this.dateTo)
       );
     });
+    if (this.$route.query.category && this.$route.query.stats === "beneficiary") {
+      lines = lines.filter(l => l.Category.UUID === this.$route.query.category)
+    }
+    return lines
   }
 
   get incomeLines(): Array<ILine> {

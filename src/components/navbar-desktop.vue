@@ -20,14 +20,14 @@
         <slot />
       </ul>
 
-      <ul class="navbar-nav mr-auto filters" v-if="filters.length">
+      <ul class="navbar-nav mr-auto filters" v-if="filters.length && $store.state.login.logged">
         <li class="nav-item">
             {{$t($t.keys.filters.filters)}}: 
             <button class="btn btn-info badge badge-info align-middle mr-1"
             v-for="f in filters"
             :key="f"
             @click="dropFilter(f)"
-            >{{$t($t.keys.filters[f])}}: {{f === 'category' ? category.Name : $route.query[f]}} <span class="material-icons align-middle">close</span>
+            >{{$t($t.keys.filters[f])}}: {{f === 'category' && category? category.Name : $route.query[f]}} <span class="material-icons align-middle">close</span>
             </button>
           </li>
       </ul>
