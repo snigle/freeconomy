@@ -115,7 +115,7 @@
                 class="material-icons mdc-list-item__graphic"
               >sync_problem</span>
               <span
-                v-if="$store.state.sync.synced"
+                v-else-if="$store.state.sync.synced"
                 class="material-icons mdc-list-item__graphic"
               >check</span>
               <span v-else class="material-icons mdc-list-item__graphic">sync</span>
@@ -267,11 +267,13 @@
         </div>
       </div>
     </div>
+    <div v-if="$store.state.mobileView">
     <Alert
       v-for="err in $store.state.errors"
       v-bind:key="err.uuid"
       v-on:close="$store.commit('hideError', err.uuid)"
     >{{err.text}}: {{JSON.stringify(err.err)}}</Alert>
+    </div>
   </div>
 </template>
 

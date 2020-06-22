@@ -41,10 +41,36 @@ import Component from "vue-class-component";
 import { login } from "../lib/oauth";
 import store from "./store";
 import { GoogleSync } from "../lib/sync";
+import { useCache } from "../lib/googlesync";
+import * as Models from "../lib/models";
+import {Bank, Money, defaultCategories} from "../lib/defaultData";
 @Component({})
 export default class Login extends Vue {
   login() {
-    store.dispatch.loginAndSync().catch(err => store.commit.showError({err, text: this.$t(this.$t.keys.errors.loginError)}));
+    useCache(false)
+    store.dispatch.loginAndSync()
+    .then( async () => {
+      useCache(true);
+      if (!store.state.wallets.length && !store.state.categories.length) {
+        const wallets = await Models.GetWallets()
+        if (wallets.length) {
+          return
+        }
+        const categories = await Models.GetCategories()
+        if (categories.length) {
+          return
+        }
+        console.log("no wallets synced");
+        Promise.all([
+          Models.CreateWallet(Bank).then(() => Models.CreateWallet(Money)),
+          Models.CreateCategory(...defaultCategories),
+        ]).then(([wallets, categories]) => {
+          store.commit.setWallets(wallets)
+          store.commit.setCategories(categories)
+        })
+      }
+    })
+    .catch(err => store.commit.showError({err, text: this.$t(this.$t.keys.errors.loginError)}));
   }
 }
 </script>

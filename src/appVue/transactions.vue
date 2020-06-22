@@ -35,7 +35,7 @@
       @cancel="unselectAll"
       :searchButton="true"
     />
-    <div class="p-1 transactions">
+    
       <Modal
         v-if="deletionPopup"
         v-on:close="deletionPopup = false"
@@ -60,6 +60,7 @@
           </div>
         </template>
       </Modal>
+        <div class="p-1 transactions">
       <div v-if="currency" class="list-group mt-1">
         <div
           class="day list-group-item bg-primary text-white font-weight-bold text-center"
@@ -135,7 +136,7 @@
         </template>
       </div>
       <Fab :actions="actions" />
-    </div>
+    </div> 
   </div>
 </template>
 
@@ -286,7 +287,7 @@ export default class Transactions extends Vue {
     );
   }
 
-  get currency(): ICurrency | undefined {
+  get currency(): ICurrency {
     if (this.wallet) {
       return this.wallet.Currency;
     }
@@ -299,10 +300,7 @@ export default class Transactions extends Vue {
       );
     }
     if (!firstWalletOfCurrency) {
-      store.commit.showError({
-        text: this.$t(this.$t.keys.errors.needWalletToDisplayTransactions)
-      });
-      return undefined;
+      return {Code : "???", Symbol: "?"}
     }
     return firstWalletOfCurrency.Currency;
   }

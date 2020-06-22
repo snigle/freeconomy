@@ -38,15 +38,6 @@ export function CleanAll(): Promise<void> {
   return AsyncStorage.clear();
 }
 
-function autoSync() {
-  AsyncStorage.getItem("autosync").then((value) => {
-    console.log("autosync?", value);
-    if (value) {
-      GoogleSync();
-    }
-  }).catch(() => { });
-}
-
 export async function GetWallets(): Promise<IWallet[]> {
   return AsyncStorage.getItem("wallets").then((raw) => {
     const result: IWallet[] | null = raw ? JSON.parse(raw) : null;
@@ -544,13 +535,6 @@ export async function SaveLogin(login: ILogin): Promise<ILogin> {
   return AsyncStorage.setItem("login", JSON.stringify(login)).then(() => login);
 }
 
-export async function setAutoSync(value: boolean): Promise<void> {
-  return AsyncStorage.setItem("autosync", `${value}`);
-}
-
-export async function getAutoSync(): Promise<boolean> {
-  return AsyncStorage.getItem("autosync").then(value => value === "true");
-}
 
 export async function GetCurrency(currencyCode: string): Promise<ICurrency> {
   return GetWallets().then((wallets) => {

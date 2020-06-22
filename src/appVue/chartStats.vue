@@ -126,6 +126,10 @@ export default class chartStats extends Transactions {
   }
 
   watchLines() {
+    if (!this.linesFrom.length) {
+      return;
+    }
+
     const groupByMonth = _(this.linesFrom)
       .groupBy(l =>
         moment(l.Date)

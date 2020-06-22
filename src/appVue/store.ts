@@ -33,7 +33,6 @@ const { store, rootActionContext, moduleActionContext } = createDirectStore({
         },
         mobileView: ["small", "xSmall"].indexOf(bsBreakpoints.detectBreakpoint()) !== -1,
         errors: [] as Array<IError>,
-        autosync: false,
         sync: {
             syncing: false,
             synced: false,
@@ -149,9 +148,6 @@ const { store, rootActionContext, moduleActionContext } = createDirectStore({
         setCategories(state, categories: Array<ICategory>) {
             state.categories = categories;
         },
-        setAutosync(state, value: boolean) {
-            state.autosync = value;
-        },
         setLogged(state, login: ILogin) {
             state.login.logged = true;
             state.login.data = login;
@@ -202,9 +198,6 @@ const { store, rootActionContext, moduleActionContext } = createDirectStore({
         }
     },
     actions: {
-        enableAutosync(state) {
-            Models.setAutoSync(true).then(() => state.commit("setAutosync", true));
-        },
         login(state) {
             return login().then((login => Models.SaveLogin(login)));
         },
@@ -219,10 +212,7 @@ const { store, rootActionContext, moduleActionContext } = createDirectStore({
             return _.throttle(() => GoogleSync(), 0, { leading: true, trailing: true })().catch(() => state.commit("syncError"));
         },
         initialize(state) {
-            return Promise.all([
-                Models.GetLogin().then(login => state.commit("setLogged", login)).catch(() => {/*no error if not logged*/ }),
-                Models.getAutoSync().then((value) => state.commit("setAutosync", value)),
-            ])
+            Models.GetLogin().then(login => state.commit("setLogged", login)).catch(() => {/*no error if not logged*/ })
         },
         loadData(state) {
             return Promise.all([

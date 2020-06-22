@@ -226,11 +226,13 @@ export default class EditWallet extends Vue {
     this.selectedIcons = selectedIcons;
   }
 
-  async deleteCategory() {
+  async deleteWallet() {
     const wallets = await Models.DeleteWallet(this.$route.params.wallet);
     store.commit.setWallets(wallets);
+    store.dispatch.sync();
     this.deletionPopup = false;
     this.$router.back();
+    store.dispatch.loadData();
   }
 
   async save(andNew: boolean) {

@@ -22,14 +22,17 @@
 
       <ul class="navbar-nav mr-auto filters" v-if="filters.length && $store.state.login.logged">
         <li class="nav-item">
-            {{$t($t.keys.filters.filters)}}: 
-            <button class="btn btn-info badge badge-info align-middle mr-1"
+          {{$t($t.keys.filters.filters)}}:
+          <button
+            class="btn btn-info badge badge-info align-middle mr-1"
             v-for="f in filters"
             :key="f"
             @click="dropFilter(f)"
-            >{{$t($t.keys.filters[f])}}: {{f === 'category' && category? category.Name : $route.query[f]}} <span class="material-icons align-middle">close</span>
-            </button>
-          </li>
+          >
+            {{$t($t.keys.filters[f])}}: {{f === 'category' && category? category.Name : $route.query[f]}}
+            <span class="material-icons align-middle">close</span>
+          </button>
+        </li>
       </ul>
 
       <form class="form-inline d-none d-md-flex">
@@ -43,7 +46,11 @@
         />
       </form>
     </nav>
-
+    <Alert
+      v-for="err in $store.state.errors"
+      v-bind:key="err.uuid"
+      v-on:close="$store.commit('hideError', err.uuid)"
+    >{{err.text}}: {{JSON.stringify(err.err)}}</Alert>
   </div>
 </template>
 
@@ -54,9 +61,9 @@ import t from "../lib/translator";
 import _ from "lodash";
 import { ICategory } from "../lib/types";
 import store from "../appVue/store";
+import Alert from "./alert.vue";
 
-@Component({
-})
+@Component({components: {Alert}})
 export default class NavbarDesktop extends Vue {
   navSearch = "";
 
@@ -80,20 +87,27 @@ export default class NavbarDesktop extends Vue {
 
   get category(): ICategory | undefined {
     if (_.isString(this.$route.query.category)) {
-      return store.state.categories.find(c => c.UUID === this.$route.query.category);
+      return store.state.categories.find(
+        c => c.UUID === this.$route.query.category
+      );
     }
     return undefined;
   }
 
-  get filters() : string[] {
-    const allowedFilters = ["category", "description", "transactionFrom", "transactionTo"];
-    return allowedFilters.filter(f => _.isString(this.$route.query[f]))
+  get filters(): string[] {
+    const allowedFilters = [
+      "category",
+      "description",
+      "transactionFrom",
+      "transactionTo"
+    ];
+    return allowedFilters.filter(f => _.isString(this.$route.query[f]));
   }
 
-  dropFilter(filter :string) {
-    const query = {...this.$route.query, }
-    delete(query[filter]);
-    this.$router.push({name: this.$route.name || "", query});
+  dropFilter(filter: string) {
+    const query = { ...this.$route.query };
+    delete query[filter];
+    this.$router.push({ name: this.$route.name || "", query });
   }
 }
 </script>

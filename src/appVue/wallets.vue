@@ -145,12 +145,16 @@ export default class Wallets extends Vue {
   hideNav!: boolean;
 
   get actions() {
-    return [
+    const actions = [
       {
         icon: "playlist_add",
         label: this.$t(this.$t.keys.walletsView.add),
         click: () => this.addWallet()
-      },
+      }
+    ]
+    if (_.find(store.state.wallets, w => w.Archived))
+    {
+      actions.push(
       {
         icon: this.$route.query.archive ? "archive" : "restore",
         label: this.$t(
@@ -166,8 +170,9 @@ export default class Wallets extends Vue {
               archive: this.$route.query.archive ? undefined : "true"
             }
           })
-      }
-    ];
+      })
+    }
+    return actions
   }
 
   addWallet() {
@@ -253,5 +258,6 @@ export default class Wallets extends Vue {
       })
       .value();
   }
+
 }
 </script>

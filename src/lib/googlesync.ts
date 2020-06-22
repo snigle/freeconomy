@@ -1,3 +1,6 @@
+let cacheEnabled = true;
+export const useCache = (_useCache : boolean) => cacheEnabled = _useCache;
+
 interface ILogin {
   id: string;
   token: string;
@@ -60,6 +63,9 @@ export const getMatchURL = "oauthCallback";
 // };
 
 export const getFileFromName = (login: ILogin, filename: string, noCache: boolean): Promise<IFile> => {
+  if (!cacheEnabled) {
+    noCache = true
+  }
   console.log("get file from name", login, filename);
   let params = "spaces=appDataFolder";
   params += "&q=" + encodeURIComponent(`name='${filename.replace(/'/g, "\'")}'`);

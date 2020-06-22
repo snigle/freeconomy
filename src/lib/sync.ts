@@ -17,8 +17,6 @@ export function GoogleSync(): Promise<any> {
     store.commit.syncStart();
     return OAuth.login()
       .then((login) => {
-        // Enable synchronisation auto when update models.
-        store.dispatch.enableAutosync();
         // Synchronisation
         return syncCollection<ICollection>(login, "deleted", Models.GetAllDeleted, Models.SaveDeleted, {}, syncResult)
           .then((deleted): { [key: string]: boolean } => {

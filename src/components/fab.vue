@@ -28,7 +28,7 @@
 
     <button
       class="mdc-fab mdc-fab--absolute"
-      v-if="actions.length !== 1"
+      v-if="actions.length > 1 "
       v-on:click="toggleActions"
       v-on-clickaway="clickAway"
     >
