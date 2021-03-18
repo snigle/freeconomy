@@ -36,7 +36,7 @@
           >{{currencyGroup.Selection.length}} {{$t($t.keys.common.selected.toString(), {count: currencyGroup.Selection.length})}} : {{currencyGroup.TotalSelected}} {{currencyGroup.Currency.Symbol}}</span>
         </router-link>
         <div
-          v-for="wallet in currencyGroup.Wallets"
+          v-for="(wallet,walletIndex) in currencyGroup.Wallets"
           v-bind:key="wallet.UUID"
           v-on:contextmenu="toogleDropdown($event,wallet.UUID)"
           class="list-group-item list-group-item-action"
@@ -93,6 +93,7 @@
             v-bind:style="{position:'fixed', display:'block', ...dropdown[wallet.UUID]}"
           >
             <button
+              v-if="walletIndex !== 0"
               type="button"
               class="dropdown-item"
               @click="() => changeWalletOrder(currencyGroup, wallet, -1)"
@@ -111,6 +112,7 @@
               @click="() => toggleArchive(wallet)"
             >{{$t(!wallet.Archived ? $t.keys.walletListItem.archive: $t.keys.walletListItem.restore)}}</button>
             <button
+              v-if="walletIndex !== currencyGroup.Wallets.length -1"
               type="button"
               class="dropdown-item"
               @click="() => changeWalletOrder(currencyGroup, wallet, 1)"
