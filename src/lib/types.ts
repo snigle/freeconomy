@@ -27,6 +27,9 @@ export interface IWallet {
   Icon: IIcon;
   Solde: number;
   Archived: boolean;
+
+  // Order
+  Order: number;
 }
 
 export type IconType = "material" |
@@ -72,6 +75,7 @@ export const WalletDefault = (w: IWallet): IWallet => ({
   Icon: DefaultIcon(w.Icon),
   Solde: w.Solde || 0,
   Archived: w.Archived || false,
+  Order: w.Order || 0,
 });
 
 export const displayPrice = (price: number): number =>

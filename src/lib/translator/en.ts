@@ -75,6 +75,8 @@ const en: typeof keys = {
   walletListItem: {
     archive: "Archive",
     restore: "Restore",
+    moveUp: "Move up",
+    moveDown: "Move down",
   },
   addWalletView: {
     currencyCode: "Currency Code",

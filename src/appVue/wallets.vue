@@ -19,9 +19,9 @@
 <template>
   <div>
     <Navbar :title="$t($t.keys.common.title)" :actions="menu" />
-
+    <Alert v-if="error" v-on:close="error=null">{{error}}</Alert>
     <div class="p-1">
-      <div class="list-group" v-for="currencyGroup in wallets" v-bind:key="currencyGroup.Code">
+      <div class="list-group" v-for="currencyGroup in wallets" v-bind:key="currencyGroup.Currency.Code">
         <router-link
           v-bind:to="{name: 'transactions', query:{...$route.query, wallet:undefined, currencyCode: currencyGroup.Currency.Code}}"
           class="list-group-item list-group-item-action"
@@ -33,7 +33,7 @@
           <span
             class="align-right"
             v-if="currencyGroup.Selection.length"
-          >{{currencyGroup.Selection.length}} {{$t($t.keys.common.selected, {count: currencyGroup.Selection.length})}} : {{currencyGroup.TotalSelected}} {{currencyGroup.Currency.Symbol}}</span>
+          >{{currencyGroup.Selection.length}} {{$t($t.keys.common.selected.toString(), {count: currencyGroup.Selection.length})}} : {{currencyGroup.TotalSelected}} {{currencyGroup.Currency.Symbol}}</span>
         </router-link>
         <div
           v-for="wallet in currencyGroup.Wallets"
@@ -87,10 +87,16 @@
             class="dropdown-menu"
             aria-labelledby="dropdownMenuLink"
             v-on-clickaway="toogleDropdown"
+            @click="toogleDropdown"
             v-if="dropdown[wallet.UUID]"
             v-bind:class="{show:dropdown[wallet.UUID]}"
             v-bind:style="{position:'fixed', display:'block', ...dropdown[wallet.UUID]}"
           >
+            <button
+              type="button"
+              class="dropdown-item"
+              @click="() => changeWalletOrder(currencyGroup, wallet, -1)"
+            >{{$t($t.keys.walletListItem.moveUp)}}</button>
             <router-link
               v-bind:to="{name: 'editWallet', params : {...$route.query, wallet: wallet.UUID}}"
               class="dropdown-item"
@@ -104,6 +110,11 @@
               class="dropdown-item"
               @click="() => toggleArchive(wallet)"
             >{{$t(!wallet.Archived ? $t.keys.walletListItem.archive: $t.keys.walletListItem.restore)}}</button>
+            <button
+              type="button"
+              class="dropdown-item"
+              @click="() => changeWalletOrder(currencyGroup, wallet, 1)"
+            >{{$t($t.keys.walletListItem.moveDown)}}</button>
           </div>
         </div>
       </div>
@@ -123,6 +134,7 @@ import { mixin as clickaway } from "vue-clickaway";
 import Fab from "../components/fab.vue";
 import Navbar, { IAction } from "../components/navbar-mobile.vue";
 import Discret from "../components/discret.vue";
+import Alert from "../components/alert.vue";
 import _ from "lodash";
 import * as Models from "../lib/models";
 
@@ -136,13 +148,14 @@ export interface IWalletsByCurrency {
 
 @Component({
   mixins: [clickaway],
-  components: { Fab, Navbar, Discret },
+  components: { Fab, Navbar, Discret, Alert },
   props: ["hideNav"]
 })
 export default class Wallets extends Vue {
   selectedLines: { [key: string]: boolean } = {};
   dropdown: { [key: string]: { top: string; left: string } } = {};
   hideNav!: boolean;
+  error: string | null = null;
 
   get actions() {
     const actions = [
@@ -179,6 +192,26 @@ export default class Wallets extends Vue {
     this.$router.push({ name: "addWallet", query: { ...this.$route.query } });
   }
 
+  async changeWalletOrder(currencyGroup : IWalletsByCurrency, wallet: IWallet, order : 1|-1) {
+    let walletIndex = 0
+    currencyGroup.Wallets.forEach((w,i) => {
+      if (w.UUID === wallet.UUID) {
+        walletIndex = i
+      }
+    })
+    const switchIndex = walletIndex + order;
+    if (switchIndex < 0 || switchIndex >= currencyGroup.Wallets.length) {
+      this.error = "can't move wallet to this position"
+      return
+    }
+    const switchWallet = currencyGroup.Wallets[switchIndex];
+
+    let updatedWallets = await Models.SwitchWalletOrder(wallet.UUID, switchWallet.UUID);
+
+    store.commit.setWallets(updatedWallets);
+    store.dispatch.sync();
+  }
+
   get menu(): Array<IAction> {
     if (this.$route.query.archive) {
       return [
@@ -206,7 +239,7 @@ export default class Wallets extends Vue {
     ];
   }
 
-  toogleDropdown(e: MouseEvent, uuid: string) {
+  toogleDropdown(e: MouseEvent, uuid?: string) {
     console.log("click", uuid, e);
     const dropdown: { [key: string]: { top: string; left: string } } = {};
     if (uuid) {
@@ -246,11 +279,13 @@ export default class Wallets extends Vue {
         );
         return {
           Currency: (_.first(wallets) as IWallet).Currency,
-          Wallets: wallets.map(w => ({
+          Wallets: _(wallets).map(w => ({
             ...w,
             Total: displayPrice(w.Total),
             TotalToCome: displayPrice(w.TotalToCome)
-          })),
+          }))
+          .sortBy(a => a.Order)
+          .value(),
           Total: displayPrice(_.sumBy(wallets, w => w.Total)),
           Selection: selection,
           TotalSelected: displayPrice(_.sumBy(selection, s => s.Total))

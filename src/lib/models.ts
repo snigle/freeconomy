@@ -44,7 +44,7 @@ export async function GetWallets(): Promise<IWallet[]> {
     if (!result) {
       return [];
     }
-    return result.map(WalletDefault);
+    return result.map(WalletDefault).map((w, i) => ({ ...w, Order: w.Order || i+1}));
   });
 }
 
@@ -61,6 +61,7 @@ export async function CreateWallet(input: IWalletInput): Promise<IWallet[]> {
     Icon: input.Icon,
     Solde: input.Solde,
     Archived: false,
+    Order: wallets.length,
   }]),
   ).then(SaveWallets);
 }
@@ -83,6 +84,29 @@ export async function UpdateWallet(walletUUID: string, input: IWalletInput): Pro
       LastUpdate: new Date(),
       Solde: input.Solde,
       Archived: input.Archived,
+    });
+    return wallets;
+  },
+  ).then(SaveWallets);
+}
+
+export async function SwitchWalletOrder(walletAUUID: string, walletBUUID: string): Promise<IWallet[]> {
+  return GetWallets().then((wallets) => {
+    const walletA = wallets.find((w) => w.UUID === walletAUUID);
+    if (!walletA) {
+      throw new Error(("fail to find wallet A"));
+    }
+    const walletB = wallets.find((w) => w.UUID === walletBUUID);
+    if (!walletB) {
+      throw new Error(("fail to find wallet B"));
+    }
+    const tmp = walletA.Order;
+
+    Object.assign(walletA, {
+      Order: walletB.Order
+    });
+    Object.assign(walletB, {
+      Order: tmp
     });
     return wallets;
   },

@@ -76,6 +76,8 @@ const fr = {
   walletListItem: {
     archive: "Archiver",
     restore: "Restorer",
+    moveUp: "Déplacer vers le haut",
+    moveDown: "Déplacer vers le bas",
   },
   addWalletView: {
     currencyCode: "Nom de la monnaie",
