@@ -103,10 +103,12 @@ export async function SwitchWalletOrder(walletAUUID: string, walletBUUID: string
     const tmp = walletA.Order;
 
     Object.assign(walletA, {
-      Order: walletB.Order
+      Order: walletB.Order,
+      LastUpdate: new Date(),
     });
     Object.assign(walletB, {
-      Order: tmp
+      Order: tmp,
+      LastUpdate: new Date(),
     });
     return wallets;
   },
