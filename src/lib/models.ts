@@ -1,4 +1,4 @@
-import * as _ from "lodash";
+import _ from "lodash";
 import { v4 } from "uuid";
 import {
   CategoryDefault,
@@ -61,7 +61,7 @@ export async function CreateWallet(input: IWalletInput): Promise<IWallet[]> {
     Icon: input.Icon,
     Solde: input.Solde,
     Archived: false,
-    Order: wallets.length,
+    Order: wallets.length+1,
   }]),
   ).then(SaveWallets);
 }
@@ -110,6 +110,17 @@ export async function SwitchWalletOrder(walletAUUID: string, walletBUUID: string
       Order: tmp,
       LastUpdate: new Date(),
     });
+
+    // Drop duplicate order values if any
+    _(wallets).sortBy(w => w.Order).forEach((w, i, array) => {
+      if (i == 0) {
+        return
+      }
+      if (array[i - 1].Order == w.Order) {
+        w.Order++;
+      }
+    })
+
     return wallets;
   },
   ).then(SaveWallets);

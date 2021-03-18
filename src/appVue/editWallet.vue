@@ -69,6 +69,7 @@
             <label for="solde">{{$t($t.keys.addWalletView.solde)}}</label>
             <input
               type="number"
+              step="0.01"
               name="solde"
               id="solde"
               class="form-control"
