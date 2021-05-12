@@ -31,7 +31,7 @@
     "@material/top-app-bar": "^6.0.0",
     "bootstrap": "^4.4.1",
     "bs-breakpoints": "^1.1.1",
-    "chart.js": "^2.9.3",
+    "chart.js": "^2.9.4",
     "cordova-plugin-googleplus": "8.4.0",
     "direct-vuex": "^0.10.4",
     "i18n-js": "^3.5.1",
