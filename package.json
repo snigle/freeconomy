@@ -76,7 +76,7 @@
     "htmllint-loader": "^2.1.4",
     "less": "^3.11.1",
     "less-loader": "^5.0.0",
-    "node-sass": "^4.13.1",
+    "node-sass": "^7.0.0",
     "postcss-loader": "^3.0.0",
     "sass": "^1.26.8",
     "sass-loader": "^8.0.2",
