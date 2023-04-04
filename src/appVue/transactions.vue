@@ -111,12 +111,6 @@
                       v-on:click="insertRepeat(line.UUID)"
                     >add</button>
                   </div>
-                  <div class="comment">
-                    {{line.Comment}}
-                    <small
-                      v-if="!wallet && walletsByUUID[line.WalletUUID]"
-                    >({{walletsByUUID[line.WalletUUID].Name}})</small>
-                  </div>
                 </div>
                 <div class="price">
                   <div class="price">{{line.DisplayPrice}} {{currency.Symbol}}</div>
