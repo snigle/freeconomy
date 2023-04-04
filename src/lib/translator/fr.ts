@@ -63,6 +63,8 @@ const fr = {
     Vérifiez d'avoir synchronisé une dernière fois avant de vous déconnecter.`,
     desactivateDiscretMode: "Mode discret",
     activateDiscretMode: "Activer le mode discret",
+    export: "Sauvegarde Locale",
+    import: "Restaurer Sauvegarde",
   },
   walletsView: {
     loading: "Chargement de comptes",
@@ -212,7 +214,7 @@ const fr = {
     needWalletToDisplayTransactions: "Vous devez ajouter un compte pour afficher les opérations.",
     needWalletToAddTransfert:"Vous devez ajouter un compte pour pouvoir créer un virement.",
     saveError:"Bug lors de l'enregistrement de l'élément %{err}",
-    syncError: "Il y a eu un bug lors de la synchronisation.",
+    syncError: "Il y a eu un bug lors de la synchronisation",
     loginError: "Il y a eu un problème lors de la connexion",
   },
 } ;

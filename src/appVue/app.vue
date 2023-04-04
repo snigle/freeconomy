@@ -70,12 +70,13 @@ export default class AppVue extends Vue {
   loading = true;
   error = "";
 
-  created() {
+  mounted() {
     Promise.all([
       new Promise((resolve, reject) => {
         document.addEventListener(
           "deviceready",
           () => {
+            console.log("cordova is ready")
             this.cordova = true;
             resolve(true);
           },
@@ -85,7 +86,10 @@ export default class AppVue extends Vue {
       store.dispatch.initialize()
     ])
       .then(() => (this.loading = false))
-      .catch(() => (this.loading = false));
+      .catch((e) => {
+        store.commit.showError({err:e,text:"fail to init application"})
+        this.loading = false
+      });
   }
 
   watchLogged() {

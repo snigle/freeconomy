@@ -22,6 +22,22 @@
             </button>
           </li>
           <li class="nav-item">
+            <button
+              class="nav-link btn"
+              v-on:click="$store.dispatch('exportData')"
+            >
+              {{$t($t.keys.sideBar.export)}}
+            </button>
+          </li>
+          <li class="nav-item">
+            <button
+              class="nav-link btn"
+              v-on:click="$store.dispatch('importData')"
+            >
+              {{$t($t.keys.sideBar.import)}}
+            </button>
+          </li>
+          <li class="nav-item">
             <button class="nav-link btn" v-on:click="logout()">
               {{$t($t.keys.sideBar.logout)}}
             </button>
