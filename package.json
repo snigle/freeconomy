@@ -5,11 +5,11 @@
   "description": "Freeconomy app running with cordova",
   "main": "src/index.ts",
   "scripts": {
-    "dev": "cordova run browser -- -l",
-    "dev-android": "cordova run android -- -l",
-    "android-debug": "cordova run android",
-    "build-web": "cordova build --release browser -- --webpack.env.prod",
-    "build-android": "cordova build android --release --bundle -- --webpack.env.prod",
+    "dev": "NODE_OPTIONS=--openssl-legacy-provider cordova run browser -- -l",
+    "dev-android": "NODE_OPTIONS=--openssl-legacy-provider cordova run android -- -l",
+    "android-debug": "NODE_OPTIONS=--openssl-legacy-provider cordova run android",
+    "build-web": "NODE_OPTIONS=--openssl-legacy-provider cordova build --release browser -- --webpack.env.prod",
+    "build-android": "NODE_OPTIONS=--openssl-legacy-provider cordova build android --release --bundle -- --webpack.env.prod",
     "bundle-android": "cd ./platforms/android ; ./gradlew app:bundleRelease ; cd ../.. ;",
     "release-android": "perl -i -pe 's/(android-versionCode=\")(\\d+)/$1.($2+1)/e' config.xml && yarn build-android",
     "release": "yarn build-web && yarn release-android && yarn bundle-android"
@@ -33,6 +33,7 @@
     "bs-breakpoints": "^1.1.1",
     "chart.js": "^2.9.3",
     "cordova-plugin-googleplus": "8.4.0",
+    "cordova-plugin-save-dialog": "2.0.0",
     "direct-vuex": "^0.10.4",
     "i18n-js": "^3.5.1",
     "jquery": "^3.5.1",
@@ -65,7 +66,7 @@
     "clean-webpack-plugin": "^3.0.0",
     "compare-func": "^2.0.0",
     "cordova": "^9.0.0",
-    "cordova-android": "#master",
+    "cordova-android": "^11.0.0",
     "cordova-browser": "^6.0.0",
     "cordova-plugin-device": "^2.0.3",
     "cordova-plugin-webpack": "^1.0.2",
@@ -88,7 +89,7 @@
     "typescript": "^3.8.3",
     "url-loader": "^4.1.0",
     "vue-loader": "^15.9.1",
-    "vue-template-compiler": "^2.6.11",
+    "vue-template-compiler": "2.6.11",
     "webpack": "^4.42.1",
     "webpack-cli": "^3.3.11",
     "webpack-dev-server": "^3.10.3"
@@ -100,7 +101,8 @@
       "cordova-plugin-googleplus": {
         "REVERSED_CLIENT_ID": "com.googleusercontent.apps.136643286294-p8r126j3803914r1vp0fdehjv5g2vbfn",
         "WEB_APPLICATION_CLIENT_ID": "136643286294-tq30lcaqafpkph4hb9muohe6ctt1291i.apps.googleusercontent.com"
-      }
+      },
+      "cordova-plugin-save-dialog": {}
     },
     "platforms": [
       "browser",

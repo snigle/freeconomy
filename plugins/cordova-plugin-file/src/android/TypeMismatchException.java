@@ -15,27 +15,16 @@
        KIND, either express or implied.  See the License for the
        specific language governing permissions and limitations
        under the License.
- */
+*/
 
-package com.freeconomy;
 
-import android.os.Bundle;
-import org.apache.cordova.*;
+package org.apache.cordova.file;
 
-public class MainActivity extends CordovaActivity
-{
-    @Override
-    public void onCreate(Bundle savedInstanceState)
-    {
-        super.onCreate(savedInstanceState);
+@SuppressWarnings("serial")
+public class TypeMismatchException extends Exception {
 
-        // enable Cordova apps to be started in the background
-        Bundle extras = getIntent().getExtras();
-        if (extras != null && extras.getBoolean("cdvStartInBackground", false)) {
-            moveTaskToBack(true);
-        }
-
-        // Set by <content src="index.html" /> in config.xml
-        loadUrl(launchUrl);
+    public TypeMismatchException(String message) {
+        super(message);
     }
+
 }

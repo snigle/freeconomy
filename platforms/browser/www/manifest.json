@@ -3,7 +3,7 @@
   "display": "standalone",
   "name": "Freeconomy",
   "short_name": "Freeconomy",
-  "version": "com.freeconomy",
+  "version": "com.freeconomy.debug",
   "description": "Freeconomy to manage your economies.",
   "author": "Ludovic Lamarche",
   "icons": [

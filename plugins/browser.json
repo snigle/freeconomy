@@ -16,6 +16,9 @@
     "cordova-plugin-googleplus": {
       "WEB_APPLICATION_CLIENT_ID": "com.googleusercontent.apps.136643286294-fv3o8ng5rodjv37cqpbfi63bok4i5084",
       "PACKAGE_NAME": "com.github.snigle.freeconomy"
+    },
+    "cordova-plugin-save-dialog": {
+      "PACKAGE_NAME": "io.cordova.hellocordova"
     }
   },
   "dependent_plugins": {}
