@@ -10,6 +10,7 @@ import { FileSync, GoogleSync, IFileData } from "../lib/sync";
 import { v4 } from "uuid";
 import moment from "moment";
 import bsBreakpoints from "bs-breakpoints";
+import { downloadAndroidIOS, downloadWeb } from "../lib/download";
 
 interface IError {
     text: string;
@@ -233,7 +234,11 @@ const { store, rootActionContext, moduleActionContext } = createDirectStore({
                 transfert: await Models.GetTransferts(),
                 categories: await Models.GetCategories(),
             }
-            download(`freeconomy-backup-${moment().format("YYYY-MM-DD")}`, JSON.stringify(data));
+            if ((device as any).android() || (device as any).ios()){
+                downloadAndroidIOS(`freeconomy-backup-${moment().format("YYYY-MM-DD")}.json`, JSON.stringify(data));
+            } else {
+                downloadWeb(`freeconomy-backup-${moment().format("YYYY-MM-DD")}.json`, JSON.stringify(data));
+            }
 
         },
         async importData() {
@@ -274,19 +279,6 @@ function upload(): Promise<string> {
         input.click();
     })
 
-}
-
-function download(filename: string, text: string) {
-    var element = document.createElement('a');
-    element.setAttribute('href', 'data:application/json;charset=utf-8,' + encodeURIComponent(text));
-    element.setAttribute('download', filename);
-
-    element.style.display = 'none';
-    document.body.appendChild(element);
-
-    element.click();
-
-    document.body.removeChild(element);
 }
 
 export default store;
