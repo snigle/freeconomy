@@ -16,7 +16,7 @@
         <template v-slot:header>
           <div>{{$t($t.keys.common.areYourSure)}}</div>
         </template>
-        {{$t($t.keys.transactionView.deleteSelectionConfirm)}}
+        {{$t($t.keys.transactionsView.deleteSelectionConfirm)}}
         <template v-slot:footer>
           <div>
             <button
@@ -32,14 +32,14 @@
           </div>
         </template>
       </Modal>
-      <Alert v-if="error" v-on:close="error=null">{{error}}</Alert>
-      <form v-on:submit="save(false)">
+      <Alert v-if="error" v-on:close="error=''">{{error}}</Alert>
+      <form v-on:submit.prevent="save(false)">
         <div class="form-row">
           <div class="form-group col-sm-6">
             <label for="inputFrom">{{$t($t.keys.addTransfertView.from)}}</label>
             <select class="form-control" id="inputFrom" v-model="transfert.From.WalletUUID">
               <option
-                v-for="wallet in wallets"
+                v-for="wallet in walletsSelection"
                 v-bind:key="wallet.UUID"
                 v-bind:value="wallet.UUID"
               >{{wallet.Name}} ({{wallet.Currency.Code}})</option>
@@ -82,7 +82,7 @@
               step="0.01"
               class="form-control"
               id="price"
-              v-bind:disabled="walletFrom.Currency.Code === walletTo.Currency.Code"
+              v-bind:disabled="walletFrom && walletTo && walletFrom.Currency.Code === walletTo.Currency.Code"
               v-model.number="transfert.To.Price"
             />
           </div>
@@ -119,7 +119,7 @@
               type="button"
               v-else
               class="btn btn-danger"
-              v-on:click="$route.back()"
+              v-on:click="$router.back()"
             >{{$t($t.keys.common.cancel)}}</button>
           </div>
           <div class="float-right">
@@ -183,6 +183,10 @@ export default class EditTransfert extends Vue {
   // Nav props
   selectedIcons: Array<IAction> = [];
   hideNav!: boolean;
+
+  get walletsSelection(): Array<IWallet> {
+    return this.wallets.filter((w) => !w.Archived || w.UUID == this.walletFrom?.UUID || w.UUID == this.walletTo?.UUID);
+  }
 
   get wallets(): Array<IWallet> {
     return store.state.wallets;
@@ -278,19 +282,16 @@ export default class EditTransfert extends Vue {
     savePromise
       .then(transferts => {
         store.commit.setTransferts(transferts);
-        store.dispatch.loadWallets();
-        store.dispatch.sync();
+        store.dispatch.loadWallets().then(() => store.dispatch.sync());
 
         if (!andNew) {
-          setTimeout(() => this.$router.back(), 0);
+          this.$router.back();
         } else {
           this.transfert = { ...emptyTransfert };
-          setTimeout(() =>
-            this.$router.replace({
-              name: "addTransfert",
-              query: { ...this.$route.query }
-            })
-          );
+          this.$router.replace({
+            name: "addTransfert",
+            query: { ...this.$route.query }
+          })
         }
       })
       .catch(

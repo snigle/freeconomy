@@ -62,6 +62,8 @@ const en: typeof keys = {
       "All not synced data will be removed. Be sure to sync all your data before logout.",
     desactivateDiscretMode: "Desactivate discret mode",
     activateDiscretMode: "Activate discret mode",
+    export: "Save locally",
+    import: "Restore backup",
   },
   walletsView: {
     loading: "Loading wallets",

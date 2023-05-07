@@ -6,19 +6,20 @@ import * as Models from "../lib/models"
 import { ILogin, IWallet, ITransfert, ITransaction, ICategory, IRepeatable, displayPrice } from "../lib/types"
 import { login } from "../lib/oauth"
 import _ from "lodash";
-import { GoogleSync } from "../lib/sync";
-import { v4 } from "uuid"; 
+import { FileSync, GoogleSync, IFileData } from "../lib/sync";
+import { v4 } from "uuid";
 import moment from "moment";
 import bsBreakpoints from "bs-breakpoints";
+import { downloadAndroidIOS, downloadWeb } from "../lib/download";
 
-interface IError { 
+interface IError {
     text: string;
     err?: any;
     uuid: string;
 }
 
 export type IWalletWithTotalToCome = IWallet & { Total: number, TotalToCome: number, OperationsToCome: number }
- 
+
 Vue.use(Vuex);
 const { store, rootActionContext, moduleActionContext } = createDirectStore({
     namespaced: true as true,
@@ -39,29 +40,29 @@ const { store, rootActionContext, moduleActionContext } = createDirectStore({
             error: false,
         },
         wallets: [] as Array<IWallet>,
-        categories: [] as Array<ICategory>, 
+        categories: [] as Array<ICategory>,
         transactions: [] as Readonly<Array<ITransaction>>,
         transferts: [] as Readonly<Array<ITransfert>>,
     },
     getters: {
         walletsWithPriceToCome(state, getters): Array<IWalletWithTotalToCome> {
             return state.wallets.map(w => {
-                const totalToCome = (getters.getRepeatOperations as IRepeatable[]).filter((r : IRepeatable) => 
-                    r.Transaction?.New.WalletUUID === w.UUID || 
-                    r.Transfert?.New.From.WalletUUID === w.UUID || 
+                const totalToCome = (getters.getRepeatOperations as IRepeatable[]).filter((r: IRepeatable) =>
+                    r.Transaction?.New.WalletUUID === w.UUID ||
+                    r.Transfert?.New.From.WalletUUID === w.UUID ||
                     r.Transfert?.New.To.WalletUUID === w.UUID
-                    ).reduce((price, r) => {
-                        if (!_.isUndefined(r.Transaction)){
-                            price.TotalToCome+=r.Transaction.New.Price
-                        } else if (!_.isUndefined(r.Transfert) && r.Transfert.New.From.WalletUUID === w.UUID){
-                            price.TotalToCome-= r.Transfert.New.From.Price
-                        } else if (!_.isUndefined(r.Transfert) && r.Transfert.New.To.WalletUUID === w.UUID){
-                            price.TotalToCome+= r.Transfert.New.To.Price
-                        }
-                        price.OperationsToCome++;
-                        return price
-                    },{TotalToCome: 0, OperationsToCome: 0, Total: displayPrice(w.Solde+_.sumBy(w.TotalPerYear, (total) => total.Total))})
-                return {...w, ...totalToCome}
+                ).reduce((price, r) => {
+                    if (!_.isUndefined(r.Transaction)) {
+                        price.TotalToCome += r.Transaction.New.Price
+                    } else if (!_.isUndefined(r.Transfert) && r.Transfert.New.From.WalletUUID === w.UUID) {
+                        price.TotalToCome -= r.Transfert.New.From.Price
+                    } else if (!_.isUndefined(r.Transfert) && r.Transfert.New.To.WalletUUID === w.UUID) {
+                        price.TotalToCome += r.Transfert.New.To.Price
+                    }
+                    price.OperationsToCome++;
+                    return price
+                }, { TotalToCome: 0, OperationsToCome: 0, Total: displayPrice(w.Solde + _.sumBy(w.TotalPerYear, (total) => total.Total)) })
+                return { ...w, ...totalToCome }
             });
         },
         getRepeatOperations(state): IRepeatable[] {
@@ -78,7 +79,7 @@ const { store, rootActionContext, moduleActionContext } = createDirectStore({
                 }
                 const repeatDate = moment(tr.Date).add(tr.Repeat.Duration, tr.Repeat.DurationType);
                 if (tr.Repeat && tr.Repeat.MaxOccurrence !== 0 && repeatTreshold.isAfter(repeatDate)) {
-                    const nextMaxOccurence = tr.Repeat.MaxOccurrence == -1 ? -1 : tr.Repeat.MaxOccurrence-1;
+                    const nextMaxOccurence = tr.Repeat.MaxOccurrence == -1 ? -1 : tr.Repeat.MaxOccurrence - 1;
                     results.push({
                         Key: `${tr.UUID}-repeat`,
                         Transaction: {
@@ -89,7 +90,7 @@ const { store, rootActionContext, moduleActionContext } = createDirectStore({
                                 Comment: tr.Comment,
                                 Date: repeatDate.toDate(),
                                 Price: tr.Price,
-                                Repeat:  nextMaxOccurence !== 0 ? {
+                                Repeat: nextMaxOccurence !== 0 ? {
                                     Duration: tr.Repeat.Duration,
                                     DurationType: tr.Repeat.DurationType,
                                     MaxOccurrence: nextMaxOccurence,
@@ -107,7 +108,7 @@ const { store, rootActionContext, moduleActionContext } = createDirectStore({
                 }
                 const repeatDate = moment(tr.Date).add(tr.Repeat.Duration, tr.Repeat.DurationType);
                 if (tr.Repeat && tr.Repeat.MaxOccurrence !== 0 && repeatTreshold.isAfter(repeatDate)) {
-                    const nextMaxOccurence = tr.Repeat.MaxOccurrence == -1 ? -1 : tr.Repeat.MaxOccurrence-1;
+                    const nextMaxOccurence = tr.Repeat.MaxOccurrence == -1 ? -1 : tr.Repeat.MaxOccurrence - 1;
                     results.push({
                         Key: `${tr.UUID}-repeat`,
                         Transfert: {
@@ -134,7 +135,7 @@ const { store, rootActionContext, moduleActionContext } = createDirectStore({
     mutations: {
         toggleDiscretMode(state) {
             state.settings.discretMode = !state.settings.discretMode
-            localStorage.setItem("settings.discretMode",`${state.settings.discretMode}`)
+            localStorage.setItem("settings.discretMode", `${state.settings.discretMode}`)
         },
         setWallets(state, wallets: Array<IWallet>) {
             state.wallets = wallets;
@@ -224,9 +225,61 @@ const { store, rootActionContext, moduleActionContext } = createDirectStore({
         },
         loadWallets(state) {
             return Models.GetWallets().then(wallets => state.commit("setWallets", wallets));
+        },
+        async exportData() {
+            const data = {
+                deleted: await Models.GetAllDeleted(),
+                wallets: await Models.GetWallets(),
+                transactions: await Models.GetAllTransactions(),
+                transfert: await Models.GetTransferts(),
+                categories: await Models.GetCategories(),
+            }
+            if ((device as any).android() || (device as any).ios()){
+                downloadAndroidIOS(`freeconomy-backup-${moment().format("YYYY-MM-DD")}.json`, JSON.stringify(data));
+            } else {
+                downloadWeb(`freeconomy-backup-${moment().format("YYYY-MM-DD")}.json`, JSON.stringify(data));
+            }
+
+        },
+        async importData() {
+            try {
+                const data = await upload();
+                const parsed = JSON.parse(data);
+                try {
+                    await FileSync(parsed as IFileData)
+                } catch (err) {
+                    store.commit.showError({ err, text: "fail to sync file" })
+                }
+            } catch (err) {
+                store.commit.showError({ err, text: "fail to read text" })
+            }
         }
     }
 })
+
+function upload(): Promise<string> {
+    return new Promise<string>((resolve, reject) => {
+        let input: HTMLInputElement = document.createElement('input');
+        input.style.display = 'none';
+        input.type = 'file';
+        input.multiple = false;
+        input.onchange = async function (e) {
+            if (input.files?.length == 1) {
+                try {
+                    resolve(await input.files[0].text())
+                } catch (err) {
+                    reject("can't read file")
+                }
+            } else {
+                reject("can't read file")
+            }
+            document.body.removeChild(input);
+        }
+        document.body.appendChild(input);
+        input.click();
+    })
+
+}
 
 export default store;
 

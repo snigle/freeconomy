@@ -22,7 +22,8 @@ module.exports.metadata =
 {
     "cordova-plugin-whitelist": "1.3.4",
     "cordova-plugin-webpack": "1.0.2",
-    "cordova-plugin-googleplus": "8.4.0"
+    "cordova-plugin-googleplus": "8.4.0",
+    "cordova-plugin-save-dialog": "2.0.0"
 }
 // BOTTOM OF METADATA
 });

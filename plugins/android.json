@@ -16,6 +16,9 @@
     "cordova-plugin-googleplus": {
       "PLAY_SERVICES_VERSION": "15.0.1",
       "PACKAGE_NAME": "com.github.snigle.freeconomy"
+    },
+    "cordova-plugin-save-dialog": {
+      "PACKAGE_NAME": "com.freeconomy"
     }
   },
   "dependent_plugins": {}
