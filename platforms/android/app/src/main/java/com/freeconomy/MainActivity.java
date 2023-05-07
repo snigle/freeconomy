@@ -17,7 +17,7 @@
        under the License.
  */
 
-package com.freeconomy.debug;
+package com.freeconomy;
 
 import android.os.Bundle;
 import org.apache.cordova.*;
