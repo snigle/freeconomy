@@ -123,7 +123,7 @@
 
       <Fab :actions="actions" />
 
-      <router-view />
+      <router-view v-if="!desktop"/>
     </div>
   </div>
 </template>
@@ -151,12 +151,12 @@ export interface IWalletsByCurrency {
 @Component({
   mixins: [clickaway],
   components: { Fab, Navbar, Discret, Alert },
-  props: ["hideNav"]
+  props: ["desktop"]
 })
 export default class Wallets extends Vue {
   selectedLines: { [key: string]: boolean } = {};
   dropdown: { [key: string]: { top: string; left: string } } = {};
-  hideNav!: boolean;
+  desktop!: boolean;
   error: string | null = null;
 
   get actions() {
