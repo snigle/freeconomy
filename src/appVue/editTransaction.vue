@@ -56,13 +56,14 @@
         </div>
       </template>
     </Modal>
-    <Alert v-if="error" v-on:close="error=null">{{error}}</Alert>
-    <form v-on:submit="save(false)">
+    <Alert v-if="error" v-on:close="error=''">{{error}}</Alert>
+    <form v-on:submit.prevent="save(false)">
       <div class="form-group">
         <label for="beneficiary">{{$t($t.keys.addTransactionView.beneficiary)}}</label>
         <input
           type="text"
           v-model="transaction.Beneficiary"
+          @input="$event.target.composing = false"
           class="form-control"
           v-bind:class="{autocomplete: autocomplete.length > 0}"
           id="beneficiary"
@@ -379,20 +380,17 @@ export default class EditTransaction extends Vue {
       .then(transactions => {
         store.commit.setTransactions(transactions);
         // Refresh wallet stored to get updated total
-        store.dispatch.loadWallets();
-        store.dispatch.sync();
         if (!andNew) {
-          setTimeout(() => this.$router.back(), 0);
+          this.$router.back();
         } else {
           this.transaction = {...emptyTransaction, WalletUUID : this.transaction.WalletUUID}
           this.price = "-";
-          setTimeout(() =>
-            this.$router.replace({
-              name: "addTransaction",
-              query: { ...this.$route.query }
-            })
-          );
+          this.$router.replace({
+            name: "addTransaction",
+            query: { ...this.$route.query }
+          })
         }
+        store.dispatch.loadWallets().then(() => store.dispatch.sync());
       })
       .catch(
         (err: any) =>
