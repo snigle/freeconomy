@@ -155,7 +155,7 @@
             type="button"
             v-else
             class="btn btn-danger"
-            v-on:click="$route.back()"
+            v-on:click="$router.back()"
           >{{$t($t.keys.common.cancel)}}</button>
         </div>
         <div class="float-right">
