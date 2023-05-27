@@ -76,7 +76,7 @@ export default class AppVue extends Vue {
         document.addEventListener(
           "deviceready",
           () => {
-            console.log("cordova is ready")
+            console.log("cordova is ready", window.cordova.platformId)
             this.cordova = true;
             resolve(true);
           },
