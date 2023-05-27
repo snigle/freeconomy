@@ -234,7 +234,7 @@ const { store, rootActionContext, moduleActionContext } = createDirectStore({
                 transfert: await Models.GetTransferts(),
                 categories: await Models.GetCategories(),
             }
-            if ((device as any).android() || (device as any).ios()){
+            if (window.cordova.platformId == "android" || window.cordova.platformId == "ios") {
                 downloadAndroidIOS(`freeconomy-backup-${moment().format("YYYY-MM-DD")}.json`, JSON.stringify(data));
             } else {
                 downloadWeb(`freeconomy-backup-${moment().format("YYYY-MM-DD")}.json`, JSON.stringify(data));
